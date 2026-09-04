@@ -112,8 +112,8 @@ export default function MainPage() {
     return () => clearTimeout(t);
   }, [absMode, enabled.length]); // eslint-disable-line react-hooks/exhaustive-deps
   const canvasH = absMode
-    ? Math.max(400, ...enabled.map(w => (w.ay ?? 0) + (w.h ?? 200))) + 40
-    : undefined;
+  ? Math.max(400, window.innerHeight - 55)
+  : undefined;
 
   return (
     <section className="page page-main-wrap" onClick={() => setCtx(null)}>
