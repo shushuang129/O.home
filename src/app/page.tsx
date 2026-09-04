@@ -112,7 +112,7 @@ export default function MainPage() {
     return () => clearTimeout(t);
   }, [absMode, enabled.length]); // eslint-disable-line react-hooks/exhaustive-deps
   const canvasH = absMode
-  ? Math.max(400, window.innerHeight - 55)
+  ? 690
   : undefined;
 
   return (
