@@ -812,8 +812,14 @@ a{color:inherit;text-decoration:none}
 body.main-fixed .page-main-wrap{
   width:1180px;
   min-width:1180px;
-  margin-left:max(0px, calc(50% - 590px));
+  margin-left:0;
   margin-right:0;
+}
+@media (min-width:621px) and (max-width:1179px){
+  body.main-fixed .page-main-wrap{
+    transform-origin:top left;
+    transform:scale(calc(100vw / 1180));
+  }
 }
 
 body.main-fixed #appMain,
@@ -1805,10 +1811,3 @@ body.edit-on .main-grid.gridlines .wgt{outline-offset:0}
 .up-spin{width:12px;height:12px;border-radius:50%;border:2px solid var(--line-dark);border-top-color:var(--accent);animation:upSpin .7s linear infinite;flex-shrink:0}
 @keyframes upSpin{to{transform:rotate(360deg)}}
 
-/* 메인홈 - 작은 PC 화면에서는 전체 비율 축소 */
-@media (min-width:621px) and (max-width:1179px){
-  body.main-fixed .page-main-wrap{
-    transform-origin:top left;
-    transform:scale(calc(100vw / 1180));
-  }
-}
