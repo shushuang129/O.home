@@ -809,8 +809,15 @@ a{color:inherit;text-decoration:none}
 .main-grid .g2{gap:10px}
 .main-grid .widget{margin-bottom:0} /* 갭은 래퍼(.wgt)에서만 — 마진 겹침 방지 */
 /* 고정 캔버스 모드: 창을 줄여도 배치 유지 — 좁은 창은 가로 스크롤(왼쪽 기준), 모바일 전환 시 해제 (v1.9) */
-body.main-fixed .page-main-wrap{min-width:1180px;margin-left:max(0px, calc(50% - 590px));margin-right:0}
-body.main-fixed #appMain,body.edit-on #appMain{
+body.main-fixed .page-main-wrap{
+  width:1180px;
+  min-width:1180px;
+  margin-left:max(0px, calc(50% - 590px));
+  margin-right:0;
+}
+
+body.main-fixed #appMain,
+body.edit-on #appMain{
   overflow-x:hidden;
   overflow-y:hidden;
 }
@@ -1798,20 +1805,10 @@ body.edit-on .main-grid.gridlines .wgt{outline-offset:0}
 .up-spin{width:12px;height:12px;border-radius:50%;border:2px solid var(--line-dark);border-top-color:var(--accent);animation:upSpin .7s linear infinite;flex-shrink:0}
 @keyframes upSpin{to{transform:rotate(360deg)}}
 
-/* 메인홈 화면 자동 축소 */
-@media (max-width: 1180px) {
-  body.main-fixed #appMain {
-    overflow: hidden;
-  }
-
-  body.main-fixed .page-main-wrap {
-    min-width: 1180px;
-    width: 1180px;
-    transform-origin: top left;
-    transform: scale(calc(100vw / 1180));
-  }
-
-  body.main-fixed .main-grid {
-    width: 1180px;
+/* 메인홈 - 작은 PC 화면에서는 전체 비율 축소 */
+@media (min-width:621px) and (max-width:1179px){
+  body.main-fixed .page-main-wrap{
+    transform-origin:top left;
+    transform:scale(calc(100vw / 1180));
   }
 }
