@@ -815,11 +815,10 @@ body.main-fixed .page-main-wrap{
   margin-left:0;
   margin-right:0;
 }
-@media (min-width:621px) and (max-width:1179px){
-  body.main-fixed .page-main-wrap{
-    transform-origin:top left;
-    transform:scale(calc(100vw / 1180));
-  }
+body.main-fixed .page-main-wrap{
+  min-width:1180px;
+  margin-left:max(0px, calc(50% - 590px));
+  margin-right:0;
 }
 
 body.main-fixed #appMain,
