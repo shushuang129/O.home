@@ -1810,3 +1810,152 @@ body.edit-on .main-grid.gridlines .wgt{outline-offset:0}
 .up-spin{width:12px;height:12px;border-radius:50%;border:2px solid var(--line-dark);border-top-color:var(--accent);animation:upSpin .7s linear infinite;flex-shrink:0}
 @keyframes upSpin{to{transform:rotate(360deg)}}
 
+
+/* ---------- 메인 다이어리 프로필 카드 (v2.1) ---------- */
+.profile-diary-card{
+  padding:16px;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.96),rgba(248,247,244,.96)),
+    var(--panel-solid);
+  border:1px solid rgba(120,110,95,.16);
+  box-shadow:0 12px 28px rgba(35,31,25,.10),0 2px 0 rgba(255,255,255,.7) inset;
+  position:relative;
+  overflow:hidden;
+}
+.profile-diary-card::after{
+  content:"";
+  position:absolute;
+  width:90px;height:90px;
+  right:-38px;top:-42px;
+  border:1px solid rgba(179,155,107,.22);
+  border-radius:50%;
+  pointer-events:none;
+}
+.profile-card-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding-bottom:10px;
+  margin-bottom:13px;
+  border-bottom:1px dashed rgba(100,94,84,.22);
+}
+.profile-card-label{
+  font-family:var(--serif);
+  font-size:12px;
+  letter-spacing:.18em;
+  color:#716b62;
+}
+.profile-card-mark{font-size:11px;color:var(--gold)}
+.profile-main{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+}
+.profile-avatar{
+  width:104px;height:104px;
+  border-radius:50%;
+  overflow:hidden;
+  padding:4px;
+  background:#fff;
+  border:1px solid rgba(100,94,84,.18);
+  box-shadow:0 5px 16px rgba(30,27,22,.10);
+}
+.profile-avatar > div{
+  border-radius:50%;
+}
+.profile-name{margin-top:10px}
+.profile-name b{
+  display:block;
+  font-family:var(--serif);
+  font-size:20px;
+  font-weight:600;
+  letter-spacing:.02em;
+  color:#302d29;
+}
+.profile-name small{
+  display:block;
+  margin-top:2px;
+  font-size:8px;
+  letter-spacing:.18em;
+  color:#aaa39a;
+}
+.profile-note{
+  margin:11px 4px 13px;
+  text-align:center;
+  font-family:var(--serif);
+  font-size:11px;
+  line-height:1.6;
+  color:#8b857d;
+}
+.profile-actions{display:flex;gap:6px}
+.profile-actions .btn{
+  flex:1;
+  justify-content:center;
+  padding:6px 5px;
+  font-size:9px;
+  letter-spacing:.08em;
+  border-color:rgba(100,94,84,.15);
+}
+.mini-player{
+  margin-top:15px;
+  padding:11px 11px 9px;
+  border-radius:10px;
+  background:#eeece8;
+  border:1px solid rgba(100,94,84,.10);
+}
+.mini-player-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:7px;
+  letter-spacing:.16em;
+  color:#9a9389;
+}
+.mini-player-top i{font-style:normal;font-size:13px;color:#746d63}
+.mini-player-title{
+  margin-top:5px;
+  font-family:var(--serif);
+  font-size:11px;
+  color:#46413b;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.mini-player-track{
+  height:2px;
+  margin:8px 0 8px;
+  border-radius:2px;
+  background:#d6d1ca;
+  overflow:hidden;
+}
+.mini-player-track i{
+  display:block;
+  width:42%;
+  height:100%;
+  background:#82796d;
+  border-radius:2px;
+}
+.mini-player-controls{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:13px;
+  font-size:8px;
+  color:#8b847b;
+}
+.mini-player-controls b{
+  display:grid;
+  place-items:center;
+  width:22px;height:22px;
+  border-radius:50%;
+  background:#4b4741;
+  color:#fff;
+  font-size:8px;
+  font-weight:500;
+}
+@media (max-width:620px){
+  .profile-avatar{width:82px;height:82px}
+  .profile-name b{font-size:17px}
+  .mini-player{margin-top:12px}
+}
