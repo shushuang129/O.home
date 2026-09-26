@@ -298,22 +298,19 @@ export default function RoomPage() {
         </div>}
       </div>
 
-      {isAdmin && editOn && (
-        <div className="panel" style={{ display:'flex', gap:8, flexWrap:'wrap', alignItems:'center', marginBottom:12 }}>
+      {isAdmin && editOn && selected && (
+        <div style={{ display:'flex', gap:8, flexWrap:'wrap', alignItems:'center', marginBottom:12 }}>
                     {selected && <button className="btn btn-ghost" onClick={() => moveZ('top')}>맨 위</button>}
           {selected && <button className="btn btn-ghost" onClick={() => moveZ('bottom')}>맨 아래</button>}
           {selected && <button className="btn btn-ghost" onClick={remove}>삭제</button>}
           {selected && (
             <input className="k-input" style={{ minWidth:220, flex:1 }} placeholder="클릭 링크 (선택)"
               value={item?.link ?? ''} onChange={e => updateItem(selected, { link: e.target.value })} />
-          )}
-        </div>
+          )}        </div>
       )}
 
       <div style={{ display:'grid', gridTemplateColumns: editOn ? 'minmax(0,1fr) 245px' : '1fr', gap:12, alignItems:'start', width: editOn ? 'calc(100% + 257px)' : '100%' }}>
       <div style={{ position:'relative', width:'100%', aspectRatio:'16 / 10', overflow:'visible' }}>
-        <span aria-hidden="true" style={{ position:'absolute', left:10, top:-8, zIndex:50, fontSize:15, transform:'rotate(-12deg)', opacity:.75, pointerEvents:'none' }}>✦</span>
-        <span aria-hidden="true" style={{ position:'absolute', right:12, bottom:-8, zIndex:50, fontSize:14, transform:'rotate(10deg)', opacity:.65, pointerEvents:'none' }}>♡</span>
         <div ref={canvas} onPointerDown={() => setSelected(null)}
           style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden',
             background: 'var(--bg)',
