@@ -285,7 +285,7 @@ export default function RoomPage() {
   const item = room.items.find(x => x.id === selected);
 
   return (
-    <section className="page" style={{ maxWidth: 1200 }}>
+    <section className="page" style={{ maxWidth: 960 }}>
       <div className="page-head">
         <div>
           <h1 style={{ margin: 0 }}>ROOM</h1>
