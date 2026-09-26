@@ -479,16 +479,14 @@ export default function RoomPage() {
             <span style={{ display:'block', marginTop:3, fontSize:8, letterSpacing:'.14em', color:'var(--faint)' }}>{user ? 'MY PROFILE' : 'WELCOME'}</span>
           </div>
           <p style={{ margin:'10px 2px 13px', textAlign:'center', fontFamily:'var(--serif)', fontSize:10.5, lineHeight:1.6, color:'var(--faint)' }}>
-            my little room<br/>my little diary
           </p>
           <div style={{ borderTop:'1px dashed var(--line)', paddingTop:11 }}>
             <div style={{ display:'flex', justifyContent:'space-between', fontSize:7.5, letterSpacing:'.1em', color:'var(--faint)' }}>
-              <span>NOW PLAYING</span><span>♪</span>
+              <span>NOW PLAYING</span><span style={{fontSize:16}}>♪</span>
             </div>
-            <div style={{ marginTop:5, fontFamily:'var(--serif)', fontSize:10.5, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>my little playlist</div>
             <div style={{ height:2, margin:'8px 0', background:'var(--line)', borderRadius:2, overflow:'hidden' }}><span style={{ display:'block', width:'38%', height:'100%', background:'var(--accent)', opacity:.65 }} /></div>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:12, color:'var(--faint)', fontSize:9 }}>
-              <span>◂◂</span><span style={{ display:'grid', placeItems:'center', width:25, height:25, borderRadius:'50%', background:'var(--text)', color:'var(--panel)' }}>▶</span><span>▸▸</span>
+              <span style={{fontSize:14}}>◂◂</span><span style={{ display:'grid', placeItems:'center', width:34, height:34, borderRadius:'50%', background:'var(--text)', color:'var(--panel)', fontSize:13 }}>▶</span><span style={{fontSize:14}}>▸▸</span>
             </div>
           </div>
         </aside>}
