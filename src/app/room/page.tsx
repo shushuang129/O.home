@@ -108,20 +108,35 @@ function BackgroundCropper({ file, onCancel, onDone }: { file: File; onCancel: (
   </div>;
 }
 
-function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate, onOpen }: {
+function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate, onOpen, rot }: {
   id: string; selected: boolean; editOn: boolean; onSelect: () => void;
   onMove: (dx: number, dy: number) => void; onResize: (dw: number, dh: number) => void;
-  onRotate: (deg: number) => void; onOpen: () => void;
+  onRotate: (deg: number) => void; onOpen: () => void; rot: number;
 }) {
   const src = useBlobUrl(id);
   const drag = useRef<{ x:number; y:number; mode:'move'|'resize' } | null>(null);
   const rotateDrag = useRef<{ lastAngle:number } | null>(null);
+  const rotation = useRef(rot);
+  const snapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const snapTarget = useRef<number | null>(null);
+  const snapped = useRef(false);
+
+  const clearSnap = () => {
+    if (snapTimer.current) clearTimeout(snapTimer.current);
+    snapTimer.current = null;
+    snapTarget.current = null;
+  };
+
+  const normalizeAngle = (angle:number) => ((angle + 180) % 360 + 360) % 360 - 180;
 
   const beginRotate = (e: React.PointerEvent<HTMLButtonElement>) => {
     if (!editOn || !selected || e.button !== 0) return;
     e.preventDefault();
     e.stopPropagation();
     onSelect();
+    clearSnap();
+    snapped.current = false;
+    rotation.current = rot;
 
     const box = e.currentTarget.parentElement?.getBoundingClientRect();
     if (!box) return;
@@ -149,11 +164,62 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
     if (delta < -Math.PI) delta += Math.PI * 2;
     d.lastAngle = angle;
 
-    onRotate(delta * 180 / Math.PI);
+    const deltaDeg = delta * 180 / Math.PI;
+    rotation.current += deltaDeg;
+
+    const normalized = ((rotation.current % 360) + 360) % 360;
+    const targets = [0, 90, 180, 270];
+    let nearest = targets[0];
+    let distance = 360;
+    for (const target of targets) {
+      const d = Math.abs(normalized - target);
+      const wrapped = Math.min(d, 360 - d);
+      if (wrapped < distance) {
+        distance = wrapped;
+        nearest = target;
+      }
+    }
+
+    const SNAP_RANGE = 8;
+    const SNAP_DELAY = 450;
+
+    if (distance <= SNAP_RANGE) {
+      if (snapTarget.current !== nearest) {
+        clearSnap();
+        snapTarget.current = nearest;
+        snapTimer.current = setTimeout(() => {
+          if (snapTarget.current !== nearest) return;
+
+          const current = ((rotation.current % 360) + 360) % 360;
+          const currentDistance = Math.min(
+            Math.abs(current - nearest),
+            360 - Math.abs(current - nearest)
+          );
+
+          if (currentDistance <= SNAP_RANGE) {
+            let correction = nearest - current;
+            if (correction > 180) correction -= 360;
+            if (correction < -180) correction += 360;
+
+            rotation.current += correction;
+            snapped.current = true;
+            onRotate(correction);
+          }
+          snapTimer.current = null;
+        }, SNAP_DELAY);
+      }
+    } else {
+      clearSnap();
+      snapped.current = false;
+    }
+
+    if (!snapped.current) onRotate(deltaDeg);
   };
 
   const endRotate = (e: React.PointerEvent<HTMLButtonElement>) => {
     rotateDrag.current = null;
+    clearSnap();
+    snapped.current = false;
     e.stopPropagation();
     try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {}
   };
@@ -390,7 +456,17 @@ export default function RoomPage() {
               onSelect={() => setSelected(x.id)}
               onMove={(dx,dy) => moveItem(x.id, dx,dy)}
               onResize={(dw,dh) => resizeItem(x.id, dw,dh)}
-              onRotate={deg => updateItem(x.id, { rot:x.rot + deg })}
+              onRotate={deg => {
+                setRoom(prev => {
+                  const next = {
+                    ...prev,
+                    items: prev.items.map(item => item.id === x.id ? { ...item, rot:item.rot + deg } : item),
+                  };
+                  setSetting(KEY, next);
+                  return next;
+                });
+              }}
+              rot={x.rot}
               onOpen={() => { if (x.link) window.open(x.link, '_blank', 'noopener,noreferrer'); }} />
           </div>
         ))}
