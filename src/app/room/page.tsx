@@ -317,7 +317,7 @@ export default function RoomPage() {
     if (!selected) return;
     if (dir === 'top' || dir === 'bottom') {
       const zs = room.items.map(x => x.z);
-      updateItem(selected, { z: dir === 'top' ? Math.max(...zs, 0) + 1 : Math.min(...zs, 0) - 1 });
+      updateItem(selected, { z: dir === 'top' ? Math.max(...zs, 0) + 1 : 1 });
       return;
     }
 
@@ -328,6 +328,7 @@ export default function RoomPage() {
 
     const current = ordered[index];
     const target = ordered[targetIndex];
+    if (dir === 'down' && index === 0) return;
     const nextItems = room.items.map(x => {
       if (x.id === current.id) return { ...x, z: target.z };
       if (x.id === target.id) return { ...x, z: current.z };
