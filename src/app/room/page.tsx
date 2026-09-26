@@ -115,6 +115,25 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
 }) {
   const src = useBlobUrl(id);
   const drag = useRef<{ x:number; y:number; mode:'move'|'resize' } | null>(null);
+  const rotateTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const stopRotate = () => {
+    if (rotateTimer.current) {
+      clearInterval(rotateTimer.current);
+      rotateTimer.current = null;
+    }
+  };
+
+  const beginRotate = (e: React.PointerEvent<HTMLButtonElement>, deg: number) => {
+    if (!editOn || !selected || e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    onSelect();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    onRotate(deg);
+    stopRotate();
+    rotateTimer.current = setInterval(() => onRotate(deg), 55);
+  };
 
   const begin = (e: React.PointerEvent, mode:'move'|'resize') => {
     if (!editOn || e.button !== 0) return;
@@ -161,12 +180,14 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
       {editOn && selected && (
         <>
           <button type="button" aria-label="rotate left"
-            onPointerDown={e=>e.stopPropagation()}
-            onClick={e=>{e.stopPropagation();onRotate(-5);}}
+            onPointerDown={e=>beginRotate(e,-3)}
+            onPointerUp={e=>{stopRotate();e.stopPropagation();}}
+            onPointerCancel={e=>{stopRotate();e.stopPropagation();}}
             style={{position:'absolute',left:-30,top:-30,width:26,height:26,border:'1px solid var(--line)',borderRadius:999,background:'var(--panel)',zIndex:30,cursor:'pointer'}}>↶</button>
           <button type="button" aria-label="rotate right"
-            onPointerDown={e=>e.stopPropagation()}
-            onClick={e=>{e.stopPropagation();onRotate(5);}}
+            onPointerDown={e=>beginRotate(e,3)}
+            onPointerUp={e=>{stopRotate();e.stopPropagation();}}
+            onPointerCancel={e=>{stopRotate();e.stopPropagation();}}
             style={{position:'absolute',right:-30,top:-30,width:26,height:26,border:'1px solid var(--line)',borderRadius:999,background:'var(--panel)',zIndex:30,cursor:'pointer'}}>↷</button>
           <button type="button" aria-label="resize"
             onPointerDown={e=>{ e.stopPropagation(); begin(e,'resize'); }}
