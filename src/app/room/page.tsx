@@ -446,7 +446,16 @@ export default function RoomPage() {
               onSelect={() => setSelected(x.id)}
               onMove={(dx,dy) => moveItem(x.id, dx,dy)}
               onResize={(dw,dh) => resizeItem(x.id, dw,dh)}
-              onRotate={deg => updateItem(x.id, { rot:x.rot + deg })}
+              onRotate={deg => {
+                setRoom(prev => {
+                  const next = {
+                    ...prev,
+                    items: prev.items.map(item => item.id === x.id ? { ...item, rot:item.rot + deg } : item),
+                  };
+                  setSetting(KEY, next);
+                  return next;
+                });
+              }}
               rot={x.rot}
               onOpen={() => { if (x.link) window.open(x.link, '_blank', 'noopener,noreferrer'); }} />
           </div>
