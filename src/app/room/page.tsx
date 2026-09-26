@@ -319,18 +319,18 @@ export default function RoomPage() {
         </div>}
       </div>
 
-      {isAdmin && editOn && selected && (
-        <div style={{ display:'flex', gap:8, flexWrap:'wrap', alignItems:'center', marginBottom:12 }}>
-                    {selected && <button className="btn btn-ghost" onClick={() => moveZ('top')}>맨 위</button>}
-          {selected && <button className="btn btn-ghost" onClick={() => moveZ('bottom')}>맨 아래</button>}
-          {selected && <button className="btn btn-ghost" onClick={remove}>삭제</button>}
-          {selected && (
-            <input className="k-input" style={{ minWidth:220, flex:1 }} placeholder="클릭 링크 (선택)"
-              value={item?.link ?? ''} onChange={e => updateItem(selected, { link: e.target.value })} />
-          )}        </div>
-      )}
-
-      <div style={{ display:'grid', gridTemplateColumns: editOn ? 'minmax(0,1fr) 245px' : '1fr', gap:12, alignItems:'start', width: editOn ? 'calc(100% + 257px)' : '100%' }}>
+      <div style={{ display:'grid', gridTemplateColumns: editOn ? '120px minmax(0,1fr) 245px' : '1fr', gap:12, alignItems:'start', width: editOn ? 'calc(100% + 389px)' : '100%' }}>
+      {editOn && <aside className="panel" style={{ padding:10, borderRadius:14, alignSelf:'start', boxShadow:'0 8px 20px rgba(0,0,0,.06)' }}>
+        <div style={{ fontSize:10, letterSpacing:'.08em', opacity:.55, marginBottom:7 }}>EDIT</div>
+        <div style={{ display:'grid', gap:6 }}>
+          <button className="btn btn-ghost" onClick={() => moveZ('top')} disabled={!selected}>맨 위</button>
+          <button className="btn btn-ghost" onClick={() => moveZ('bottom')} disabled={!selected}>맨 아래</button>
+          <button className="btn btn-ghost" onClick={remove} disabled={!selected}>삭제</button>
+          <input className="k-input" style={{ width:'100%', boxSizing:'border-box' }} placeholder="클릭 링크 (선택)"
+            disabled={!selected}
+            value={item?.link ?? ''} onChange={e => selected && updateItem(selected, { link: e.target.value })} />
+        </div>
+      </aside>}
       <div style={{ position:'relative', width:'100%', aspectRatio:'16 / 10', overflow:'visible' }}>
         <div ref={canvas} onPointerDown={() => setSelected(null)}
           style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden',
