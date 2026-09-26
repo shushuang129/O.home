@@ -560,6 +560,7 @@ export function StickerWidget({ conf }: { conf: WidgetConf }) {
   const [open, setOpen] = useState(false);
   const imgId = conf.settings.imgId as string | undefined;
   const src = useBlobUrl(imgId ?? '');
+  const link = conf.settings.link as string | undefined;
 
   useEditEvent(conf.id, () => setOpen(true));
 
@@ -568,7 +569,7 @@ export function StickerWidget({ conf }: { conf: WidgetConf }) {
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt="" draggable={false}
-          style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', pointerEvents: 'none', userSelect: 'none' }} />
+          style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', pointerEvents: 'none', userSelect: 'none' }} onClick={() => { if (link && !editOn) window.open(link, '_blank', 'noopener,noreferrer'); }} />
       ) : (
         editOn ? <div className="ph" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
           <span style={{ fontSize: 9 }}>STICKER — 편집모드에서 우클릭 → 설정</span>
@@ -576,7 +577,7 @@ export function StickerWidget({ conf }: { conf: WidgetConf }) {
       )}
       <div style={{ pointerEvents: 'auto' }}>
         <Modal open={open} onClose={() => setOpen(false)} small title="스티커"
-          desc="클릭·링크 없이 꾸미기용으로 사용하는 이미지입니다.">
+          desc="장식용 이미지. 링크를 넣으면 클릭해서 이동할 수 있습니다.">
           {open && <StickerEditor conf={conf} onClose={() => setOpen(false)} />}
         </Modal>
       </div>
