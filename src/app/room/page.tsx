@@ -11,17 +11,20 @@ type RoomItem = {
   id: string; imgId: string; x: number; y: number; w: number; h: number;
   rot: number; z: number; link?: string;
 };
-type RoomState = { background?: string; items: RoomItem[] };
+type RoomState = { background?: string; backgroundFit?: 'cover' | 'contain'; description?: string; items: RoomItem[] };
 type StickerLibraryItem = { id: string; imgId: string; name?: string };
 const KEY = 'ohome.room.v1';
 const STICKER_KEY = 'ohome.room.stickers.v1';
-const DEFAULT: RoomState = { items: [] };
+const ROOM_W = 1000;
+const ROOM_H = 625;
+const DEFAULT_DESCRIPTION = '이미지와 스티커로 나만의 미니홈피를 꾸며보세요.';
+const DEFAULT: RoomState = { items: [], description: DEFAULT_DESCRIPTION, backgroundFit: 'cover' };
 const DEFAULT_STICKERS: StickerLibraryItem[] = [];
 
 function readRoom(): RoomState {
   try {
     const v = getSetting<RoomState>(KEY, DEFAULT);
-    return { ...DEFAULT, ...v, items: Array.isArray(v?.items) ? v.items : [] };
+    return { ...DEFAULT, ...v, description: v?.description ?? DEFAULT_DESCRIPTION, backgroundFit: v?.backgroundFit ?? 'cover', items: Array.isArray(v?.items) ? v.items : [] };
   } catch { return DEFAULT; }
 }
 
@@ -101,7 +104,7 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
             onClick={e=>{e.stopPropagation();onRotate(5);}}
             style={{position:'absolute',right:-30,top:-30,width:26,height:26,border:'1px solid var(--line)',borderRadius:999,background:'var(--panel)',zIndex:30,cursor:'pointer'}}>↷</button>
           <button type="button" aria-label="resize"
-            onPointerDown={e=>begin(e,'resize')}
+            onPointerDown={e=>{ e.stopPropagation(); begin(e,'resize'); }}
             onPointerMove={move}
             onPointerUp={end}
             onPointerCancel={end}
@@ -137,12 +140,11 @@ export default function RoomPage() {
 
   const addStickerToRoom = (imgId: string) => {
     if (!canvas.current) return;
-    const r = canvas.current.getBoundingClientRect();
-    const size = Math.min(190, Math.max(90, r.width * 0.17));
+    const size = 150;
     const item: RoomItem = {
       id: newId(), imgId,
-      x: Math.max(10, r.width / 2 - size / 2),
-      y: Math.max(10, r.height / 2 - size / 2),
+      x: ROOM_W / 2 - size / 2,
+      y: ROOM_H / 2 - size / 2,
       w: size, h: size, rot: 0,
       z: Math.max(0, ...room.items.map(x => x.z)) + 1,
     };
@@ -164,7 +166,7 @@ export default function RoomPage() {
 
   const addBackground = async (file: File) => {
     const id = await putBlob(file);
-    save({ ...room, background: id });
+    save({ ...room, background: id, backgroundFit: room.backgroundFit ?? 'cover' });
     toast('배경을 저장했습니다');
   };
 
@@ -172,17 +174,25 @@ export default function RoomPage() {
     save({ ...room, items: room.items.map(x => x.id === id ? { ...x, ...patch } : x) });
 
   const moveItem = (id: string, dx: number, dy: number) => {
+    const rect = canvas.current?.getBoundingClientRect();
+    if (!rect) return;
+    const designDx = dx * ROOM_W / rect.width;
+    const designDy = dy * ROOM_H / rect.height;
     setRoom(prev => {
-      const next = { ...prev, items: prev.items.map(x => x.id === id ? { ...x, x:x.x + dx, y:x.y + dy } : x) };
+      const next = { ...prev, items: prev.items.map(x => x.id === id ? { ...x, x:x.x + designDx, y:x.y + designDy } : x) };
       setSetting(KEY, next);
       return next;
     });
   };
 
   const resizeItem = (id: string, dw: number, dh: number) => {
+    const rect = canvas.current?.getBoundingClientRect();
+    if (!rect) return;
+    const designDw = dw * ROOM_W / rect.width;
+    const designDh = dh * ROOM_H / rect.height;
     setRoom(prev => {
       const next = { ...prev, items: prev.items.map(x => x.id === id ? {
-        ...x, w:Math.max(50,x.w + dw), h:Math.max(50,x.h + dh)
+        ...x, w:Math.max(50,x.w + designDw), h:Math.max(50,x.h + designDh)
       } : x) };
       setSetting(KEY, next);
       return next;
@@ -201,6 +211,9 @@ export default function RoomPage() {
     updateItem(selected, { z: dir === 'top' ? Math.max(...zs, 0) + 1 : Math.min(...zs, 0) - 1 });
   };
 
+  const setDescription = (value: string) => save({ ...room, description: value });
+  const toggleBackgroundFit = () => save({ ...room, backgroundFit: room.backgroundFit === 'contain' ? 'cover' : 'contain' });
+
   if (!loaded) return <section className="page"><div className="panel">불러오는 중…</div></section>;
 
   const item = room.items.find(x => x.id === selected);
@@ -210,7 +223,14 @@ export default function RoomPage() {
       <div className="page-head">
         <div>
           <h1 style={{ margin: 0 }}>ROOM</h1>
-          <p className="hint">이미지와 스티커로 나만의 미니홈피를 꾸며보세요.</p>
+          <p
+            className="hint"
+            contentEditable={isAdmin && editOn}
+            suppressContentEditableWarning
+            onBlur={e => { if (isAdmin && editOn) setDescription(e.currentTarget.textContent?.trim() || DEFAULT_DESCRIPTION); }}
+            style={{ marginBottom: 0, outline: isAdmin && editOn ? '1px dashed var(--line)' : undefined, borderRadius: 6, padding: isAdmin && editOn ? '3px 5px' : undefined, cursor: isAdmin && editOn ? 'text' : undefined }}
+            title={isAdmin && editOn ? '클릭해서 문구를 수정할 수 있어요' : undefined}
+          >{room.description ?? DEFAULT_DESCRIPTION}</p>
         </div>
         {isAdmin && <div className="head-actions">
           <button className="btn btn-dark" onClick={() => setEditOn(v => !v)}>{editOn ? '꾸미기 끝' : '꾸미기'}</button>
@@ -225,6 +245,9 @@ export default function RoomPage() {
           <label className="btn btn-ghost">배경 바꾸기
             <input type="file" accept="image/*" hidden onChange={e => { const f=e.target.files?.[0]; e.target.value=''; if(f) void addBackground(f); }} />
           </label>
+          <button className="btn btn-ghost" onClick={toggleBackgroundFit}>
+            배경 비율: {room.backgroundFit === 'contain' ? '전체 보이기' : '꽉 채우기'}
+          </button>
           {selected && <button className="btn btn-ghost" onClick={() => moveZ('top')}>맨 위</button>}
           {selected && <button className="btn btn-ghost" onClick={() => moveZ('bottom')}>맨 아래</button>}
           {selected && <button className="btn btn-ghost" onClick={remove}>삭제</button>}
@@ -237,16 +260,18 @@ export default function RoomPage() {
 
       <div style={{ display:'grid', gridTemplateColumns: editOn ? 'minmax(0,1fr) 245px' : 'minmax(0,1fr)', gap:12, alignItems:'start' }}>
       <div ref={canvas} onPointerDown={() => setSelected(null)}
-        style={{ position:'relative', width:'100%', minHeight:'min(70vh, 760px)', overflow:'hidden',
-          background: bgSrc ? 'url("' + bgSrc + '") center / cover no-repeat' : 'var(--bg)',
+        style={{ position:'relative', width:'100%', aspectRatio:'16 / 10', overflow:'hidden',
+          background: bgSrc ? 'url("' + bgSrc + '") center / ' + (room.backgroundFit === 'contain' ? 'contain' : 'cover') + ' no-repeat' : 'var(--bg)',
           border: editOn ? '1px dashed var(--line)' : '1px solid var(--line)', borderRadius:10 }}>
         {room.items.map(x => (
-          <div key={x.id} style={{ position:'absolute', left:x.x, top:x.y, width:x.w, height:x.h,
-            zIndex:x.z, transform:'rotate(' + x.rot + 'deg)', outline:editOn && selected === x.id ? '1px dashed var(--accent)' : undefined }}>
+          <div key={x.id} style={{ position:'absolute', left:(x.x / ROOM_W * 100) + '%', top:(x.y / ROOM_H * 100) + '%',
+            width:(x.w / ROOM_W * 100) + '%', height:(x.h / ROOM_H * 100) + '%',
+            zIndex:x.z, transform:'rotate(' + x.rot + 'deg)', transformOrigin:'center center',
+            outline:editOn && selected === x.id ? '1px dashed var(--accent)' : undefined }}>
             <RoomImage id={x.imgId} selected={selected === x.id} editOn={editOn}
               onSelect={() => setSelected(x.id)}
-              onMove={(dx,dy) => moveItem(x.id, dx, dy)}
-              onResize={(dw,dh) => resizeItem(x.id, dw, dh)}
+              onMove={(dx,dy) => moveItem(x.id, dx,dy)}
+              onResize={(dw,dh) => resizeItem(x.id, dw,dh)}
               onRotate={deg => updateItem(x.id, { rot:x.rot + deg })}
               onOpen={() => { if (x.link) window.open(x.link, '_blank', 'noopener,noreferrer'); }} />
           </div>
@@ -255,7 +280,7 @@ export default function RoomPage() {
           {isAdmin ? '꾸미기 버튼을 눌러 이미지를 추가해보세요.' : '아직 꾸며진 방이 없습니다.'}
         </div>}
       </div>
-      {editOn && <aside className="panel" style={{ padding:10, borderRadius:12, maxHeight:'min(70vh,760px)', overflowY:'auto' }}>
+      {editOn && <aside className="panel" style={{ padding:10, borderRadius:12, maxHeight:'min(70vh,625px)', overflowY:'auto' }}>
         <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}><strong style={{fontSize:13}}>스티커 보관함</strong><span className="hint">{stickers.length}개</span></div>
         <p className="hint" style={{fontSize:10.5, margin:'0 0 10px'}}>한 번 불러온 스티커는 여기서 다시 꺼내 쓸 수 있어요.</p>
         {stickers.length===0 ? <div style={{padding:20,textAlign:'center',border:'1px dashed var(--line)',borderRadius:10,fontSize:11,color:'var(--faint)'}}>아직 스티커가 없어요.<br/>위의 ＋ 이미지 추가로 추가해보세요.</div> :
