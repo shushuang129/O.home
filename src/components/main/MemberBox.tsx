@@ -12,31 +12,42 @@ export function MemberBox() {
   const avatarSrc = useBlobUrl(user?.avatarUrl);
 
   return (
-    <div className="panel login-box" style={{ display: 'flex', flexDirection: 'column' }}>
-      <h3>MEMBER</h3>
+    <div className="panel login-box profile-diary-card" style={{ display: 'flex', flexDirection: 'column' }}>
+      <div className="profile-card-head">
+        <span className="profile-card-label">PROFILE</span>
+        <span className="profile-card-mark">✦</span>
+      </div>
       {user ? (
         <>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginBottom: 14 }}>
-            {/* 기본 아바타는 이니셜 없이 단색/그라데이션 (v1.9) */}
-            <div style={{
-              width: 42, height: 42, borderRadius: '50%', flexShrink: 0, overflow: 'hidden',
-              background: avatarSrc ? undefined : (user.avatarColor ?? 'linear-gradient(135deg,#6b7280,#3c434d)'),
-            }}>
+          <div className="profile-main">
+            <div className="profile-avatar">
+              {/* 기본 아바타는 이니셜 없이 단색/그라데이션 */}
+              <div style={{
+                width: '100%', height: '100%', overflow: 'hidden',
+                background: avatarSrc ? undefined : (user.avatarColor ?? 'linear-gradient(135deg,#6b7280,#3c434d)'),
+              }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              {avatarSrc && <img src={avatarSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                {avatarSrc && <img src={avatarSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+              </div>
             </div>
-            <div style={{ flex: 1 }}>
-              <b style={{ fontSize: 13.5 }}>{user.nickname}</b>
-              <small style={{ display: 'block', fontSize: 10.5, color: 'var(--faint)' }}>
-                {user.role === 'admin' ? '관리자' : '회원'} · 알림 <span style={{ color: 'var(--accent)', fontWeight: 700 }}>0</span>
-              </small>
+            <div className="profile-name">
+              <b>{user.nickname}</b>
+              <small>{user.role === 'admin' ? 'ADMIN' : 'MEMBER'}</small>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 6 }}>
-            <button className="btn btn-ghost" style={{ flex: 1, justifyContent: 'center', padding: 7, fontSize: 11 }}
-              onClick={() => router.push('/mypage')}>마이페이지</button>
-            <button className="btn btn-ghost" style={{ flex: 1, justifyContent: 'center', padding: 7, fontSize: 11 }}
-              onClick={logout}>로그아웃</button>
+          <p className="profile-note">welcome to my little archive.</p>
+          <div className="profile-actions">
+            <button className="btn btn-ghost" onClick={() => router.push('/mypage')}>MY PAGE</button>
+            <button className="btn btn-ghost" onClick={logout}>LOG OUT</button>
+          </div>
+          <div className="mini-player" aria-label="BGM decoration">
+            <div className="mini-player-top">
+              <span>NOW PLAYING</span>
+              <i>♪</i>
+            </div>
+            <div className="mini-player-title">my little playlist</div>
+            <div className="mini-player-track"><i /></div>
+            <div className="mini-player-controls"><span>◂◂</span><b>▶</b><span>▸▸</span></div>
           </div>
         </>
       ) : (
