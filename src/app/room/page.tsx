@@ -423,8 +423,8 @@ export default function RoomPage() {
         </div>}
       </div>
 
-      <div style={{ position:'relative', display:'grid', gridTemplateColumns: editOn ? 'minmax(0,1fr) 245px' : '1fr', gap:12, alignItems:'start', width: editOn ? 'calc(100% + 257px)' : '100%' }}>
-      {editOn && <aside className="panel" style={{ position:'absolute', left:-132, top:0, width:120, boxSizing:'border-box', padding:10, borderRadius:14, boxShadow:'0 8px 20px rgba(0,0,0,.06)' }}>
+      <div style={{ position:'relative', display:'grid', gridTemplateColumns: editOn ? '120px minmax(0,1fr) 245px' : '1fr', gap:12, alignItems:'start', width: editOn ? 'calc(100% + 257px)' : '100%' }}>
+      {editOn && <aside className="panel" style={{ width:'100%', boxSizing:'border-box', padding:10, borderRadius:14, boxShadow:'0 8px 20px rgba(0,0,0,.06)' }}>
         <div style={{ fontSize:10, letterSpacing:'.08em', opacity:.55, marginBottom:7 }}>EDIT</div>
         <div style={{ display:'grid', gap:6 }}>
           <button className="btn btn-ghost" onClick={() => moveZ('top')} disabled={!selected}>맨 위</button>
