@@ -85,9 +85,23 @@ function BackgroundCropper({ file, onCancel, onDone }: { file: File; onCancel: (
       <div onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} style={{width:'100%',aspectRatio:'16 / 10',overflow:'hidden',position:'relative',background:'var(--bg)',cursor:'grab',touchAction:'none',borderRadius:10}}>
         {src&&<img src={src} alt="" draggable={false} onLoad={e=>setImgSize({w:e.currentTarget.naturalWidth,h:e.currentTarget.naturalHeight})} style={{position:'absolute',width:shownW,height:shownH,maxWidth:'none',left:'50%',top:'50%',transform:'translate(-50%,-50%) translate('+pos.x+'px,'+pos.y+'px)',userSelect:'none',pointerEvents:'none'}}/>}
       </div>
-      <div style={{display:'flex',justifyContent:'space-between',marginTop:12,gap:8}}>
-        <div style={{display:'flex',gap:6}}><button type="button" className="btn btn-ghost" onClick={()=>{setScale(s=>Math.max(1,s-.1));setPos(p=>clampPos(p.x,p.y));}}>− 축소</button><button type="button" className="btn btn-ghost" onClick={()=>setScale(s=>Math.min(3,s+.1))}>＋ 확대</button><button type="button" className="btn btn-ghost" onClick={()=>{setScale(1);setPos({x:0,y:0});}}>초기화</button></div>
-        <div style={{display:'flex',gap:6}}><button type="button" className="btn btn-ghost" onClick={onCancel}>취소</button><button type="button" className="btn btn-dark" onClick={crop}>이대로 자르기</button></div>
+      <div style={{display:'flex',alignItems:'center',gap:10,marginTop:12}}>
+        <span className="hint" style={{whiteSpace:'nowrap'}}>확대/축소</span>
+        <input
+          type="range"
+          min="1"
+          max="3"
+          step="0.01"
+          value={scale}
+          onChange={e=>setScale(Number(e.target.value))}
+          style={{flex:1}}
+        />
+        <span className="hint" style={{minWidth:42,textAlign:'right'}}>{Math.round(scale * 100)}%</span>
+        <button type="button" className="btn btn-ghost" onClick={()=>{setScale(1);setPos({x:0,y:0});}}>초기화</button>
+      </div>
+      <div style={{display:'flex',justifyContent:'flex-end',gap:6,marginTop:10}}>
+        <button type="button" className="btn btn-ghost" onClick={onCancel}>취소</button>
+        <button type="button" className="btn btn-dark" onClick={crop}>이대로 자르기</button>
       </div>
     </div>
   </div>;
@@ -174,6 +188,7 @@ export default function RoomPage() {
   const [selected, setSelected] = useState<string | null>(null);
   const [stickers, setStickers] = useState<StickerLibraryItem[]>(DEFAULT_STICKERS);
   const [descriptionEditing, setDescriptionEditing] = useState(false);
+  const descriptionInput = useRef<HTMLInputElement>(null);
   const [descriptionHover, setDescriptionHover] = useState(false);
   const [backgroundCropFile, setBackgroundCropFile] = useState<File | null>(null);
   const canvas = useRef<HTMLDivElement>(null);
@@ -266,6 +281,12 @@ export default function RoomPage() {
 
   const setDescription = (value: string) => save({ ...room, description: value });
 
+  useEffect(() => {
+    if (descriptionEditing) {
+      requestAnimationFrame(() => descriptionInput.current?.focus());
+    }
+  }, [descriptionEditing]);
+
   if (!loaded) return <section className="page"><div className="panel">불러오는 중…</div></section>;
 
   const item = room.items.find(x => x.id === selected);
@@ -281,17 +302,34 @@ export default function RoomPage() {
             style={{display:'inline-flex',alignItems:'center',gap:4,maxWidth:'100%'}}
           >
             {descriptionEditing ? (
-              <p
-                className="hint"
-                contentEditable={isAdmin}
-                suppressContentEditableWarning
-                autoFocus
+              <input
+                ref={descriptionInput}
+                type="text"
+                value={room.description ?? DEFAULT_DESCRIPTION}
+                onChange={e => setRoom(prev => ({...prev, description:e.target.value}))}
                 onBlur={e => {
-                  if (isAdmin) setDescription(e.currentTarget.textContent?.trim() || DEFAULT_DESCRIPTION);
+                  setDescription(e.currentTarget.value.trim() || DEFAULT_DESCRIPTION);
                   setDescriptionEditing(false);
                 }}
-                style={{margin:0,outline:'1px dashed var(--line)',borderRadius:6,padding:'3px 5px',cursor:'text'}}
-              >{room.description ?? DEFAULT_DESCRIPTION}</p>
+                onKeyDown={e => {
+                  if (e.key === 'Enter') e.currentTarget.blur();
+                  if (e.key === 'Escape') {
+                    setRoom(readRoom());
+                    setDescriptionEditing(false);
+                  }
+                }}
+                style={{
+                  margin:0,
+                  width:'min(520px,70vw)',
+                  border:'1px dashed var(--line)',
+                  borderRadius:6,
+                  padding:'4px 7px',
+                  background:'transparent',
+                  color:'inherit',
+                  font:'inherit',
+                  outline:'none'
+                }}
+              />
             ) : (
               <>
                 <p className="hint" style={{margin:0,padding:'3px 5px'}}>{room.description ?? DEFAULT_DESCRIPTION}</p>
