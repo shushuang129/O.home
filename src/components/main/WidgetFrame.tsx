@@ -157,6 +157,8 @@ export function WidgetFrame({ conf, mobileOrder, children, className, style, onC
     window.addEventListener('pointerup', up);
   };
 
+  const passThrough = conf.type === 'sticker' && !editOn;
+
   return (
     <div
       ref={ref}
@@ -164,6 +166,7 @@ export function WidgetFrame({ conf, mobileOrder, children, className, style, onC
       className={`wgt ${useSize && conf.w != null ? 'sized' : ''} ${conf.mOff ? 'wgt-hide-m' : ''} ${className ?? ''}`}
       style={{
         ...style,
+        pointerEvents: passThrough ? 'none' : undefined,
         order: mobileOrder,
         // 절대배치 (v1.9) — PC 캔버스에는 흐름 없음. 모바일 CSS가 static으로 되돌려 스택 렌더
         // 기울기(rot)는 transform에 합성 — 모바일 스택에서는 CSS가 해제 (v1.9)

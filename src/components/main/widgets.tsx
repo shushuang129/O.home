@@ -12,7 +12,7 @@ import { Modal } from '@/components/ui/Modal';
 import { KTextarea, KSelect, KStep, KCheck } from '@/components/ui/Kit';
 import { ColorField } from '@/components/ui/ColorField';
 import { useFonts } from '@/lib/fontStore';
-import { BannerEditor, BannerSlide, DEMO_SLIDES, DdayEditor, DecoEditor, TodoEditor, TodoSetItem } from '@/components/main/widgetEditors';
+import { BannerEditor, BannerSlide, DEMO_SLIDES, DdayEditor, DecoEditor, StickerEditor, TodoEditor, TodoSetItem } from '@/components/main/widgetEditors';
 import { CroppedBlobImg, CropValue } from '@/components/ui/CropEditor';
 import { useLocalList } from '@/lib/postStore';
 import { RoadItem, ROAD_SEED, BackupPost, BACKUP_SEED } from '@/lib/galleryStore';
@@ -554,6 +554,36 @@ export function DecoWidget({ conf }: { conf: WidgetConf }) {
   );
 }
 
+/* ---------- 스티커 — 클릭을 통과시키는 장식 이미지 ---------- */
+export function StickerWidget({ conf }: { conf: WidgetConf }) {
+  const { editOn } = useMainStore();
+  const [open, setOpen] = useState(false);
+  const imgId = conf.settings.imgId as string | undefined;
+  const src = useBlobUrl(imgId ?? '');
+
+  useEditEvent(conf.id, () => setOpen(true));
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%', minHeight: 80, pointerEvents: 'none' }}>
+      {src ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={src} alt="" draggable={false}
+          style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', pointerEvents: 'none', userSelect: 'none' }} />
+      ) : (
+        editOn ? <div className="ph" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+          <span style={{ fontSize: 9 }}>STICKER — 편집모드에서 우클릭 → 설정</span>
+        </div> : null
+      )}
+      <div style={{ pointerEvents: 'auto' }}>
+        <Modal open={open} onClose={() => setOpen(false)} small title="스티커"
+          desc="클릭·링크 없이 꾸미기용으로 사용하는 이미지입니다.">
+          {open && <StickerEditor conf={conf} onClose={() => setOpen(false)} />}
+        </Modal>
+      </div>
+    </div>
+  );
+}
+
 /* ---------- 스티커 메모 미니보드 (4.6) — 읽기 전용 축소 보드, 클릭 시 /memo ---------- */
 export function MemoBoardWidget() {
   const router = useRouter();
@@ -664,6 +694,7 @@ export function renderWidget(conf: WidgetConf) {
     case 'upcoming': return <UpcomingWidget />;
     case 'freetext': return <FreeTextWidget conf={conf} />;
     case 'deco': return <DecoWidget conf={conf} />;
+    case 'sticker': return <StickerWidget conf={conf} />;
     case 'memoboard': return <MemoBoardWidget />;
     case 'apply': return <ApplyWidget conf={conf} />;
     default: return <div className="panel widget"><h4>{WIDGET_META[conf.type]?.title ?? conf.type}</h4></div>;
