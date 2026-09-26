@@ -225,11 +225,11 @@ export default function RoomPage() {
           <h1 style={{ margin: 0 }}>ROOM</h1>
           <p
             className="hint"
-            contentEditable={isAdmin && editOn}
+            contentEditable={isAdmin}
             suppressContentEditableWarning
-            onBlur={e => { if (isAdmin && editOn) setDescription(e.currentTarget.textContent?.trim() || DEFAULT_DESCRIPTION); }}
-            style={{ marginBottom: 0, outline: isAdmin && editOn ? '1px dashed var(--line)' : undefined, borderRadius: 6, padding: isAdmin && editOn ? '3px 5px' : undefined, cursor: isAdmin && editOn ? 'text' : undefined }}
-            title={isAdmin && editOn ? '클릭해서 문구를 수정할 수 있어요' : undefined}
+            onBlur={e => { if (isAdmin) setDescription(e.currentTarget.textContent?.trim() || DEFAULT_DESCRIPTION); }}
+            style={{ marginBottom: 0, outline: isAdmin ? '1px dashed var(--line)' : undefined, borderRadius: 6, padding: isAdmin ? '3px 5px' : undefined, cursor: isAdmin ? 'text' : undefined }}
+            title={isAdmin ? '클릭해서 문구를 수정할 수 있어요' : undefined}
           >{room.description ?? DEFAULT_DESCRIPTION}</p>
         </div>
         {isAdmin && <div className="head-actions">
