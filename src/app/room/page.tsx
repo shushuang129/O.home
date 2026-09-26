@@ -80,11 +80,25 @@ function BackgroundCropper({ file, onCancel, onDone }: { file: File; onCancel: (
 
   const crop=()=>{
     if(!imgSize.w||!imgSize.h)return;
-    const cv=document.createElement('canvas'); cv.width=VIEW_W; cv.height=VIEW_H;
-    const ctx=cv.getContext('2d'); if(!ctx)return;
-    const left=(VIEW_W-shownW)/2+pos.x, top=(VIEW_H-shownH)/2+pos.y;
+    const OUTPUT_W = 800;
+    const OUTPUT_H = 600;
+    const scaleOut = OUTPUT_W / VIEW_W;
+    const cv=document.createElement('canvas');
+    cv.width=OUTPUT_W;
+    cv.height=OUTPUT_H;
+    const ctx=cv.getContext('2d');
+    if(!ctx)return;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    const left=((VIEW_W-shownW)/2+pos.x) * scaleOut;
+    const top=((VIEW_H-shownH)/2+pos.y) * scaleOut;
     const image=new Image();
-    image.onload=()=>{ctx.drawImage(image,left,top,shownW,shownH);cv.toBlob(blob=>{if(blob)onDone(new File([blob],'room-background.jpg',{type:'image/jpeg'}));},'image/jpeg',0.92);};
+    image.onload=()=>{
+      ctx.drawImage(image,left,top,shownW*scaleOut,shownH*scaleOut);
+      cv.toBlob(blob=>{
+        if(blob)onDone(new File([blob],'room-background.png',{type:'image/png'}));
+      },'image/png');
+    };
     image.src=src;
   };
 
@@ -614,7 +628,7 @@ export default function RoomPage() {
             <strong style={{fontSize:12}}>ROOM 배경</strong>
             <span className="hint">4 : 3</span>
           </div>
-          <p className="hint" style={{fontSize:10.5, margin:'0 0 10px'}}>방에 어울리는 배경을 골라보세요. 이미지는 4:3으로 맞춰 저장돼요.</p>
+          <p className="hint" style={{fontSize:10.5, margin:'0 0 10px'}}>방에 어울리는 배경을 골라보세요. 800×600으로 저장해서 선명하게 보여줘요.</p>
           <label className="btn btn-ghost" style={{ width:'100%', justifyContent:'center', marginBottom:8 }}>
             ▧ 배경 바꾸기
             <input type="file" accept="image/*" hidden onChange={e => { const f=e.target.files?.[0]; e.target.value=''; if(f) setBackgroundCropFile(f); }} />
