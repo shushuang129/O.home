@@ -300,9 +300,6 @@ export default function RoomPage() {
 
       {isAdmin && editOn && (
         <div className="panel" style={{ display:'flex', gap:8, flexWrap:'wrap', alignItems:'center', marginBottom:12 }}>
-          <label className="btn btn-dark">＋ 이미지 추가
-            <input type="file" accept="image/*" hidden onChange={e => { const f=e.target.files?.[0]; e.target.value=''; if(f) void addStickerToLibrary(f); }} />
-          </label>
                     {selected && <button className="btn btn-ghost" onClick={() => moveZ('top')}>맨 위</button>}
           {selected && <button className="btn btn-ghost" onClick={() => moveZ('bottom')}>맨 아래</button>}
           {selected && <button className="btn btn-ghost" onClick={remove}>삭제</button>}
@@ -369,9 +366,20 @@ export default function RoomPage() {
             <strong style={{fontSize:12}}>스티커 보관함</strong>
             <span className="hint">{stickers.length}개</span>
           </div>
-          <p className="hint" style={{fontSize:10.5, margin:'0 0 10px'}}>한 번 넣어둔 스티커는 여러 번 꺼내 쓸 수 있어요.</p>
-          {stickers.length===0 ? <div style={{padding:20,textAlign:'center',border:'1px dashed var(--line)',borderRadius:10,fontSize:11,color:'var(--faint)'}}>아직 스티커가 없어요.<br/>위의 ＋ 이미지 추가로 추가해보세요.</div> :
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:7}}>{stickers.map(x=><StickerLibraryCard key={x.id} sticker={x} onAdd={() => addStickerToRoom(x.imgId)} onRemove={() => removeStickerFromLibrary(x.id)}/>)}</div>}
+          <p className="hint" style={{fontSize:10.5, margin:'0 0 10px'}}>＋에서 스티커를 추가하고, 보관함의 스티커는 여러 번 꺼내 쓸 수 있어요.</p>
+          {stickers.length===0 ? <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:7}}>
+            <label style={{minHeight:118,border:'1px dashed var(--line)',borderRadius:12,display:'grid',placeItems:'center',textAlign:'center',cursor:'pointer',background:'var(--bg)',color:'var(--faint)',fontSize:11}}>
+              <span><span style={{display:'grid',placeItems:'center',width:34,height:34,margin:'0 auto 6px',border:'1px solid var(--line)',borderRadius:999,fontSize:20}}>＋</span>스티커 추가</span>
+              <input type="file" accept="image/*" hidden onChange={e => { const f=e.target.files?.[0]; e.target.value=''; if(f) void addStickerToLibrary(f); }} />
+            </label>
+          </div> :
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:7}}>
+              <label style={{minHeight:118,border:'1px dashed var(--line)',borderRadius:12,display:'grid',placeItems:'center',textAlign:'center',cursor:'pointer',background:'var(--bg)',color:'var(--faint)',fontSize:11}}>
+                <span><span style={{display:'grid',placeItems:'center',width:34,height:34,margin:'0 auto 6px',border:'1px solid var(--line)',borderRadius:999,fontSize:20}}>＋</span>새 스티커</span>
+                <input type="file" accept="image/*" hidden onChange={e => { const f=e.target.files?.[0]; e.target.value=''; if(f) void addStickerToLibrary(f); }} />
+              </label>
+              {stickers.map(x=><StickerLibraryCard key={x.id} sticker={x} onAdd={() => addStickerToRoom(x.imgId)} onRemove={() => removeStickerFromLibrary(x.id)}/>)}
+            </div>}
         </> : <>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:4 }}>
             <strong style={{fontSize:12}}>ROOM 배경</strong>
