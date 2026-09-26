@@ -113,8 +113,16 @@ export default function RoomPage() {
     if (!canvas.current) return;
     const r = canvas.current.getBoundingClientRect();
     const size = Math.min(190, Math.max(90, r.width * 0.17));
-    const item: RoomItem = { id:newId(), imgId, x:Math.max(10,r.width/2-size/2), y:Math.max(10,r.height/2-size/2), w:size, h:size, rot:0, z:Math.max(0,...room.items.map(x=>x.z))+1 };
-    save({ ...room, items:[...room.items,item] }); setSelected(item.id); toast('스티커를 방에 넣었어요');
+    const item: RoomItem = {
+      id: newId(), imgId,
+      x: Math.max(10, r.width / 2 - size / 2),
+      y: Math.max(10, r.height / 2 - size / 2),
+      w: size, h: size, rot: 0,
+      z: Math.max(0, ...room.items.map(x => x.z)) + 1,
+    };
+    save({ ...room, items: [...room.items, item] });
+    setSelected(item.id);
+    toast('이미지를 방에 넣었어요');
   };
   const addStickerToLibrary = async (file: File) => {
     const imgId = await putBlob(file);
@@ -180,11 +188,8 @@ export default function RoomPage() {
 
       {isAdmin && editOn && (
         <div className="panel" style={{ display:'flex', gap:8, flexWrap:'wrap', alignItems:'center', marginBottom:12 }}>
-          <label className="btn btn-dark">＋ 스티커
-            <input type="file" accept="image/png,image/gif,image/webp,image/jpeg" hidden onChange={e => { const f=e.target.files?.[0]; e.target.value=''; if(f) void addStickerToLibrary(f); }} />
-          </label>
-          <label className="btn btn-ghost">＋ 이미지
-            <input type="file" accept="image/*" hidden onChange={e => { const f=e.target.files?.[0]; e.target.value=''; if(f) void addImage(f); }} />
+          <label className="btn btn-dark">＋ 이미지 추가
+            <input type="file" accept="image/*" hidden onChange={e => { const f=e.target.files?.[0]; e.target.value=''; if(f) void addStickerToLibrary(f); }} />
           </label>
           <label className="btn btn-ghost">배경 바꾸기
             <input type="file" accept="image/*" hidden onChange={e => { const f=e.target.files?.[0]; e.target.value=''; if(f) void addBackground(f); }} />
@@ -223,7 +228,7 @@ export default function RoomPage() {
         <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}><strong style={{fontSize:13}}>스티커 보관함</strong><span className="hint">{stickers.length}개</span></div>
         <p className="hint" style={{fontSize:10.5, margin:'0 0 10px'}}>한 번 불러온 스티커는 여기서 다시 꺼내 쓸 수 있어요.</p>
         {stickers.length===0 ? <div style={{padding:20,textAlign:'center',border:'1px dashed var(--line)',borderRadius:10,fontSize:11,color:'var(--faint)'}}>아직 스티커가 없어요.<br/>위의 ＋ 스티커로 추가해보세요.</div> :
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:7}}>{stickers.map(x=><StickerLibraryCard key={x.id} sticker={x} onAdd={()=>addStickerToRoom(x.imgId)} onRemove={()=>removeStickerFromLibrary(x.id)}/>)}</div>}
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:7}}>{stickers.map(x=><StickerLibraryCard key={x.id} sticker={x} onAdd={() => addStickerToRoom(x.imgId)} onRemove={() => removeStickerFromLibrary(x.id)}/>)}</div>}
       </aside>}
       </div>
       {editOn && <p className="hint" style={{ marginTop:8 }}>보관함에서 스티커를 여러 번 꺼내 쓸 수 있어요. 방에서 삭제해도 보관함에는 남습니다.</p>}
