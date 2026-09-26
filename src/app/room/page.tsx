@@ -194,7 +194,7 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
             const correction = nearest - rotation.current;
             rotation.current = nearest;
             snapped.current = true;
-            onRotate(deltaDeg + correction);
+            onRotate(correction);
           }
           snapTimer.current = null;
         }, SNAP_DELAY);
