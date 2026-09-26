@@ -216,7 +216,9 @@ export function StickerEditor({ conf, onClose }: { conf: WidgetConf; onClose?: (
         )}
         {onClose && <button className="btn btn-ghost" onClick={onClose}>CLOSE</button>}
       </div>
-      <p className="hint">링크 없이 장식용으로만 사용합니다. 편집모드에서 이동·크기 조절할 수 있습니다.</p>
+      <KInput placeholder="링크 (선택 — 클릭하면 이동)" value={(conf.settings.link as string) ?? ''}
+        onChange={e => updateWidget(conf.id, { settings: { ...conf.settings, link: e.target.value } }, { persist: true })} />
+      <p className="hint">링크를 넣으면 일반 모드에서 스티커를 클릭했을 때 이동합니다. 편집모드에서는 이동·크기 조절이 우선됩니다.</p>
     </div>
   );
 }
