@@ -79,7 +79,7 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
     <div
       onPointerDown={e => begin(e,'move')}
       onClick={e => { e.stopPropagation(); if (!editOn) onOpen(); }}
-      style={{ width:'100%', height:'100%', position:'relative', cursor:editOn?'move':(onOpen?'pointer':'default'), touchAction:'none' }}
+      style={{ width:'100%', height:'100%', position:'relative', cursor:editOn?'move':'pointer', touchAction:'none' }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt="" draggable={false}
@@ -150,21 +150,6 @@ export default function RoomPage() {
   const removeStickerFromLibrary = (id: string) => {
     const next = stickers.filter(x=>x.id!==id);
     setStickers(next); setSetting(STICKER_KEY,next); toast('스티커 보관함에서 삭제했어요');
-  };
-
-  const addImage = async (file: File) => {
-    if (!canvas.current) return;
-    const imgId = await putBlob(file);
-    const r = canvas.current.getBoundingClientRect();
-    const size = Math.min(280, Math.max(100, r.width * 0.22));
-    const item: RoomItem = {
-      id: newId(), imgId,
-      x: Math.max(10, r.width / 2 - size / 2), y: Math.max(10, r.height / 2 - size / 2),
-      w: size, h: size, rot: 0, z: Math.max(0, ...room.items.map(x => x.z)) + 1,
-    };
-    save({ ...room, items: [...room.items, item] });
-    setSelected(item.id);
-    toast('이미지를 추가했습니다');
   };
 
   const addBackground = async (file: File) => {
@@ -245,7 +230,7 @@ export default function RoomPage() {
       {editOn && <aside className="panel" style={{ padding:10, borderRadius:12, maxHeight:'min(70vh,760px)', overflowY:'auto' }}>
         <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}><strong style={{fontSize:13}}>스티커 보관함</strong><span className="hint">{stickers.length}개</span></div>
         <p className="hint" style={{fontSize:10.5, margin:'0 0 10px'}}>한 번 불러온 스티커는 여기서 다시 꺼내 쓸 수 있어요.</p>
-        {stickers.length===0 ? <div style={{padding:20,textAlign:'center',border:'1px dashed var(--line)',borderRadius:10,fontSize:11,color:'var(--faint)'}}>아직 스티커가 없어요.<br/>위의 ＋ 스티커로 추가해보세요.</div> :
+        {stickers.length===0 ? <div style={{padding:20,textAlign:'center',border:'1px dashed var(--line)',borderRadius:10,fontSize:11,color:'var(--faint)'}}>아직 스티커가 없어요.<br/>위의 ＋ 이미지 추가로 추가해보세요.</div> :
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:7}}>{stickers.map(x=><StickerLibraryCard key={x.id} sticker={x} onAdd={() => addStickerToRoom(x.imgId)} onRemove={() => removeStickerFromLibrary(x.id)}/>)}</div>}
       </aside>}
       </div>
