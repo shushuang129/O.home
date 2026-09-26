@@ -313,10 +313,27 @@ export default function RoomPage() {
     setSelected(null);
   };
 
-  const moveZ = (dir: 'top' | 'bottom') => {
+  const moveZ = (dir: 'top' | 'bottom' | 'up' | 'down') => {
     if (!selected) return;
-    const zs = room.items.map(x => x.z);
-    updateItem(selected, { z: dir === 'top' ? Math.max(...zs, 0) + 1 : Math.min(...zs, 0) - 1 });
+    if (dir === 'top' || dir === 'bottom') {
+      const zs = room.items.map(x => x.z);
+      updateItem(selected, { z: dir === 'top' ? Math.max(...zs, 0) + 1 : Math.min(...zs, 0) - 1 });
+      return;
+    }
+
+    const ordered = [...room.items].sort((a, b) => a.z - b.z);
+    const index = ordered.findIndex(x => x.id === selected);
+    const targetIndex = dir === 'up' ? index + 1 : index - 1;
+    if (index < 0 || targetIndex < 0 || targetIndex >= ordered.length) return;
+
+    const current = ordered[index];
+    const target = ordered[targetIndex];
+    const nextItems = room.items.map(x => {
+      if (x.id === current.id) return { ...x, z: target.z };
+      if (x.id === target.id) return { ...x, z: current.z };
+      return x;
+    });
+    save({ ...room, items: nextItems });
   };
 
   if (!loaded) return <section className="page"><div className="panel">불러오는 중…</div></section>;
@@ -344,6 +361,8 @@ export default function RoomPage() {
         <div style={{ fontSize:10, letterSpacing:'.08em', opacity:.55, marginBottom:7 }}>EDIT</div>
         <div style={{ display:'grid', gap:6 }}>
           <button className="btn btn-ghost" onClick={() => moveZ('top')} disabled={!selected}>맨 위</button>
+          <button className="btn btn-ghost" onClick={() => moveZ('up')} disabled={!selected}>위</button>
+          <button className="btn btn-ghost" onClick={() => moveZ('down')} disabled={!selected}>아래</button>
           <button className="btn btn-ghost" onClick={() => moveZ('bottom')} disabled={!selected}>맨 아래</button>
           <button className="btn btn-ghost" onClick={remove} disabled={!selected}>삭제</button>
           <input className="k-input" style={{ width:'100%', boxSizing:'border-box' }} placeholder="클릭 링크 (선택)"
