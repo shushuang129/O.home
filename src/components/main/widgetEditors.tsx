@@ -174,6 +174,61 @@ export function TodoEditor({ conf }: { conf: WidgetConf }) {
 
 /* (v1.9) 이미지 위젯은 장식 이미지(deco — 업로드·크롭·링크)로 일원화되어 제거됨 */
 
+/* ---------- 스티커 — settings.imgId ---------- */
+export function StickerEditor({ conf, onClose }: { conf: WidgetConf; onClose?: () => void }) {
+  const { updateWidget } = useMainStore();
+  const toast = useToast();
+  const imgId = conf.settings.imgId as string | undefined;
+  const inputId = `stickerF-${conf.id}`;
+
+  return (
+    <div style={{ display: 'grid', gap: 10 }}>
+      <input id={inputId} type="file" accept="image/*" style={{ display: 'none' }}
+        onChange={async e => {
+          const file = e.target.files?.[0];
+          e.target.value = '';
+          if (!file) return;
+          const next = await putBlob(file);
+          updateWidget(conf.id, { settings: { ...conf.settings, imgId: next } }, { persist: true });
+          toast('스티커 이미지가 저장되었습니다');
+        }} />
+
+      {imgId ? (
+        <div style={{ width: 180, height: 120, border: '1.5px dashed var(--line)', borderRadius: 8,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+          <StickerPreview fileRef={imgId} />
+        </div>
+      ) : (
+        <div className="ph" style={{ width: 180, height: 120, borderRadius: 8, border: '1.5px dashed var(--line)' }}>
+          <span style={{ fontSize: 9 }}>STICKER</span>
+        </div>
+      )}
+
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+        <button className="btn btn-dark" onClick={() => document.getElementById(inputId)?.click()}>
+          {imgId ? '이미지 교체' : '이미지 선택'}
+        </button>
+        {imgId && (
+          <button className="btn btn-ghost" onClick={() => {
+            updateWidget(conf.id, { settings: { ...conf.settings, imgId: undefined } }, { persist: true });
+            toast('스티커 이미지가 제거되었습니다');
+          }}>이미지 제거</button>
+        )}
+        {onClose && <button className="btn btn-ghost" onClick={onClose}>CLOSE</button>}
+      </div>
+      <p className="hint">링크 없이 장식용으로만 사용합니다. 편집모드에서 이동·크기 조절할 수 있습니다.</p>
+    </div>
+  );
+}
+
+function StickerPreview({ fileRef }: { fileRef: string }) {
+  const src = useBlobUrl(fileRef);
+  if (!src) return null;
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={src} alt="" draggable={false}
+    style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto', display: 'block', objectFit: 'contain' }} />;
+}
+
 /* ---------- 장식 이미지 — settings: slides[] / interval / rounded / fit ----------
    패널 없이 이미지만 박아넣는 장식용. 원본 보존 + 위치 크롭(현재 위젯 비율 기준).
    여러 장을 넣으면 순서대로 넘어가는 슬라이드가 된다 (v2.0) — 링크는 장면마다 따로 걸 수 있다. */
