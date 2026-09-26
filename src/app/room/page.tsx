@@ -119,6 +119,7 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
   const rotation = useRef(rot);
   const snapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const snapTarget = useRef<number | null>(null);
+  const snapped = useRef(false);
 
   const clearSnap = () => {
     if (snapTimer.current) clearTimeout(snapTimer.current);
@@ -126,12 +127,15 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
     snapTarget.current = null;
   };
 
+  const normalizeAngle = (angle:number) => ((angle + 180) % 360 + 360) % 360 - 180;
+
   const beginRotate = (e: React.PointerEvent<HTMLButtonElement>) => {
     if (!editOn || !selected || e.button !== 0) return;
     e.preventDefault();
     e.stopPropagation();
     onSelect();
     clearSnap();
+    snapped.current = false;
     rotation.current = rot;
 
     const box = e.currentTarget.parentElement?.getBoundingClientRect();
@@ -162,34 +166,50 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
 
     const deltaDeg = delta * 180 / Math.PI;
     rotation.current += deltaDeg;
-    onRotate(deltaDeg);
+
+    if (snapped.current) {
+      const snappedTarget = snapTarget.current ?? rotation.current;
+      const distanceFromSnap = Math.abs(normalizeAngle(rotation.current - snappedTarget));
+      if (distanceFromSnap < 4) {
+        rotation.current = snappedTarget;
+        return;
+      }
+      snapped.current = false;
+      clearSnap();
+    }
 
     const nearest = Math.round(rotation.current / 90) * 90;
-    const distance = Math.abs(rotation.current - nearest);
-    const SNAP_RANGE = 7;
-    if (distance <= SNAP_RANGE && Math.abs(deltaDeg) < 4) {
+    const distance = Math.abs(normalizeAngle(rotation.current - nearest));
+    const SNAP_RANGE = 10;
+    const SNAP_DELAY = 450;
+
+    if (distance <= SNAP_RANGE) {
       if (snapTarget.current !== nearest) {
         clearSnap();
         snapTarget.current = nearest;
         snapTimer.current = setTimeout(() => {
           if (snapTarget.current !== nearest) return;
-          const currentDistance = Math.abs(rotation.current - nearest);
+          const currentDistance = Math.abs(normalizeAngle(rotation.current - nearest));
           if (currentDistance <= SNAP_RANGE) {
             const correction = nearest - rotation.current;
             rotation.current = nearest;
-            onRotate(correction);
+            snapped.current = true;
+            onRotate(deltaDeg + correction);
           }
           snapTimer.current = null;
-        }, 300);
+        }, SNAP_DELAY);
       }
     } else {
       clearSnap();
     }
+
+    if (!snapped.current) onRotate(deltaDeg);
   };
 
   const endRotate = (e: React.PointerEvent<HTMLButtonElement>) => {
     rotateDrag.current = null;
     clearSnap();
+    snapped.current = false;
     e.stopPropagation();
     try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {}
   };
