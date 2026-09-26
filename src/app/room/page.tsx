@@ -291,7 +291,6 @@ export default function RoomPage() {
           <h1 style={{ margin: 0 }}>ROOM</h1>
           <EditableDesc k="room-desc" def={DEFAULT_DESCRIPTION} />
           </div>
-        </div>
         {isAdmin && <div className="head-actions">
           <button className="btn btn-dark" onClick={() => setEditOn(v => !v)}>{editOn ? '꾸미기 끝' : '꾸미기'}</button>
         </div>}
