@@ -16,8 +16,8 @@ type RoomState = { background?: string; description?: string; items: RoomItem[] 
 type StickerLibraryItem = { id: string; imgId: string; name?: string };
 const KEY = 'ohome.room.v1';
 const STICKER_KEY = 'ohome.room.stickers.v1';
-const ROOM_W = 1000;
-const ROOM_H = 625;
+const ROOM_W = 800;
+const ROOM_H = 600;
 const DEFAULT_DESCRIPTION = '이미지와 스티커로 나만의 미니홈피를 꾸며보세요.';
 const DEFAULT: RoomState = { items: [], description: DEFAULT_DESCRIPTION };
 const DEFAULT_STICKERS: StickerLibraryItem[] = [];
@@ -45,8 +45,8 @@ function StickerLibraryCard({ sticker, onAdd, onRemove }: { sticker: StickerLibr
 }
 
 function BackgroundCropper({ file, onCancel, onDone }: { file: File; onCancel: () => void; onDone: (file: File) => void }) {
-  const VIEW_W = 720;
-  const VIEW_H = 450;
+  const VIEW_W = 576;
+  const VIEW_H = 432;
   const [src, setSrc] = useState('');
   const [imgSize, setImgSize] = useState({ w: 0, h: 0 });
   const [scale, setScale] = useState(1);
@@ -82,8 +82,8 @@ function BackgroundCropper({ file, onCancel, onDone }: { file: File; onCancel: (
 
   return <div style={{position:'fixed',inset:0,zIndex:1000,background:'rgba(0,0,0,.55)',display:'grid',placeItems:'center',padding:20}}>
     <div className="panel" style={{width:'min(780px,95vw)',padding:16,borderRadius:14}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}><strong>배경 자르기</strong><span className="hint">16 : 10 · 이미지를 드래그해서 원하는 부분을 맞춰주세요.</span></div>
-      <div onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} style={{width:'100%',aspectRatio:'16 / 10',overflow:'hidden',position:'relative',background:'var(--bg)',cursor:'grab',touchAction:'none',borderRadius:10}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}><strong>배경 자르기</strong><span className="hint">4 : 3 · 이미지를 드래그해서 원하는 부분을 맞춰주세요.</span></div>
+      <div onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} style={{width:'100%',aspectRatio:'4 / 3',overflow:'hidden',position:'relative',background:'var(--bg)',cursor:'grab',touchAction:'none',borderRadius:10}}>
         {src&&<img src={src} alt="" draggable={false} onLoad={e=>setImgSize({w:e.currentTarget.naturalWidth,h:e.currentTarget.naturalHeight})} style={{position:'absolute',width:shownW,height:shownH,maxWidth:'none',left:'50%',top:'50%',transform:'translate(-50%,-50%) translate('+pos.x+'px,'+pos.y+'px)',userSelect:'none',pointerEvents:'none'}}/>}
       </div>
       <div style={{display:'flex',alignItems:'center',gap:10,marginTop:12}}>
@@ -314,7 +314,7 @@ export default function RoomPage() {
 
   const addStickerToRoom = (imgId: string) => {
     if (!canvas.current) return;
-    const size = 150;
+    const size = 120;
     const item: RoomItem = {
       id: newId(), imgId,
       x: ROOM_W / 2 - size / 2,
@@ -408,7 +408,7 @@ export default function RoomPage() {
   const item = room.items.find(x => x.id === selected);
 
   return (
-    <section className="page" style={{ maxWidth: 1100 }}>
+    <section className="page" style={{ maxWidth: 1100, width: '100%', boxSizing: 'border-box' }}>
       <div className="page-head">
         <div>
           <h1 style={{ margin: 0, display:'flex', alignItems:'center', gap:7 }}>
@@ -423,8 +423,8 @@ export default function RoomPage() {
         </div>}
       </div>
 
-      <div style={{ position:'relative', display:'grid', gridTemplateColumns: editOn ? 'minmax(0,1fr) 245px' : '1fr', gap:12, alignItems:'start', width: editOn ? 'calc(100% + 257px)' : '100%' }}>
-      {editOn && <aside className="panel" style={{ position:'absolute', left:-132, top:0, width:120, boxSizing:'border-box', padding:10, borderRadius:14, boxShadow:'0 8px 20px rgba(0,0,0,.06)' }}>
+      <div style={{ position:'relative', width:'800px', maxWidth:'100%', margin:'28px auto 0' }}>
+      {editOn && <aside className="panel" style={{ position:'absolute', left:-145, top:0, width:'120px', boxSizing:'border-box', padding:10, borderRadius:14, boxShadow:'0 8px 20px rgba(0,0,0,.06)', zIndex:40 }}>
         <div style={{ fontSize:10, letterSpacing:'.08em', opacity:.55, marginBottom:7 }}>EDIT</div>
         <div style={{ display:'grid', gap:6 }}>
           <button className="btn btn-ghost" onClick={() => moveZ('top')} disabled={!selected}>맨 위</button>
@@ -437,7 +437,7 @@ export default function RoomPage() {
             value={item?.link ?? ''} onChange={e => selected && updateItem(selected, { link: e.target.value })} />
         </div>
       </aside>}
-      <div style={{ position:'relative', width:'100%', aspectRatio:'16 / 10', overflow:'visible' }}>
+      <div style={{ position:'relative', width:'100%', aspectRatio:'4 / 3', overflow:'visible' }}>
         <div ref={canvas} onPointerDown={() => setSelected(null)}
           style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden',
             background: 'var(--bg)',
@@ -475,7 +475,7 @@ export default function RoomPage() {
         </div>}
       </div>
       </div>
-      {editOn && <aside className="panel" style={{ padding:10, borderRadius:14, maxHeight:'min(70vh,625px)', overflowY:'auto', boxShadow:'0 8px 20px rgba(0,0,0,.06)' }}>
+      {editOn && <aside className="panel" style={{ position:'absolute', left:'calc(100% + 12px)', top:0, width:'200px', boxSizing:'border-box', padding:10, borderRadius:14, maxHeight:'min(70vh,750px)', overflowY:'auto', boxShadow:'0 8px 20px rgba(0,0,0,.06)', zIndex:40 }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:9 }}>
           <div>
             <div style={{ fontSize:10, letterSpacing:'.08em', opacity:.55 }}>MY COLLECTION</div>
@@ -517,16 +517,16 @@ export default function RoomPage() {
         </> : <>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:4 }}>
             <strong style={{fontSize:12}}>ROOM 배경</strong>
-            <span className="hint">16 : 10</span>
+            <span className="hint">4 : 3</span>
           </div>
-          <p className="hint" style={{fontSize:10.5, margin:'0 0 10px'}}>방에 어울리는 배경을 골라보세요. 이미지는 16:10으로 맞춰 저장돼요.</p>
+          <p className="hint" style={{fontSize:10.5, margin:'0 0 10px'}}>방에 어울리는 배경을 골라보세요. 이미지는 4:3으로 맞춰 저장돼요.</p>
           <label className="btn btn-ghost" style={{ width:'100%', justifyContent:'center', marginBottom:8 }}>
             ▧ 배경 바꾸기
             <input type="file" accept="image/*" hidden onChange={e => { const f=e.target.files?.[0]; e.target.value=''; if(f) setBackgroundCropFile(f); }} />
           </label>
           {bgSrc ? <div style={{ border:'1px solid var(--line)', borderRadius:10, overflow:'hidden', background:'var(--bg)' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={bgSrc} alt="현재 ROOM 배경" style={{ display:'block', width:'100%', aspectRatio:'16 / 10', objectFit:'cover' }} />
+            <img src={bgSrc} alt="현재 ROOM 배경" style={{ display:'block', width:'100%', aspectRatio:'4 / 3', objectFit:'cover' }} />
           </div> :
           <div style={{padding:24, textAlign:'center', border:'1px dashed var(--line)', borderRadius:10, fontSize:11, color:'var(--faint)'}}>아직 배경이 없어요.<br/>이미지를 추가해보세요.</div>}
         </>}
