@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { getSetting, onSettingChange, setSetting } from '@/lib/settingStore';
+import { useFonts } from '@/lib/fontStore';
 import { putBlob, useBlobUrl } from '@/lib/blobStore';
 import { newId } from '@/lib/postStore';
 import { useAuth } from '@/lib/auth';
@@ -27,6 +28,13 @@ function readRoom(): RoomState {
     const v = getSetting<RoomState>(KEY, DEFAULT);
     return { ...DEFAULT, ...v, description: v?.description ?? DEFAULT_DESCRIPTION, items: Array.isArray(v?.items) ? v.items : [] };
   } catch { return DEFAULT; }
+}
+
+
+function RoomProfileImage({ id }: { id: string }) {
+  const src = useBlobUrl(id);
+  if (!src) return null;
+  return <img src={src} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />;
 }
 
 function StickerLibraryCard({ sticker, onAdd, onRemove }: { sticker: StickerLibraryItem; onAdd: () => void; onRemove: () => void }) {
@@ -106,6 +114,26 @@ function BackgroundCropper({ file, onCancel, onDone }: { file: File; onCancel: (
       </div>
     </div>
   </div>;
+}
+
+
+function ProfileCropper({ file, onCancel, onDone }: { file: File; onCancel: () => void; onDone: (file: File) => void }) {
+  const VIEW_W = 560, VIEW_H = 420;
+  const [src, setSrc] = useState('');
+  const [imgSize, setImgSize] = useState({w:0,h:0});
+  const [scale, setScale] = useState(1);
+  const [pos, setPos] = useState({x:0,y:0});
+  const drag = useRef<{x:number;y:number;px:number;py:number}|null>(null);
+  useEffect(() => { const url=URL.createObjectURL(file); setSrc(url); return()=>URL.revokeObjectURL(url); },[file]);
+  const base = imgSize.w&&imgSize.h ? Math.max(VIEW_W/imgSize.w,VIEW_H/imgSize.h) : 1;
+  const shownW=imgSize.w*base*scale, shownH=imgSize.h*base*scale;
+  const maxX=Math.max(0,(shownW-VIEW_W)/2), maxY=Math.max(0,(shownH-VIEW_H)/2);
+  const clamp=(x:number,y:number)=>({x:Math.max(-maxX,Math.min(maxX,x)),y:Math.max(-maxY,Math.min(maxY,y))});
+  const down=(e:React.PointerEvent<HTMLDivElement>)=>{if(e.button!==0)return;e.currentTarget.setPointerCapture(e.pointerId);drag.current={x:e.clientX,y:e.clientY,px:pos.x,py:pos.y};};
+  const move=(e:React.PointerEvent<HTMLDivElement>)=>{if(!drag.current)return;const d=drag.current;setPos(clamp(d.px+e.clientX-d.x,d.py+e.clientY-d.y));};
+  const up=()=>{drag.current=null;};
+  const crop=()=>{if(!src||!imgSize.w||!imgSize.h)return;const cv=document.createElement('canvas');cv.width=VIEW_W;cv.height=VIEW_H;const ctx=cv.getContext('2d');if(!ctx)return;const left=(VIEW_W-shownW)/2+pos.x,top=(VIEW_H-shownH)/2+pos.y;const image=new Image();image.onload=()=>{ctx.drawImage(image,left,top,shownW,shownH);cv.toBlob(b=>{if(b)onDone(new File([b],'profile.jpg',{type:'image/jpeg'}));},'image/jpeg',.92);};image.src=src;};
+  return <div style={{position:'fixed',inset:0,zIndex:1100,background:'rgba(20,18,15,.55)',display:'grid',placeItems:'center',padding:20}}><div className="panel" style={{width:'min(650px,95vw)',padding:16,borderRadius:14}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}><strong>프로필 사진 맞추기</strong><span className="hint">4 : 3 · 드래그해서 위치를 맞춰주세요.</span></div><div onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} style={{width:'100%',aspectRatio:'4 / 3',overflow:'hidden',position:'relative',background:'var(--bg)',cursor:'grab',touchAction:'none',borderRadius:10}}>{src&&<img src={src} alt="" draggable={false} onLoad={e=>setImgSize({w:e.currentTarget.naturalWidth,h:e.currentTarget.naturalHeight})} style={{position:'absolute',width:shownW,height:shownH,maxWidth:'none',left:'50%',top:'50%',transform:'translate(-50%,-50%) translate('+pos.x+'px,'+pos.y+'px)',userSelect:'none',pointerEvents:'none'}}/>}</div><div style={{display:'flex',alignItems:'center',gap:10,marginTop:12}}><span className="hint">확대/축소</span><input type="range" min="1" max="3" step=".01" value={scale} onChange={e=>setScale(Number(e.target.value))} style={{flex:1}}/><span className="hint">{Math.round(scale*100)}%</span><button type="button" className="btn btn-ghost" onClick={()=>{setScale(1);setPos({x:0,y:0});}}>초기화</button></div><div style={{display:'flex',justifyContent:'flex-end',gap:6,marginTop:10}}><button type="button" className="btn btn-ghost" onClick={onCancel}>취소</button><button type="button" className="btn btn-dark" onClick={crop}>이대로 자르기</button></div></div></div>;
 }
 
 function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate, onOpen, rot }: {
@@ -288,7 +316,8 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
 }
 
 export default function RoomPage() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, user, updateProfile } = useAuth();
+  const { fonts, familyOf } = useFonts();
   const toast = useToast();
   const [room, setRoom] = useState<RoomState>(DEFAULT);
   const [loaded, setLoaded] = useState(false);
@@ -297,8 +326,50 @@ export default function RoomPage() {
   const [stickers, setStickers] = useState<StickerLibraryItem[]>(DEFAULT_STICKERS);
   const [backgroundCropFile, setBackgroundCropFile] = useState<File | null>(null);
   const [editTab, setEditTab] = useState<'stickers' | 'background'>('stickers');
+  const [profileEditOn, setProfileEditOn] = useState(false);
+  const [profileName, setProfileName] = useState('');
+  const [profileColor, setProfileColor] = useState('#d8d2c8');
+  const [profileFile, setProfileFile] = useState<File | null>(null);
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
+  const [profileCropFile, setProfileCropFile] = useState<File | null>(null);
+  const [profileFont, setProfileFont] = useState('var(--serif)');
+  const [profileAvatarRef, setProfileAvatarRef] = useState<string | undefined>(user?.avatarUrl);
   const canvas = useRef<HTMLDivElement>(null);
   const bgSrc = useBlobUrl(room.background);
+
+  useEffect(() => {
+    setProfileName(user?.nickname ?? '');
+    setProfileColor(user?.avatarColor ?? '#d8d2c8');
+    setProfileAvatarRef(user?.avatarUrl);
+    setProfileFont(getSetting<string>(`ohome.room.profile.font.${user?.id ?? 'guest'}`, 'serif'));
+  }, [user?.id, user?.nickname, user?.avatarColor, user?.avatarUrl]);
+
+  useEffect(() => {
+    if (!profileFile) { setProfilePreview(null); return; }
+    const url = URL.createObjectURL(profileFile);
+    setProfilePreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [profileFile]);
+
+  const saveProfile = async () => {
+    if (!user) return;
+    let avatarUrl: string | undefined = user.avatarUrl;
+    if (profileFile) avatarUrl = await putBlob(profileFile);
+    const result = await updateProfile({
+      nickname: profileName.trim() || user.nickname,
+      avatarUrl,
+      avatarColor: profileColor,
+    });
+    if (result.ok) {
+      setProfileAvatarRef(avatarUrl);
+      setSetting(`ohome.room.profile.font.${user.id}`, profileFont);
+      setProfileEditOn(false);
+      setProfileFile(null);
+      toast('프로필을 저장했어요');
+    } else {
+      toast(result.error ?? '프로필을 저장하지 못했어요');
+    }
+  };
 
   useEffect(() => {
     setRoom(readRoom());
@@ -424,6 +495,30 @@ export default function RoomPage() {
       </div>
 
       <div style={{ position:'relative', width:'800px', maxWidth:'100%', margin:'28px auto 0' }}>
+        {!editOn && <aside className="room-side-card" style={{ position:'absolute', right:'calc(100% + 18px)', top:0, width:220, boxSizing:'border-box', padding:17, borderRadius:16, background:'var(--panel)', border:'1px solid var(--line)', boxShadow:'0 10px 24px rgba(0,0,0,.07)' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
+            <span style={{ fontSize:9, letterSpacing:'.16em', color:'var(--faint)' }}>PROFILE</span>
+            <button type="button" className="btn btn-ghost" onClick={()=>setProfileEditOn(true)} style={{ padding:'4px 7px', fontSize:9 }}>EDIT</button>
+          </div>
+          <div style={{ width:'100%', aspectRatio:'4 / 3', borderRadius:10, overflow:'hidden', border:'1px solid var(--line)', background:user?.avatarColor ?? 'linear-gradient(135deg,#ddd8cf,#aaa39a)', boxShadow:'0 5px 15px rgba(0,0,0,.06)' }}>
+            {(profileAvatarRef ?? user?.avatarUrl) && <RoomProfileImage key={profileAvatarRef ?? user?.avatarUrl} id={profileAvatarRef ?? user!.avatarUrl!} />}
+          </div>
+          <div style={{ textAlign:'center', marginTop:12 }}>
+            <strong style={{ display:'block', fontFamily:familyOf(profileFont) ?? 'var(--serif)', fontSize:20 }}>{user?.nickname ?? 'MY ROOM'}</strong>
+            <span style={{ display:'block', marginTop:3, fontSize:8, letterSpacing:'.14em', color:'var(--faint)' }}>{user ? 'MY PROFILE' : 'WELCOME'}</span>
+          </div>
+          <p style={{ margin:'10px 2px 13px', textAlign:'center', fontFamily:'var(--serif)', fontSize:10.5, lineHeight:1.6, color:'var(--faint)' }}>
+          </p>
+          <div style={{ borderTop:'1px dashed var(--line)', paddingTop:11 }}>
+            <div style={{ display:'flex', justifyContent:'space-between', fontSize:7.5, letterSpacing:'.1em', color:'var(--faint)' }}>
+              <span>NOW PLAYING</span><span style={{fontSize:18}}>♪</span>
+            </div>
+            <div style={{ height:2, margin:'8px 0', background:'var(--line)', borderRadius:2, overflow:'hidden' }}><span style={{ display:'block', width:'38%', height:'100%', background:'var(--accent)', opacity:.65 }} /></div>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:16, color:'var(--faint)', fontSize:11 }}>
+              <span style={{fontSize:21}}>◂◂</span><span style={{ display:'grid', placeItems:'center', width:44, height:44, borderRadius:'50%', background:'var(--text)', color:'var(--faint)', fontSize:18 }}>▶</span><span style={{fontSize:21}}>▸▸</span>
+            </div>
+          </div>
+        </aside>}
       {editOn && <aside className="panel" style={{ position:'absolute', left:-145, top:0, width:'120px', boxSizing:'border-box', padding:10, borderRadius:14, boxShadow:'0 8px 20px rgba(0,0,0,.06)', zIndex:40 }}>
         <div style={{ fontSize:10, letterSpacing:'.08em', opacity:.55, marginBottom:7 }}>EDIT</div>
         <div style={{ display:'grid', gap:6 }}>
@@ -532,7 +627,40 @@ export default function RoomPage() {
         </>}
       </aside>}
       </div>
-      {editOn && <p className="hint" style={{ marginTop:8 }}>보관함에서 스티커를 여러 번 꺼내 쓸 수 있어요. 방에서 삭제해도 보관함에는 남습니다.</p>}
+{profileEditOn && !editOn && <div style={{ position:'fixed', inset:0, zIndex:900, background:'rgba(20,18,15,.42)', display:'grid', placeItems:'center', padding:20 }}>
+        <div className="panel" style={{ width:'min(430px,94vw)', padding:18, borderRadius:16, boxShadow:'0 18px 50px rgba(0,0,0,.18)' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
+            <div><div style={{fontSize:9,letterSpacing:'.15em',color:'var(--faint)'}}>PROFILE</div><strong style={{fontSize:17}}>프로필 편집</strong></div>
+            <button type="button" className="btn btn-ghost" onClick={()=>{setProfileEditOn(false);setProfileFile(null);}}>닫기</button>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'140px 1fr', gap:18, alignItems:'start' }}>
+            <div>
+              <div style={{ width:'100%', aspectRatio:'4 / 3', borderRadius:10, overflow:'hidden', border:'1px solid var(--line)', background:profileColor }}>
+                {profilePreview ? <img src={profilePreview} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}}/> : user?.avatarUrl ? <RoomProfileImage id={user.avatarUrl}/> : null}
+              </div>
+              <label className="btn btn-ghost" style={{width:'100%',justifyContent:'center',marginTop:7,cursor:'pointer'}}>
+                사진 변경
+                <input type="file" accept="image/*" hidden onChange={e=>{const f=e.target.files?.[0];e.target.value='';if(f)setProfileCropFile(f);}}/>
+              </label>
+            </div>
+            <div style={{display:'grid',gap:10}}>
+              <label style={{fontSize:10,color:'var(--faint)'}}>닉네임<input className="k-input" value={profileName} onChange={e=>setProfileName(e.target.value)} style={{width:'100%',boxSizing:'border-box',marginTop:4}}/></label>
+              <label style={{fontSize:10,color:'var(--faint)'}}>이미지 없을 때 색상<input type="color" value={profileColor} onChange={e=>setProfileColor(e.target.value)} style={{display:'block',width:'100%',height:34,marginTop:4,border:0,background:'transparent',padding:0}}/></label>
+            </div>
+          </div>
+          <label style={{display:'grid',gap:4,fontSize:10,color:'var(--faint)',marginTop:12}}>
+            이름 폰트
+            <select className="k-input" value={profileFont} onChange={e=>setProfileFont(e.target.value)}>
+              {fonts.map(f=><option key={f.id} value={f.id}>{f.name}</option>)}
+            </select>
+          </label>
+          <div style={{display:'flex',justifyContent:'flex-end',gap:6,marginTop:16}}>
+            <button type="button" className="btn btn-ghost" onClick={()=>{setProfileEditOn(false);setProfileFile(null);}}>취소</button>
+            <button type="button" className="btn btn-dark" onClick={()=>void saveProfile()}>저장</button>
+          </div>
+        </div>
+      </div>}
+      {profileCropFile && <ProfileCropper file={profileCropFile} onCancel={()=>setProfileCropFile(null)} onDone={file=>{setProfileCropFile(null);setProfileFile(file);}} />}\n      {editOn && <p className="hint" style={{ marginTop:8 }}>보관함에서 스티커를 여러 번 꺼내 쓸 수 있어요. 방에서 삭제해도 보관함에는 남습니다.</p>}
       {backgroundCropFile && <BackgroundCropper file={backgroundCropFile} onCancel={()=>setBackgroundCropFile(null)} onDone={async file=>{setBackgroundCropFile(null);await addBackground(file);}} />}
     </section>
   );
