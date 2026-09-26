@@ -5,6 +5,7 @@ import { getSetting, onSettingChange, setSetting } from '@/lib/settingStore';
 import { putBlob, useBlobUrl } from '@/lib/blobStore';
 import { newId } from '@/lib/postStore';
 import { useAuth } from '@/lib/auth';
+import { EditableDesc } from '@/components/ui/PageText';
 import { useToast } from '@/components/ui/Toast';
 
 type RoomItem = {
@@ -187,9 +188,6 @@ export default function RoomPage() {
   const [editOn, setEditOn] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [stickers, setStickers] = useState<StickerLibraryItem[]>(DEFAULT_STICKERS);
-  const [descriptionEditing, setDescriptionEditing] = useState(false);
-  const descriptionInput = useRef<HTMLInputElement>(null);
-  const [descriptionHover, setDescriptionHover] = useState(false);
   const [backgroundCropFile, setBackgroundCropFile] = useState<File | null>(null);
   const canvas = useRef<HTMLDivElement>(null);
   const bgSrc = useBlobUrl(room.background);
@@ -281,11 +279,6 @@ export default function RoomPage() {
 
   const setDescription = (value: string) => save({ ...room, description: value });
 
-  useEffect(() => {
-    if (descriptionEditing) {
-      requestAnimationFrame(() => descriptionInput.current?.focus());
-    }
-  }, [descriptionEditing]);
 
   if (!loaded) return <section className="page"><div className="panel">불러오는 중…</div></section>;
 
@@ -296,54 +289,7 @@ export default function RoomPage() {
       <div className="page-head">
         <div>
           <h1 style={{ margin: 0 }}>ROOM</h1>
-          <div
-            onMouseEnter={() => setDescriptionHover(true)}
-            onMouseLeave={() => setDescriptionHover(false)}
-            style={{display:'inline-flex',alignItems:'center',gap:4,maxWidth:'100%'}}
-          >
-            {descriptionEditing ? (
-              <input
-                ref={descriptionInput}
-                type="text"
-                value={room.description ?? DEFAULT_DESCRIPTION}
-                onChange={e => setRoom(prev => ({...prev, description:e.target.value}))}
-                onBlur={e => {
-                  setDescription(e.currentTarget.value.trim() || DEFAULT_DESCRIPTION);
-                  setDescriptionEditing(false);
-                }}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') e.currentTarget.blur();
-                  if (e.key === 'Escape') {
-                    setRoom(readRoom());
-                    setDescriptionEditing(false);
-                  }
-                }}
-                style={{
-                  margin:0,
-                  width:'min(520px,70vw)',
-                  border:'1px dashed var(--line)',
-                  borderRadius:6,
-                  padding:'4px 7px',
-                  background:'transparent',
-                  color:'inherit',
-                  font:'inherit',
-                  outline:'none'
-                }}
-              />
-            ) : (
-              <>
-                <p className="hint" style={{margin:0,padding:'3px 5px'}}>{room.description ?? DEFAULT_DESCRIPTION}</p>
-                {isAdmin && descriptionHover && (
-                  <button
-                    type="button"
-                    aria-label="문구 수정"
-                    onClick={() => setDescriptionEditing(true)}
-                    style={{border:0,background:'transparent',padding:2,cursor:'pointer',fontSize:13,lineHeight:1,opacity:.65}}
-                    title="문구 수정"
-                  >✎</button>
-                )}
-              </>
-            )}
+          <EditableDesc k="room-desc" def={DEFAULT_DESCRIPTION} />
           </div>
         </div>
         {isAdmin && <div className="head-actions">
