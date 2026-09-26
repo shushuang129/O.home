@@ -314,7 +314,7 @@ export default function RoomPage() {
         </div>
       )}
 
-      <div style={{ display:'grid', gridTemplateColumns: editOn ? 'minmax(0,1fr) 245px' : '1fr', gap:12, alignItems:'start' }}>
+      <div style={{ display:'grid', gridTemplateColumns: editOn ? 'minmax(0,1fr) 245px' : '1fr', gap:12, alignItems:'start', width: editOn ? 'calc(100% + 257px)' : '100%' }}>
       <div ref={canvas} onPointerDown={() => setSelected(null)}
         style={{ position:'relative', width:'100%', aspectRatio:'16 / 10', overflow:'hidden',
           background: 'var(--bg)',
