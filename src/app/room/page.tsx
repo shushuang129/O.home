@@ -565,7 +565,7 @@ export default function RoomPage() {
               onOpen={() => { if (x.link) window.open(x.link, '_blank', 'noopener,noreferrer'); }} />
           </div>
         ))}
-        {room.items.length === 0 && <div style={{ position:'absolute', inset:0, display:'grid', placeItems:'center', color:'var(--faint)' }}>
+        {room.items.length === 0 && !room.background && <div style={{ position:'absolute', inset:0, display:'grid', placeItems:'center', color:'var(--faint)' }}>
           {isAdmin ? '꾸미기 버튼을 눌러 이미지를 추가해보세요.' : '아직 꾸며진 방이 없습니다.'}
         </div>}
       </div>
