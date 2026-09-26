@@ -81,6 +81,7 @@ export default function RoomPage() {
   const [editOn, setEditOn] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const canvas = useRef<HTMLDivElement>(null);
+  const bgSrc = useBlobUrl(room.background);
 
   useEffect(() => {
     setRoom(readRoom()); setLoaded(true);
@@ -127,7 +128,6 @@ export default function RoomPage() {
 
   if (!loaded) return <section className="page"><div className="panel">불러오는 중…</div></section>;
 
-  const bgSrc = useBlobUrl(room.background);
   const item = room.items.find(x => x.id === selected);
 
   return (
