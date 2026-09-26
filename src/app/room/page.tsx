@@ -46,17 +46,23 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
   onRotate: (deg: number) => void; onOpen: () => void;
 }) {
   const src = useBlobUrl(id);
-  const drag = useRef<{ x: number; y: number; mode: 'move' | 'resize' } | null>(null);
+  const drag = useRef<{ x:number; y:number; mode:'move'|'resize' } | null>(null);
 
-  const down = (e: React.PointerEvent, mode: 'move' | 'resize') => {
+  const begin = (e: React.PointerEvent, mode:'move'|'resize') => {
     if (!editOn || e.button !== 0) return;
-    e.stopPropagation(); e.preventDefault();
-    drag.current = { x: e.clientX, y: e.clientY, mode };
+    e.preventDefault();
+    e.stopPropagation();
+    onSelect();
+    drag.current = { x:e.clientX, y:e.clientY, mode };
+
     const move = (ev: PointerEvent) => {
-      const d = drag.current; if (!d) return;
-      const dx = ev.clientX - d.x, dy = ev.clientY - d.y;
-      drag.current = { x: ev.clientX, y: ev.clientY, mode: d.mode };
-      if (d.mode === 'move') onMove(dx, dy); else onResize(dx, dy);
+      const d = drag.current;
+      if (!d) return;
+      const dx = ev.clientX - d.x;
+      const dy = ev.clientY - d.y;
+      drag.current = { x:ev.clientX, y:ev.clientY, mode:d.mode };
+      if (d.mode === 'move') onMove(dx,dy);
+      else onResize(dx,dy);
     };
     const up = () => {
       drag.current = null;
@@ -68,23 +74,30 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
   };
 
   if (!src) return null;
+
   return (
-    <div onPointerDown={e => down(e, 'move')}
-      onClick={e => { e.stopPropagation(); if (!editOn) onOpen(); else onSelect(); }}
-      style={{ width: '100%', height: '100%', cursor: editOn ? 'grab' : 'pointer', touchAction: 'none' }}>
+    <div
+      onPointerDown={e => begin(e,'move')}
+      onClick={e => { e.stopPropagation(); if (!editOn) onOpen(); }}
+      style={{ width:'100%', height:'100%', position:'relative', cursor:editOn?'move':(onOpen?'pointer':'default'), touchAction:'none' }}
+    >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt="" draggable={false}
-        style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', userSelect: 'none', pointerEvents: 'none' }} />
+        style={{ width:'100%', height:'100%', objectFit:'contain', display:'block', userSelect:'none', pointerEvents:'none' }} />
+
       {editOn && selected && (
         <>
           <button type="button" aria-label="rotate left"
-            onPointerDown={e => e.stopPropagation()} onClick={e => { e.stopPropagation(); onRotate(-5); }}
-            style={{ position:'absolute', left:-30, top:-30, width:24, height:24, border:'1px solid var(--line)', borderRadius:999, background:'var(--panel)', color:'var(--text)', zIndex:20 }}>↶</button>
+            onPointerDown={e=>e.stopPropagation()}
+            onClick={e=>{e.stopPropagation();onRotate(-5);}}
+            style={{position:'absolute',left:-30,top:-30,width:26,height:26,border:'1px solid var(--line)',borderRadius:999,background:'var(--panel)',zIndex:30,cursor:'pointer'}}>↶</button>
           <button type="button" aria-label="rotate right"
-            onPointerDown={e => e.stopPropagation()} onClick={e => { e.stopPropagation(); onRotate(5); }}
-            style={{ position:'absolute', right:-30, top:-30, width:24, height:24, border:'1px solid var(--line)', borderRadius:999, background:'var(--panel)', color:'var(--text)', zIndex:20 }}>↷</button>
-          <span onPointerDown={e => down(e, 'resize')}
-            style={{ position:'absolute', right:-7, bottom:-7, width:18, height:18, border:'1px solid var(--line)', borderRadius:999, background:'var(--panel)', display:'grid', placeItems:'center', zIndex:20, cursor:'nwse-resize' }}>↘</span>
+            onPointerDown={e=>e.stopPropagation()}
+            onClick={e=>{e.stopPropagation();onRotate(5);}}
+            style={{position:'absolute',right:-30,top:-30,width:26,height:26,border:'1px solid var(--line)',borderRadius:999,background:'var(--panel)',zIndex:30,cursor:'pointer'}}>↷</button>
+          <button type="button" aria-label="resize"
+            onPointerDown={e=>begin(e,'resize')}
+            style={{position:'absolute',right:-10,bottom:-10,width:24,height:24,border:'1px solid var(--line)',borderRadius:7,background:'var(--panel)',zIndex:30,cursor:'nwse-resize'}}>↘</button>
         </>
       )}
     </div>
@@ -103,8 +116,13 @@ export default function RoomPage() {
   const bgSrc = useBlobUrl(room.background);
 
   useEffect(() => {
-    setRoom(readRoom()); setLoaded(true);
-    return onSettingChange(key => { if (key === KEY) setRoom(readRoom()); });
+    setRoom(readRoom());
+    setStickers(getSetting<StickerLibraryItem[]>(STICKER_KEY, DEFAULT_STICKERS));
+    setLoaded(true);
+    return onSettingChange(key => {
+      if (key === KEY) setRoom(readRoom());
+      if (key === STICKER_KEY) setStickers(getSetting<StickerLibraryItem[]>(STICKER_KEY, DEFAULT_STICKERS));
+    });
   }, []);
 
   const save = (next: RoomState) => { setRoom(next); setSetting(KEY, next); };
