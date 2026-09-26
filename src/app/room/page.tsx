@@ -295,7 +295,7 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
 }
 
 export default function RoomPage() {
-  const { isAdmin, user } = useAuth();
+  const { isAdmin, user, updateProfile } = useAuth();
   const toast = useToast();
   const [room, setRoom] = useState<RoomState>(DEFAULT);
   const [loaded, setLoaded] = useState(false);
@@ -304,8 +304,43 @@ export default function RoomPage() {
   const [stickers, setStickers] = useState<StickerLibraryItem[]>(DEFAULT_STICKERS);
   const [backgroundCropFile, setBackgroundCropFile] = useState<File | null>(null);
   const [editTab, setEditTab] = useState<'stickers' | 'background'>('stickers');
+  const [profileEditOn, setProfileEditOn] = useState(false);
+  const [profileName, setProfileName] = useState('');
+  const [profileColor, setProfileColor] = useState('#d8d2c8');
+  const [profileFile, setProfileFile] = useState<File | null>(null);
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
   const canvas = useRef<HTMLDivElement>(null);
   const bgSrc = useBlobUrl(room.background);
+
+  useEffect(() => {
+    setProfileName(user?.nickname ?? '');
+    setProfileColor(user?.avatarColor ?? '#d8d2c8');
+  }, [user?.nickname, user?.avatarColor]);
+
+  useEffect(() => {
+    if (!profileFile) { setProfilePreview(null); return; }
+    const url = URL.createObjectURL(profileFile);
+    setProfilePreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [profileFile]);
+
+  const saveProfile = async () => {
+    if (!user) return;
+    let avatarUrl: string | undefined = user.avatarUrl;
+    if (profileFile) avatarUrl = await putBlob(profileFile);
+    const result = await updateProfile({
+      nickname: profileName.trim() || user.nickname,
+      avatarUrl,
+      avatarColor: profileColor,
+    });
+    if (result.ok) {
+      setProfileEditOn(false);
+      setProfileFile(null);
+      toast('프로필을 저장했어요');
+    } else {
+      toast(result.error ?? '프로필을 저장하지 못했어요');
+    }
+  };
 
   useEffect(() => {
     setRoom(readRoom());
@@ -431,34 +466,32 @@ export default function RoomPage() {
       </div>
 
       <div style={{ position:'relative', width:'800px', maxWidth:'100%', margin:'28px auto 0' }}>
-        <aside className="room-side-card" style={{ position:'absolute', right:'calc(100% + 18px)', top:0, width:170, boxSizing:'border-box', padding:14, borderRadius:16, background:'var(--panel)', border:'1px solid var(--line)', boxShadow:'0 10px 24px rgba(0,0,0,.07)' }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
+        {!editOn && <aside className="room-side-card" style={{ position:'absolute', right:'calc(100% + 18px)', top:0, width:220, boxSizing:'border-box', padding:17, borderRadius:16, background:'var(--panel)', border:'1px solid var(--line)', boxShadow:'0 10px 24px rgba(0,0,0,.07)' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
             <span style={{ fontSize:9, letterSpacing:'.16em', color:'var(--faint)' }}>PROFILE</span>
-            <span style={{ fontSize:12, opacity:.55 }}>✦</span>
+            <button type="button" className="btn btn-ghost" onClick={()=>setProfileEditOn(true)} style={{ padding:'4px 7px', fontSize:9 }}>EDIT</button>
           </div>
-          <div style={{ width:92, height:92, margin:'0 auto 10px', padding:4, borderRadius:'50%', border:'1px solid var(--line)', background:'var(--bg)', boxSizing:'border-box' }}>
-            <div style={{ width:'100%', height:'100%', borderRadius:'50%', overflow:'hidden', background:user?.avatarColor ?? 'linear-gradient(135deg,#ddd8cf,#aaa39a)' }}>
-              {user?.avatarUrl && <RoomProfileImage id={user.avatarUrl} />}
-            </div>
+          <div style={{ width:'100%', aspectRatio:'4 / 3', borderRadius:10, overflow:'hidden', border:'1px solid var(--line)', background:user?.avatarColor ?? 'linear-gradient(135deg,#ddd8cf,#aaa39a)', boxShadow:'0 5px 15px rgba(0,0,0,.06)' }}>
+            {user?.avatarUrl && <RoomProfileImage id={user.avatarUrl} />}
           </div>
-          <div style={{ textAlign:'center' }}>
-            <strong style={{ display:'block', fontFamily:'var(--serif)', fontSize:17 }}>{user?.nickname ?? 'MY ROOM'}</strong>
+          <div style={{ textAlign:'center', marginTop:12 }}>
+            <strong style={{ display:'block', fontFamily:'var(--serif)', fontSize:20 }}>{user?.nickname ?? 'MY ROOM'}</strong>
             <span style={{ display:'block', marginTop:3, fontSize:8, letterSpacing:'.14em', color:'var(--faint)' }}>{user ? 'MY PROFILE' : 'WELCOME'}</span>
           </div>
-          <p style={{ margin:'10px 2px 12px', textAlign:'center', fontFamily:'var(--serif)', fontSize:10.5, lineHeight:1.6, color:'var(--faint)' }}>
+          <p style={{ margin:'10px 2px 13px', textAlign:'center', fontFamily:'var(--serif)', fontSize:10.5, lineHeight:1.6, color:'var(--faint)' }}>
             my little room<br/>my little diary
           </p>
-          <div style={{ borderTop:'1px dashed var(--line)', paddingTop:10 }}>
+          <div style={{ borderTop:'1px dashed var(--line)', paddingTop:11 }}>
             <div style={{ display:'flex', justifyContent:'space-between', fontSize:7.5, letterSpacing:'.1em', color:'var(--faint)' }}>
               <span>NOW PLAYING</span><span>♪</span>
             </div>
             <div style={{ marginTop:5, fontFamily:'var(--serif)', fontSize:10.5, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>my little playlist</div>
             <div style={{ height:2, margin:'8px 0', background:'var(--line)', borderRadius:2, overflow:'hidden' }}><span style={{ display:'block', width:'38%', height:'100%', background:'var(--accent)', opacity:.65 }} /></div>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:12, color:'var(--faint)', fontSize:9 }}>
-              <span>◂◂</span><span style={{ display:'grid', placeItems:'center', width:23, height:23, borderRadius:'50%', background:'var(--text)', color:'var(--panel)' }}>▶</span><span>▸▸</span>
+              <span>◂◂</span><span style={{ display:'grid', placeItems:'center', width:25, height:25, borderRadius:'50%', background:'var(--text)', color:'var(--panel)' }}>▶</span><span>▸▸</span>
             </div>
           </div>
-        </aside>
+        </aside>}
       {editOn && <aside className="panel" style={{ position:'absolute', left:-145, top:0, width:'120px', boxSizing:'border-box', padding:10, borderRadius:14, boxShadow:'0 8px 20px rgba(0,0,0,.06)', zIndex:40 }}>
         <div style={{ fontSize:10, letterSpacing:'.08em', opacity:.55, marginBottom:7 }}>EDIT</div>
         <div style={{ display:'grid', gap:6 }}>
@@ -567,6 +600,33 @@ export default function RoomPage() {
         </>}
       </aside>}
       </div>
+{profileEditOn && !editOn && <div style={{ position:'fixed', inset:0, zIndex:900, background:'rgba(20,18,15,.42)', display:'grid', placeItems:'center', padding:20 }}>
+        <div className="panel" style={{ width:'min(430px,94vw)', padding:18, borderRadius:16, boxShadow:'0 18px 50px rgba(0,0,0,.18)' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
+            <div><div style={{fontSize:9,letterSpacing:'.15em',color:'var(--faint)'}}>PROFILE</div><strong style={{fontSize:17}}>프로필 편집</strong></div>
+            <button type="button" className="btn btn-ghost" onClick={()=>{setProfileEditOn(false);setProfileFile(null);}}>닫기</button>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'140px 1fr', gap:18, alignItems:'start' }}>
+            <div>
+              <div style={{ width:'100%', aspectRatio:'4 / 3', borderRadius:10, overflow:'hidden', border:'1px solid var(--line)', background:profileColor }}>
+                {profilePreview ? <img src={profilePreview} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}}/> : user?.avatarUrl ? <RoomProfileImage id={user.avatarUrl}/> : null}
+              </div>
+              <label className="btn btn-ghost" style={{width:'100%',justifyContent:'center',marginTop:7,cursor:'pointer'}}>
+                사진 변경
+                <input type="file" accept="image/*" hidden onChange={e=>{const f=e.target.files?.[0];e.target.value='';if(f)setProfileFile(f);}}/>
+              </label>
+            </div>
+            <div style={{display:'grid',gap:10}}>
+              <label style={{fontSize:10,color:'var(--faint)'}}>닉네임<input className="k-input" value={profileName} onChange={e=>setProfileName(e.target.value)} style={{width:'100%',boxSizing:'border-box',marginTop:4}}/></label>
+              <label style={{fontSize:10,color:'var(--faint)'}}>이미지 없을 때 색상<input type="color" value={profileColor} onChange={e=>setProfileColor(e.target.value)} style={{display:'block',width:'100%',height:34,marginTop:4,border:0,background:'transparent',padding:0}}/></label>
+            </div>
+          </div>
+          <div style={{display:'flex',justifyContent:'flex-end',gap:6,marginTop:16}}>
+            <button type="button" className="btn btn-ghost" onClick={()=>{setProfileEditOn(false);setProfileFile(null);}}>취소</button>
+            <button type="button" className="btn btn-dark" onClick={()=>void saveProfile()}>저장</button>
+          </div>
+        </div>
+      </div>}
       {editOn && <p className="hint" style={{ marginTop:8 }}>보관함에서 스티커를 여러 번 꺼내 쓸 수 있어요. 방에서 삭제해도 보관함에는 남습니다.</p>}
       {backgroundCropFile && <BackgroundCropper file={backgroundCropFile} onCancel={()=>setBackgroundCropFile(null)} onDone={async file=>{setBackgroundCropFile(null);await addBackground(file);}} />}
     </section>
