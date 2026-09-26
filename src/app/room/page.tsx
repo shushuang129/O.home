@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { getSetting, onSettingChange, setSetting } from '@/lib/settingStore';
+import { useFonts } from '@/lib/fontStore';
 import { putBlob, useBlobUrl } from '@/lib/blobStore';
 import { newId } from '@/lib/postStore';
 import { useAuth } from '@/lib/auth';
@@ -316,6 +317,7 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
 
 export default function RoomPage() {
   const { isAdmin, user, updateProfile } = useAuth();
+  const { fonts, familyOf } = useFonts();
   const toast = useToast();
   const [room, setRoom] = useState<RoomState>(DEFAULT);
   const [loaded, setLoaded] = useState(false);
@@ -339,7 +341,7 @@ export default function RoomPage() {
     setProfileName(user?.nickname ?? '');
     setProfileColor(user?.avatarColor ?? '#d8d2c8');
     setProfileAvatarRef(user?.avatarUrl);
-    setProfileFont(getSetting<string>(`ohome.room.profile.font.${user?.id ?? 'guest'}`, 'var(--serif)'));
+    setProfileFont(getSetting<string>(`ohome.room.profile.font.${user?.id ?? 'guest'}`, 'serif'));
   }, [user?.id, user?.nickname, user?.avatarColor, user?.avatarUrl]);
 
   useEffect(() => {
@@ -502,7 +504,7 @@ export default function RoomPage() {
             {(profileAvatarRef ?? user?.avatarUrl) && <RoomProfileImage key={profileAvatarRef ?? user?.avatarUrl} id={profileAvatarRef ?? user!.avatarUrl!} />}
           </div>
           <div style={{ textAlign:'center', marginTop:12 }}>
-            <strong style={{ display:'block', fontFamily:profileFont, fontSize:20 }}>{user?.nickname ?? 'MY ROOM'}</strong>
+            <strong style={{ display:'block', fontFamily:familyOf(profileFont) ?? 'var(--serif)', fontSize:20 }}>{user?.nickname ?? 'MY ROOM'}</strong>
             <span style={{ display:'block', marginTop:3, fontSize:8, letterSpacing:'.14em', color:'var(--faint)' }}>{user ? 'MY PROFILE' : 'WELCOME'}</span>
           </div>
           <p style={{ margin:'10px 2px 13px', textAlign:'center', fontFamily:'var(--serif)', fontSize:10.5, lineHeight:1.6, color:'var(--faint)' }}>
@@ -646,7 +648,12 @@ export default function RoomPage() {
               <label style={{fontSize:10,color:'var(--faint)'}}>이미지 없을 때 색상<input type="color" value={profileColor} onChange={e=>setProfileColor(e.target.value)} style={{display:'block',width:'100%',height:34,marginTop:4,border:0,background:'transparent',padding:0}}/></label>
             </div>
           </div>
-          <label style={{display:'grid',gap:4,fontSize:10,color:'var(--faint)',marginTop:12}}>이름 폰트<select className="k-input" value={profileFont} onChange={e=>setProfileFont(e.target.value)}><option value="var(--serif)">Serif</option><option value="var(--sans)">Sans</option><option value="Georgia, serif">Georgia</option><option value="Arial, sans-serif">Arial</option><option value="'Courier New', monospace">Courier New</option></select></label>
+          <label style={{display:'grid',gap:4,fontSize:10,color:'var(--faint)',marginTop:12}}>
+            이름 폰트
+            <select className="k-input" value={profileFont} onChange={e=>setProfileFont(e.target.value)}>
+              {fonts.map(f=><option key={f.id} value={f.id}>{f.name}</option>)}
+            </select>
+          </label>
           <div style={{display:'flex',justifyContent:'flex-end',gap:6,marginTop:16}}>
             <button type="button" className="btn btn-ghost" onClick={()=>{setProfileEditOn(false);setProfileFile(null);}}>취소</button>
             <button type="button" className="btn btn-dark" onClick={()=>void saveProfile()}>저장</button>
