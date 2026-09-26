@@ -660,7 +660,8 @@ export default function RoomPage() {
           </div>
         </div>
       </div>}
-      {profileCropFile && <ProfileCropper file={profileCropFile} onCancel={()=>setProfileCropFile(null)} onDone={file=>{setProfileCropFile(null);setProfileFile(file);}} />}\n      {editOn && <p className="hint" style={{ marginTop:8 }}>보관함에서 스티커를 여러 번 꺼내 쓸 수 있어요. 방에서 삭제해도 보관함에는 남습니다.</p>}
+      {profileCropFile && <ProfileCropper file={profileCropFile} onCancel={()=>setProfileCropFile(null)} onDone={file=>{setProfileCropFile(null);setProfileFile(file);}} />}
+      {editOn && <p className="hint" style={{ marginTop:8 }}>보관함에서 스티커를 여러 번 꺼내 쓸 수 있어요. 방에서 삭제해도 보관함에는 남습니다.</p>}
       {backgroundCropFile && <BackgroundCropper file={backgroundCropFile} onCancel={()=>setBackgroundCropFile(null)} onDone={async file=>{setBackgroundCropFile(null);await addBackground(file);}} />}
     </section>
   );
