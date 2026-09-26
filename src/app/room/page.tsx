@@ -408,7 +408,7 @@ export default function RoomPage() {
   const item = room.items.find(x => x.id === selected);
 
   return (
-    <section className="page" style={{ maxWidth: 1100 }}>
+    <section className="page" style={{ maxWidth: editOn ? 1524 : 1100, width: '100%', boxSizing: 'border-box' }}>
       <div className="page-head">
         <div>
           <h1 style={{ margin: 0, display:'flex', alignItems:'center', gap:7 }}>
@@ -423,8 +423,8 @@ export default function RoomPage() {
         </div>}
       </div>
 
-      <div style={{ position:'relative', display:'grid', gridTemplateColumns: editOn ? '120px minmax(0,1fr) 245px' : '1fr', gap:12, alignItems:'start', width: editOn ? 'calc(100% + 257px)' : '100%' }}>
-      {editOn && <aside className="panel" style={{ width:'100%', boxSizing:'border-box', padding:10, borderRadius:14, boxShadow:'0 8px 20px rgba(0,0,0,.06)' }}>
+      <div style={{ position:'relative', display:'grid', gridTemplateColumns: editOn ? '245px 1000px 245px' : '1fr', gap:12, alignItems:'start', width: editOn ? '1524px' : '100%', maxWidth:'100%', margin:'0 auto' }}>
+      {editOn && <aside className="panel" style={{ width:'120px', justifySelf:'end', boxSizing:'border-box', padding:10, borderRadius:14, boxShadow:'0 8px 20px rgba(0,0,0,.06)' }}>
         <div style={{ fontSize:10, letterSpacing:'.08em', opacity:.55, marginBottom:7 }}>EDIT</div>
         <div style={{ display:'grid', gap:6 }}>
           <button className="btn btn-ghost" onClick={() => moveZ('top')} disabled={!selected}>맨 위</button>
