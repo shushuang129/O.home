@@ -167,20 +167,20 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
     const deltaDeg = delta * 180 / Math.PI;
     rotation.current += deltaDeg;
 
-    if (snapped.current) {
-      const snappedTarget = snapTarget.current ?? rotation.current;
-      const distanceFromSnap = Math.abs(normalizeAngle(rotation.current - snappedTarget));
-      if (distanceFromSnap < 4) {
-        rotation.current = snappedTarget;
-        return;
+    const normalized = ((rotation.current % 360) + 360) % 360;
+    const targets = [0, 90, 180, 270];
+    let nearest = targets[0];
+    let distance = 360;
+    for (const target of targets) {
+      const d = Math.abs(normalized - target);
+      const wrapped = Math.min(d, 360 - d);
+      if (wrapped < distance) {
+        distance = wrapped;
+        nearest = target;
       }
-      snapped.current = false;
-      clearSnap();
     }
 
-    const nearest = Math.round(rotation.current / 90) * 90;
-    const distance = Math.abs(normalizeAngle(rotation.current - nearest));
-    const SNAP_RANGE = 10;
+    const SNAP_RANGE = 8;
     const SNAP_DELAY = 450;
 
     if (distance <= SNAP_RANGE) {
@@ -189,10 +189,19 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
         snapTarget.current = nearest;
         snapTimer.current = setTimeout(() => {
           if (snapTarget.current !== nearest) return;
-          const currentDistance = Math.abs(normalizeAngle(rotation.current - nearest));
+
+          const current = ((rotation.current % 360) + 360) % 360;
+          const currentDistance = Math.min(
+            Math.abs(current - nearest),
+            360 - Math.abs(current - nearest)
+          );
+
           if (currentDistance <= SNAP_RANGE) {
-            const correction = nearest - rotation.current;
-            rotation.current = nearest;
+            let correction = nearest - current;
+            if (correction > 180) correction -= 360;
+            if (correction < -180) correction += 360;
+
+            rotation.current += correction;
             snapped.current = true;
             onRotate(correction);
           }
@@ -201,6 +210,7 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
       }
     } else {
       clearSnap();
+      snapped.current = false;
     }
 
     if (!snapped.current) onRotate(deltaDeg);
