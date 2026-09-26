@@ -11,20 +11,20 @@ type RoomItem = {
   id: string; imgId: string; x: number; y: number; w: number; h: number;
   rot: number; z: number; link?: string;
 };
-type RoomState = { background?: string; backgroundScale?: number; backgroundX?: number; backgroundY?: number; description?: string; items: RoomItem[] };
+type RoomState = { background?: string; description?: string; items: RoomItem[] };
 type StickerLibraryItem = { id: string; imgId: string; name?: string };
 const KEY = 'ohome.room.v1';
 const STICKER_KEY = 'ohome.room.stickers.v1';
 const ROOM_W = 1000;
 const ROOM_H = 625;
 const DEFAULT_DESCRIPTION = '이미지와 스티커로 나만의 미니홈피를 꾸며보세요.';
-const DEFAULT: RoomState = { items: [], description: DEFAULT_DESCRIPTION, backgroundScale: 1, backgroundX: 50, backgroundY: 50 };
+const DEFAULT: RoomState = { items: [], description: DEFAULT_DESCRIPTION };
 const DEFAULT_STICKERS: StickerLibraryItem[] = [];
 
 function readRoom(): RoomState {
   try {
     const v = getSetting<RoomState>(KEY, DEFAULT);
-    return { ...DEFAULT, ...v, description: v?.description ?? DEFAULT_DESCRIPTION, backgroundScale: v?.backgroundScale ?? 1, backgroundX: v?.backgroundX ?? 50, backgroundY: v?.backgroundY ?? 50, items: Array.isArray(v?.items) ? v.items : [] };
+    return { ...DEFAULT, ...v, description: v?.description ?? DEFAULT_DESCRIPTION, items: Array.isArray(v?.items) ? v.items : [] };
   } catch { return DEFAULT; }
 }
 
@@ -39,6 +39,56 @@ function StickerLibraryCard({ sticker, onAdd, onRemove }: { sticker: StickerLibr
     <div style={{ display:'flex', gap:5, marginTop:6 }}>
       <button type="button" className="btn btn-dark" onClick={onAdd} style={{ flex:1, padding:'6px 4px', fontSize:11, borderRadius:8 }}>＋ 넣기</button>
       <button type="button" className="btn btn-ghost" onClick={onRemove} style={{ padding:'6px 8px', fontSize:11, borderRadius:8 }} title="보관함에서 삭제">×</button>
+    </div>
+  </div>;
+}
+
+function BackgroundCropper({ file, onCancel, onDone }: { file: File; onCancel: () => void; onDone: (file: File) => void }) {
+  const VIEW_W = 720;
+  const VIEW_H = 450;
+  const [src, setSrc] = useState('');
+  const [imgSize, setImgSize] = useState({ w: 0, h: 0 });
+  const [scale, setScale] = useState(1);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const drag = useRef<{ x:number; y:number; px:number; py:number } | null>(null);
+
+  useEffect(() => {
+    const url = URL.createObjectURL(file);
+    setSrc(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+
+  const baseScale = imgSize.w && imgSize.h ? Math.max(VIEW_W / imgSize.w, VIEW_H / imgSize.h) : 1;
+  const shownW = imgSize.w * baseScale * scale;
+  const shownH = imgSize.h * baseScale * scale;
+  const maxX = Math.max(0, (shownW - VIEW_W) / 2);
+  const maxY = Math.max(0, (shownH - VIEW_H) / 2);
+  const clampPos = (x:number,y:number) => ({x:Math.max(-maxX,Math.min(maxX,x)),y:Math.max(-maxY,Math.min(maxY,y))});
+
+  const down=(e:React.PointerEvent<HTMLDivElement>)=>{if(e.button!==0)return;e.currentTarget.setPointerCapture(e.pointerId);drag.current={x:e.clientX,y:e.clientY,px:pos.x,py:pos.y};};
+  const move=(e:React.PointerEvent<HTMLDivElement>)=>{if(!drag.current)return;const d=drag.current;setPos(clampPos(d.px+e.clientX-d.x,d.py+e.clientY-d.y));};
+  const up=()=>{drag.current=null;};
+
+  const crop=()=>{
+    if(!imgSize.w||!imgSize.h)return;
+    const cv=document.createElement('canvas'); cv.width=VIEW_W; cv.height=VIEW_H;
+    const ctx=cv.getContext('2d'); if(!ctx)return;
+    const left=(VIEW_W-shownW)/2+pos.x, top=(VIEW_H-shownH)/2+pos.y;
+    const image=new Image();
+    image.onload=()=>{ctx.drawImage(image,left,top,shownW,shownH);cv.toBlob(blob=>{if(blob)onDone(new File([blob],'room-background.jpg',{type:'image/jpeg'}));},'image/jpeg',0.92);};
+    image.src=src;
+  };
+
+  return <div style={{position:'fixed',inset:0,zIndex:1000,background:'rgba(0,0,0,.55)',display:'grid',placeItems:'center',padding:20}}>
+    <div className="panel" style={{width:'min(780px,95vw)',padding:16,borderRadius:14}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}><strong>배경 자르기</strong><span className="hint">16 : 10 · 이미지를 드래그해서 원하는 부분을 맞춰주세요.</span></div>
+      <div onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} style={{width:'100%',aspectRatio:'16 / 10',overflow:'hidden',position:'relative',background:'var(--bg)',cursor:'grab',touchAction:'none',borderRadius:10}}>
+        {src&&<img src={src} alt="" draggable={false} onLoad={e=>setImgSize({w:e.currentTarget.naturalWidth,h:e.currentTarget.naturalHeight})} style={{position:'absolute',width:shownW,height:shownH,maxWidth:'none',left:'50%',top:'50%',transform:'translate(-50%,-50%) translate('+pos.x+'px,'+pos.y+'px)',userSelect:'none',pointerEvents:'none'}}/>}
+      </div>
+      <div style={{display:'flex',justifyContent:'space-between',marginTop:12,gap:8}}>
+        <div style={{display:'flex',gap:6}}><button type="button" className="btn btn-ghost" onClick={()=>{setScale(s=>Math.max(1,s-.1));setPos(p=>clampPos(p.x,p.y));}}>− 축소</button><button type="button" className="btn btn-ghost" onClick={()=>setScale(s=>Math.min(3,s+.1))}>＋ 확대</button><button type="button" className="btn btn-ghost" onClick={()=>{setScale(1);setPos({x:0,y:0});}}>초기화</button></div>
+        <div style={{display:'flex',gap:6}}><button type="button" className="btn btn-ghost" onClick={onCancel}>취소</button><button type="button" className="btn btn-dark" onClick={crop}>이대로 자르기</button></div>
+      </div>
     </div>
   </div>;
 }
@@ -125,6 +175,7 @@ export default function RoomPage() {
   const [stickers, setStickers] = useState<StickerLibraryItem[]>(DEFAULT_STICKERS);
   const [descriptionEditing, setDescriptionEditing] = useState(false);
   const [descriptionHover, setDescriptionHover] = useState(false);
+  const [backgroundCropFile, setBackgroundCropFile] = useState<File | null>(null);
   const canvas = useRef<HTMLDivElement>(null);
   const bgSrc = useBlobUrl(room.background);
 
@@ -168,7 +219,7 @@ export default function RoomPage() {
 
   const addBackground = async (file: File) => {
     const id = await putBlob(file);
-    save({ ...room, background: id, backgroundScale: 1, backgroundX: 0, backgroundY: 0 });
+    save({ ...room, background: id });
     toast('배경을 저장했습니다');
   };
 
@@ -214,7 +265,6 @@ export default function RoomPage() {
   };
 
   const setDescription = (value: string) => save({ ...room, description: value });
-  const updateBackground = (patch: Partial<Pick<RoomState, 'backgroundScale' | 'backgroundX' | 'backgroundY'>>) => save({ ...room, ...patch });
 
   if (!loaded) return <section className="page"><div className="panel">불러오는 중…</div></section>;
 
@@ -269,18 +319,9 @@ export default function RoomPage() {
             <input type="file" accept="image/*" hidden onChange={e => { const f=e.target.files?.[0]; e.target.value=''; if(f) void addStickerToLibrary(f); }} />
           </label>
           <label className="btn btn-ghost">배경 바꾸기
-            <input type="file" accept="image/*" hidden onChange={e => { const f=e.target.files?.[0]; e.target.value=''; if(f) void addBackground(f); }} />
+            <input type="file" accept="image/*" hidden onChange={e => { const f=e.target.files?.[0]; e.target.value=''; if(f) setBackgroundCropFile(f); }} />
           </label>
-          <label className="btn btn-ghost" style={{display:'inline-flex',alignItems:'center',gap:6}}>배경 확대
-            <input type="range" min="1" max="3" step="0.05" value={room.backgroundScale ?? 1} onChange={e=>updateBackground({backgroundScale:Number(e.target.value)})} />
-          </label>
-          <label className="btn btn-ghost" style={{display:'inline-flex',alignItems:'center',gap:6}}>위·아래
-            <input type="range" min="0" max="100" step="1" value={room.backgroundY ?? 50} onChange={e=>updateBackground({backgroundY:Number(e.target.value)})} />
-          </label>
-          <label className="btn btn-ghost" style={{display:'inline-flex',alignItems:'center',gap:6}}>좌·우
-            <input type="range" min="0" max="100" step="1" value={room.backgroundX ?? 50} onChange={e=>updateBackground({backgroundX:Number(e.target.value)})} />
-          </label>
-          {selected && <button className="btn btn-ghost" onClick={() => moveZ('top')}>맨 위</button>}
+                    {selected && <button className="btn btn-ghost" onClick={() => moveZ('top')}>맨 위</button>}
           {selected && <button className="btn btn-ghost" onClick={() => moveZ('bottom')}>맨 아래</button>}
           {selected && <button className="btn btn-ghost" onClick={remove}>삭제</button>}
           {selected && (
@@ -296,22 +337,8 @@ export default function RoomPage() {
           background: 'var(--bg)',
           border: editOn ? '1px dashed var(--line)' : '1px solid var(--line)', borderRadius:10 }}>
         {bgSrc && <div style={{position:'absolute',inset:0,overflow:'hidden',pointerEvents:'none'}}>
-          {/* object-fit: cover keeps the image ratio; object-position chooses which part is shown. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={bgSrc}
-            alt=""
-            draggable={false}
-            style={{
-              width:'100%',
-              height:'100%',
-              display:'block',
-              objectFit:'cover',
-              objectPosition:(room.backgroundX ?? 50) + '% ' + (room.backgroundY ?? 50) + '%',
-              transform:'scale(' + (room.backgroundScale ?? 1) + ')',
-              transformOrigin:'center center'
-            }}
-          />
+          <img src={bgSrc} alt="" draggable={false} style={{width:'100%',height:'100%',display:'block',objectFit:'fill'}} />
         </div>}
         {room.items.map(x => (
           <div key={x.id} style={{ position:'absolute', left:(x.x / ROOM_W * 100) + '%', top:(x.y / ROOM_H * 100) + '%',
@@ -338,6 +365,7 @@ export default function RoomPage() {
       </aside>}
       </div>
       {editOn && <p className="hint" style={{ marginTop:8 }}>보관함에서 스티커를 여러 번 꺼내 쓸 수 있어요. 방에서 삭제해도 보관함에는 남습니다.</p>}
+      {backgroundCropFile && <BackgroundCropper file={backgroundCropFile} onCancel={()=>setBackgroundCropFile(null)} onDone={async file=>{setBackgroundCropFile(null);await addBackground(file);}} />}
     </section>
   );
 }
