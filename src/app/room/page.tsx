@@ -189,6 +189,7 @@ export default function RoomPage() {
   const [selected, setSelected] = useState<string | null>(null);
   const [stickers, setStickers] = useState<StickerLibraryItem[]>(DEFAULT_STICKERS);
   const [backgroundCropFile, setBackgroundCropFile] = useState<File | null>(null);
+  const [editTab, setEditTab] = useState<'stickers' | 'background'>('stickers');
   const canvas = useRef<HTMLDivElement>(null);
   const bgSrc = useBlobUrl(room.background);
 
@@ -277,9 +278,6 @@ export default function RoomPage() {
     updateItem(selected, { z: dir === 'top' ? Math.max(...zs, 0) + 1 : Math.min(...zs, 0) - 1 });
   };
 
-  const setDescription = (value: string) => save({ ...room, description: value });
-
-
   if (!loaded) return <section className="page"><div className="panel">불러오는 중…</div></section>;
 
   const item = room.items.find(x => x.id === selected);
@@ -288,11 +286,15 @@ export default function RoomPage() {
     <section className="page" style={{ maxWidth: 1100 }}>
       <div className="page-head">
         <div>
-          <h1 style={{ margin: 0 }}>ROOM</h1>
+          <h1 style={{ margin: 0, display:'flex', alignItems:'center', gap:7 }}>
+            <span aria-hidden="true" style={{ fontSize:16, transform:'rotate(-8deg)', display:'inline-block' }}>✦</span>
+            <span>ROOM</span>
+            <span aria-hidden="true" style={{ fontSize:12, opacity:.7, transform:'rotate(8deg)', display:'inline-block' }}>♡</span>
+          </h1>
           <EditableDesc k="room-desc" def={DEFAULT_DESCRIPTION} />
           </div>
         {isAdmin && <div className="head-actions">
-          <button className="btn btn-dark" onClick={() => setEditOn(v => !v)}>{editOn ? '꾸미기 끝' : '꾸미기'}</button>
+          <button className="btn btn-dark" onClick={() => setEditOn(v => !v)}>{editOn ? '✦ 꾸미기 끝' : '✦ 꾸미기'}</button>
         </div>}
       </div>
 
@@ -300,9 +302,6 @@ export default function RoomPage() {
         <div className="panel" style={{ display:'flex', gap:8, flexWrap:'wrap', alignItems:'center', marginBottom:12 }}>
           <label className="btn btn-dark">＋ 이미지 추가
             <input type="file" accept="image/*" hidden onChange={e => { const f=e.target.files?.[0]; e.target.value=''; if(f) void addStickerToLibrary(f); }} />
-          </label>
-          <label className="btn btn-ghost">배경 바꾸기
-            <input type="file" accept="image/*" hidden onChange={e => { const f=e.target.files?.[0]; e.target.value=''; if(f) setBackgroundCropFile(f); }} />
           </label>
                     {selected && <button className="btn btn-ghost" onClick={() => moveZ('top')}>맨 위</button>}
           {selected && <button className="btn btn-ghost" onClick={() => moveZ('bottom')}>맨 아래</button>}
@@ -315,10 +314,14 @@ export default function RoomPage() {
       )}
 
       <div style={{ display:'grid', gridTemplateColumns: editOn ? 'minmax(0,1fr) 245px' : '1fr', gap:12, alignItems:'start', width: editOn ? 'calc(100% + 257px)' : '100%' }}>
-      <div ref={canvas} onPointerDown={() => setSelected(null)}
-        style={{ position:'relative', width:'100%', aspectRatio:'16 / 10', overflow:'hidden',
-          background: 'var(--bg)',
-          border: editOn ? '1px dashed var(--line)' : '1px solid var(--line)', borderRadius:10 }}>
+      <div style={{ position:'relative', width:'100%', aspectRatio:'16 / 10', overflow:'visible' }}>
+        <span aria-hidden="true" style={{ position:'absolute', left:10, top:-8, zIndex:50, fontSize:15, transform:'rotate(-12deg)', opacity:.75, pointerEvents:'none' }}>✦</span>
+        <span aria-hidden="true" style={{ position:'absolute', right:12, bottom:-8, zIndex:50, fontSize:14, transform:'rotate(10deg)', opacity:.65, pointerEvents:'none' }}>♡</span>
+        <div ref={canvas} onPointerDown={() => setSelected(null)}
+          style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden',
+            background: 'var(--bg)',
+            border: editOn ? '1px dashed var(--line)' : '1px solid var(--line)', borderRadius:14,
+            boxShadow:'0 10px 24px rgba(0,0,0,.08), 0 0 0 4px var(--panel)' }}>
         {bgSrc && <div style={{position:'absolute',inset:0,overflow:'hidden',pointerEvents:'none'}}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={bgSrc} alt="" draggable={false} style={{width:'100%',height:'100%',display:'block',objectFit:'fill'}} />
@@ -340,11 +343,51 @@ export default function RoomPage() {
           {isAdmin ? '꾸미기 버튼을 눌러 이미지를 추가해보세요.' : '아직 꾸며진 방이 없습니다.'}
         </div>}
       </div>
-      {editOn && <aside className="panel" style={{ padding:10, borderRadius:12, maxHeight:'min(70vh,625px)', overflowY:'auto' }}>
-        <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}><strong style={{fontSize:13}}>스티커 보관함</strong><span className="hint">{stickers.length}개</span></div>
-        <p className="hint" style={{fontSize:10.5, margin:'0 0 10px'}}>한 번 불러온 스티커는 여기서 다시 꺼내 쓸 수 있어요.</p>
-        {stickers.length===0 ? <div style={{padding:20,textAlign:'center',border:'1px dashed var(--line)',borderRadius:10,fontSize:11,color:'var(--faint)'}}>아직 스티커가 없어요.<br/>위의 ＋ 이미지 추가로 추가해보세요.</div> :
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:7}}>{stickers.map(x=><StickerLibraryCard key={x.id} sticker={x} onAdd={() => addStickerToRoom(x.imgId)} onRemove={() => removeStickerFromLibrary(x.id)}/>)}</div>}
+      </div>
+      {editOn && <aside className="panel" style={{ padding:10, borderRadius:14, maxHeight:'min(70vh,625px)', overflowY:'auto', boxShadow:'0 8px 20px rgba(0,0,0,.06)' }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:9 }}>
+          <div>
+            <div style={{ fontSize:10, letterSpacing:'.08em', opacity:.55 }}>MY COLLECTION</div>
+            <strong style={{ fontSize:14 }}>ROOM 꾸미기</strong>
+          </div>
+          <span aria-hidden="true" style={{ fontSize:16, opacity:.65 }}>✦</span>
+        </div>
+
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:5, padding:4, border:'1px solid var(--line)', borderRadius:10, background:'var(--bg)', marginBottom:10 }}>
+          <button type="button" onClick={()=>setEditTab('stickers')}
+            style={{ border:0, borderRadius:7, padding:'7px 4px', background:editTab==='stickers'?'var(--panel)':'transparent', color:'inherit', cursor:'pointer', fontSize:11, fontWeight:editTab==='stickers'?700:500, boxShadow:editTab==='stickers'?'0 2px 8px rgba(0,0,0,.05)':'none' }}>
+            ✦ 스티커
+          </button>
+          <button type="button" onClick={()=>setEditTab('background')}
+            style={{ border:0, borderRadius:7, padding:'7px 4px', background:editTab==='background'?'var(--panel)':'transparent', color:'inherit', cursor:'pointer', fontSize:11, fontWeight:editTab==='background'?700:500, boxShadow:editTab==='background'?'0 2px 8px rgba(0,0,0,.05)':'none' }}>
+            ▧ 배경
+          </button>
+        </div>
+
+        {editTab==='stickers' ? <>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:4 }}>
+            <strong style={{fontSize:12}}>스티커 보관함</strong>
+            <span className="hint">{stickers.length}개</span>
+          </div>
+          <p className="hint" style={{fontSize:10.5, margin:'0 0 10px'}}>한 번 넣어둔 스티커는 여러 번 꺼내 쓸 수 있어요.</p>
+          {stickers.length===0 ? <div style={{padding:20,textAlign:'center',border:'1px dashed var(--line)',borderRadius:10,fontSize:11,color:'var(--faint)'}}>아직 스티커가 없어요.<br/>위의 ＋ 이미지 추가로 추가해보세요.</div> :
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:7}}>{stickers.map(x=><StickerLibraryCard key={x.id} sticker={x} onAdd={() => addStickerToRoom(x.imgId)} onRemove={() => removeStickerFromLibrary(x.id)}/>)}</div>}
+        </> : <>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:4 }}>
+            <strong style={{fontSize:12}}>ROOM 배경</strong>
+            <span className="hint">16 : 10</span>
+          </div>
+          <p className="hint" style={{fontSize:10.5, margin:'0 0 10px'}}>방에 어울리는 배경을 골라보세요. 이미지는 16:10으로 맞춰 저장돼요.</p>
+          <label className="btn btn-ghost" style={{ width:'100%', justifyContent:'center', marginBottom:8 }}>
+            ▧ 배경 바꾸기
+            <input type="file" accept="image/*" hidden onChange={e => { const f=e.target.files?.[0]; e.target.value=''; if(f) setBackgroundCropFile(f); }} />
+          </label>
+          {bgSrc ? <div style={{ border:'1px solid var(--line)', borderRadius:10, overflow:'hidden', background:'var(--bg)' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={bgSrc} alt="현재 ROOM 배경" style={{ display:'block', width:'100%', aspectRatio:'16 / 10', objectFit:'cover' }} />
+          </div> :
+          <div style={{padding:24, textAlign:'center', border:'1px dashed var(--line)', borderRadius:10, fontSize:11, color:'var(--faint)'}}>아직 배경이 없어요.<br/>이미지를 추가해보세요.</div>}
+        </>}
       </aside>}
       </div>
       {editOn && <p className="hint" style={{ marginTop:8 }}>보관함에서 스티커를 여러 번 꺼내 쓸 수 있어요. 방에서 삭제해도 보관함에는 남습니다.</p>}
