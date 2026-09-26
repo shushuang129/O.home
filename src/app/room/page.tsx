@@ -408,7 +408,7 @@ export default function RoomPage() {
   const item = room.items.find(x => x.id === selected);
 
   return (
-    <section className="page" style={{ maxWidth: editOn ? 1524 : 1100, width: '100%', boxSizing: 'border-box' }}>
+    <section className="page" style={{ maxWidth: 1100, width: '100%', boxSizing: 'border-box' }}>
       <div className="page-head">
         <div>
           <h1 style={{ margin: 0, display:'flex', alignItems:'center', gap:7 }}>
@@ -423,8 +423,8 @@ export default function RoomPage() {
         </div>}
       </div>
 
-      <div style={{ position:'relative', display:'grid', gridTemplateColumns: editOn ? '245px 1000px 245px' : '1fr', gap:12, alignItems:'start', width: editOn ? '1524px' : '100%', maxWidth:'100%', margin:'0 auto' }}>
-      {editOn && <aside className="panel" style={{ width:'120px', justifySelf:'end', boxSizing:'border-box', padding:10, borderRadius:14, boxShadow:'0 8px 20px rgba(0,0,0,.06)' }}>
+      <div style={{ position:'relative', width:'1000px', maxWidth:'100%', margin:'0 auto' }}>
+      {editOn && <aside className="panel" style={{ position:'absolute', left:-132, top:0, width:'120px', boxSizing:'border-box', padding:10, borderRadius:14, boxShadow:'0 8px 20px rgba(0,0,0,.06)', zIndex:40 }}>
         <div style={{ fontSize:10, letterSpacing:'.08em', opacity:.55, marginBottom:7 }}>EDIT</div>
         <div style={{ display:'grid', gap:6 }}>
           <button className="btn btn-ghost" onClick={() => moveZ('top')} disabled={!selected}>맨 위</button>
@@ -437,7 +437,7 @@ export default function RoomPage() {
             value={item?.link ?? ''} onChange={e => selected && updateItem(selected, { link: e.target.value })} />
         </div>
       </aside>}
-      <div style={{ position:'relative', width:'100%', aspectRatio:'16 / 10', overflow:'visible' }}>
+      <div style={{ position:'relative', width:'100%', aspectRatio:'4 / 3', overflow:'visible' }}>
         <div ref={canvas} onPointerDown={() => setSelected(null)}
           style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden',
             background: 'var(--bg)',
@@ -475,7 +475,7 @@ export default function RoomPage() {
         </div>}
       </div>
       </div>
-      {editOn && <aside className="panel" style={{ padding:10, borderRadius:14, maxHeight:'min(70vh,750px)', overflowY:'auto', boxShadow:'0 8px 20px rgba(0,0,0,.06)' }}>
+      {editOn && <aside className="panel" style={{ position:'absolute', left:'calc(100% + 12px)', top:0, width:'245px', boxSizing:'border-box', padding:10, borderRadius:14, maxHeight:'min(70vh,750px)', overflowY:'auto', boxShadow:'0 8px 20px rgba(0,0,0,.06)', zIndex:40 }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:9 }}>
           <div>
             <div style={{ fontSize:10, letterSpacing:'.08em', opacity:.55 }}>MY COLLECTION</div>
@@ -526,7 +526,7 @@ export default function RoomPage() {
           </label>
           {bgSrc ? <div style={{ border:'1px solid var(--line)', borderRadius:10, overflow:'hidden', background:'var(--bg)' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={bgSrc} alt="현재 ROOM 배경" style={{ display:'block', width:'100%', aspectRatio:'16 / 10', objectFit:'cover' }} />
+            <img src={bgSrc} alt="현재 ROOM 배경" style={{ display:'block', width:'100%', aspectRatio:'4 / 3', objectFit:'cover' }} />
           </div> :
           <div style={{padding:24, textAlign:'center', border:'1px dashed var(--line)', borderRadius:10, fontSize:11, color:'var(--faint)'}}>아직 배경이 없어요.<br/>이미지를 추가해보세요.</div>}
         </>}
