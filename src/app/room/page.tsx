@@ -115,24 +115,47 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
 }) {
   const src = useBlobUrl(id);
   const drag = useRef<{ x:number; y:number; mode:'move'|'resize' } | null>(null);
-  const rotateTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const rotateDrag = useRef<{ lastAngle:number } | null>(null);
 
-  const stopRotate = () => {
-    if (rotateTimer.current) {
-      clearInterval(rotateTimer.current);
-      rotateTimer.current = null;
-    }
-  };
-
-  const beginRotate = (e: React.PointerEvent<HTMLButtonElement>, deg: number) => {
+  const beginRotate = (e: React.PointerEvent<HTMLButtonElement>) => {
     if (!editOn || !selected || e.button !== 0) return;
     e.preventDefault();
     e.stopPropagation();
     onSelect();
+
+    const box = e.currentTarget.parentElement?.getBoundingClientRect();
+    if (!box) return;
+    const cx = box.left + box.width / 2;
+    const cy = box.top + box.height / 2;
+    rotateDrag.current = {
+      lastAngle: Math.atan2(e.clientY - cy, e.clientX - cx),
+    };
     e.currentTarget.setPointerCapture(e.pointerId);
-    onRotate(deg);
-    stopRotate();
-    rotateTimer.current = setInterval(() => onRotate(deg), 55);
+  };
+
+  const moveRotate = (e: React.PointerEvent<HTMLButtonElement>) => {
+    const d = rotateDrag.current;
+    if (!d) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const box = e.currentTarget.parentElement?.getBoundingClientRect();
+    if (!box) return;
+    const cx = box.left + box.width / 2;
+    const cy = box.top + box.height / 2;
+    const angle = Math.atan2(e.clientY - cy, e.clientX - cx);
+    let delta = angle - d.lastAngle;
+    if (delta > Math.PI) delta -= Math.PI * 2;
+    if (delta < -Math.PI) delta += Math.PI * 2;
+    d.lastAngle = angle;
+
+    onRotate(delta * 180 / Math.PI);
+  };
+
+  const endRotate = (e: React.PointerEvent<HTMLButtonElement>) => {
+    rotateDrag.current = null;
+    e.stopPropagation();
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {}
   };
 
   const begin = (e: React.PointerEvent, mode:'move'|'resize') => {
@@ -179,16 +202,13 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
 
       {editOn && selected && (
         <>
-          <button type="button" aria-label="rotate left"
-            onPointerDown={e=>beginRotate(e,-3)}
-            onPointerUp={e=>{stopRotate();e.stopPropagation();}}
-            onPointerCancel={e=>{stopRotate();e.stopPropagation();}}
-            style={{position:'absolute',left:-30,top:-30,width:26,height:26,border:'1px solid var(--line)',borderRadius:999,background:'var(--panel)',zIndex:30,cursor:'pointer'}}>↶</button>
-          <button type="button" aria-label="rotate right"
-            onPointerDown={e=>beginRotate(e,3)}
-            onPointerUp={e=>{stopRotate();e.stopPropagation();}}
-            onPointerCancel={e=>{stopRotate();e.stopPropagation();}}
-            style={{position:'absolute',right:-30,top:-30,width:26,height:26,border:'1px solid var(--line)',borderRadius:999,background:'var(--panel)',zIndex:30,cursor:'pointer'}}>↷</button>
+          <button type="button" aria-label="rotate"
+            onPointerDown={beginRotate}
+            onPointerMove={moveRotate}
+            onPointerUp={endRotate}
+            onPointerCancel={endRotate}
+            title="드래그해서 회전"
+            style={{position:'absolute',left:'50%',top:-30,transform:'translateX(-50%)',width:28,height:28,border:'1px solid var(--line)',borderRadius:999,background:'var(--panel)',zIndex:30,cursor:'grab',touchAction:'none'}}>↻</button>
           <button type="button" aria-label="resize"
             onPointerDown={e=>{ e.stopPropagation(); begin(e,'resize'); }}
             onPointerMove={move}
