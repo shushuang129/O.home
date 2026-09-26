@@ -285,7 +285,7 @@ export default function RoomPage() {
   const item = room.items.find(x => x.id === selected);
 
   return (
-    <section className="page" style={{ maxWidth: 960 }}>
+    <section className="page" style={{ maxWidth: 1100 }}>
       <div className="page-head">
         <div>
           <h1 style={{ margin: 0 }}>ROOM</h1>
@@ -314,7 +314,7 @@ export default function RoomPage() {
         </div>
       )}
 
-      <div style={{ display:'grid', gridTemplateColumns: editOn ? 'minmax(0,1fr) 245px' : 'minmax(0,1fr)', gap:12, alignItems:'start' }}>
+      <div style={{ display:'grid', gridTemplateColumns: editOn ? 'minmax(0,1fr) 245px' : '1fr', gap:12, alignItems:'start' }}>
       <div ref={canvas} onPointerDown={() => setSelected(null)}
         style={{ position:'relative', width:'100%', aspectRatio:'16 / 10', overflow:'hidden',
           background: 'var(--bg)',
