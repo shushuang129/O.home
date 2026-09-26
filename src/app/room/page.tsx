@@ -482,11 +482,11 @@ export default function RoomPage() {
           </p>
           <div style={{ borderTop:'1px dashed var(--line)', paddingTop:11 }}>
             <div style={{ display:'flex', justifyContent:'space-between', fontSize:7.5, letterSpacing:'.1em', color:'var(--faint)' }}>
-              <span>NOW PLAYING</span><span style={{fontSize:16}}>♪</span>
+              <span>NOW PLAYING</span><span style={{fontSize:18}}>♪</span>
             </div>
             <div style={{ height:2, margin:'8px 0', background:'var(--line)', borderRadius:2, overflow:'hidden' }}><span style={{ display:'block', width:'38%', height:'100%', background:'var(--accent)', opacity:.65 }} /></div>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:12, color:'var(--faint)', fontSize:9 }}>
-              <span style={{fontSize:14}}>◂◂</span><span style={{ display:'grid', placeItems:'center', width:34, height:34, borderRadius:'50%', background:'var(--text)', color:'var(--panel)', fontSize:13 }}>▶</span><span style={{fontSize:14}}>▸▸</span>
+              <span style={{fontSize:17}}>◂◂</span><span style={{ display:'grid', placeItems:'center', width:40, height:40, borderRadius:'50%', background:'var(--text)', color:'var(--panel)', fontSize:16 }}>▶</span><span style={{fontSize:14}}>▸▸</span>
             </div>
           </div>
         </aside>}
