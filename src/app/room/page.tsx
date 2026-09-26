@@ -486,7 +486,7 @@ export default function RoomPage() {
             </div>
             <div style={{ height:2, margin:'8px 0', background:'var(--line)', borderRadius:2, overflow:'hidden' }}><span style={{ display:'block', width:'38%', height:'100%', background:'var(--accent)', opacity:.65 }} /></div>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:16, color:'var(--faint)', fontSize:11 }}>
-              <span style={{fontSize:21}}>◂◂</span><span style={{ display:'grid', placeItems:'center', width:44, height:44, borderRadius:'50%', background:'var(--text)', color:'var(--panel)', fontSize:18, color:'var(--faint)' }}>▶</span><span style={{fontSize:14}}>▸▸</span>
+              <span style={{fontSize:21}}>◂◂</span><span style={{ display:'grid', placeItems:'center', width:44, height:44, borderRadius:'50%', background:'var(--text)', color:'var(--faint)', fontSize:18 }}>▶</span><span style={{fontSize:21}}>▸▸</span>
             </div>
           </div>
         </aside>}
