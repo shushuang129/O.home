@@ -16,8 +16,8 @@ type RoomState = { background?: string; description?: string; items: RoomItem[] 
 type StickerLibraryItem = { id: string; imgId: string; name?: string };
 const KEY = 'ohome.room.v1';
 const STICKER_KEY = 'ohome.room.stickers.v1';
-const ROOM_W = 1000;
-const ROOM_H = 750;
+const ROOM_W = 700;
+const ROOM_H = 525;
 const DEFAULT_DESCRIPTION = '이미지와 스티커로 나만의 미니홈피를 꾸며보세요.';
 const DEFAULT: RoomState = { items: [], description: DEFAULT_DESCRIPTION };
 const DEFAULT_STICKERS: StickerLibraryItem[] = [];
@@ -45,8 +45,8 @@ function StickerLibraryCard({ sticker, onAdd, onRemove }: { sticker: StickerLibr
 }
 
 function BackgroundCropper({ file, onCancel, onDone }: { file: File; onCancel: () => void; onDone: (file: File) => void }) {
-  const VIEW_W = 720;
-  const VIEW_H = 540;
+  const VIEW_W = 504;
+  const VIEW_H = 378;
   const [src, setSrc] = useState('');
   const [imgSize, setImgSize] = useState({ w: 0, h: 0 });
   const [scale, setScale] = useState(1);
@@ -314,7 +314,7 @@ export default function RoomPage() {
 
   const addStickerToRoom = (imgId: string) => {
     if (!canvas.current) return;
-    const size = 150;
+    const size = 105;
     const item: RoomItem = {
       id: newId(), imgId,
       x: ROOM_W / 2 - size / 2,
@@ -423,8 +423,8 @@ export default function RoomPage() {
         </div>}
       </div>
 
-      <div style={{ position:'relative', width:'1000px', maxWidth:'100%', margin:'0 auto' }}>
-      {editOn && <aside className="panel" style={{ position:'absolute', left:-132, top:0, width:'120px', boxSizing:'border-box', padding:10, borderRadius:14, boxShadow:'0 8px 20px rgba(0,0,0,.06)', zIndex:40 }}>
+      <div style={{ position:'relative', width:'700px', maxWidth:'100%', margin:'0 auto' }}>
+      {editOn && <aside className="panel" style={{ position:'absolute', left:-92, top:0, width:'120px', boxSizing:'border-box', padding:10, borderRadius:14, boxShadow:'0 8px 20px rgba(0,0,0,.06)', zIndex:40 }}>
         <div style={{ fontSize:10, letterSpacing:'.08em', opacity:.55, marginBottom:7 }}>EDIT</div>
         <div style={{ display:'grid', gap:6 }}>
           <button className="btn btn-ghost" onClick={() => moveZ('top')} disabled={!selected}>맨 위</button>
@@ -475,7 +475,7 @@ export default function RoomPage() {
         </div>}
       </div>
       </div>
-      {editOn && <aside className="panel" style={{ position:'absolute', left:'calc(100% + 12px)', top:0, width:'245px', boxSizing:'border-box', padding:10, borderRadius:14, maxHeight:'min(70vh,750px)', overflowY:'auto', boxShadow:'0 8px 20px rgba(0,0,0,.06)', zIndex:40 }}>
+      {editOn && <aside className="panel" style={{ position:'absolute', left:'calc(100% + 10px)', top:0, width:'172px', boxSizing:'border-box', padding:10, borderRadius:14, maxHeight:'min(70vh,750px)', overflowY:'auto', boxShadow:'0 8px 20px rgba(0,0,0,.06)', zIndex:40 }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:9 }}>
           <div>
             <div style={{ fontSize:10, letterSpacing:'.08em', opacity:.55 }}>MY COLLECTION</div>
