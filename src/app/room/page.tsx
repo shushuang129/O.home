@@ -11,20 +11,20 @@ type RoomItem = {
   id: string; imgId: string; x: number; y: number; w: number; h: number;
   rot: number; z: number; link?: string;
 };
-type RoomState = { background?: string; backgroundFit?: 'cover' | 'contain'; description?: string; items: RoomItem[] };
+type RoomState = { background?: string; backgroundScale?: number; backgroundX?: number; backgroundY?: number; description?: string; items: RoomItem[] };
 type StickerLibraryItem = { id: string; imgId: string; name?: string };
 const KEY = 'ohome.room.v1';
 const STICKER_KEY = 'ohome.room.stickers.v1';
 const ROOM_W = 1000;
 const ROOM_H = 625;
 const DEFAULT_DESCRIPTION = '이미지와 스티커로 나만의 미니홈피를 꾸며보세요.';
-const DEFAULT: RoomState = { items: [], description: DEFAULT_DESCRIPTION, backgroundFit: 'cover' };
+const DEFAULT: RoomState = { items: [], description: DEFAULT_DESCRIPTION, backgroundScale: 1, backgroundX: 0, backgroundY: 0 };
 const DEFAULT_STICKERS: StickerLibraryItem[] = [];
 
 function readRoom(): RoomState {
   try {
     const v = getSetting<RoomState>(KEY, DEFAULT);
-    return { ...DEFAULT, ...v, description: v?.description ?? DEFAULT_DESCRIPTION, backgroundFit: v?.backgroundFit ?? 'cover', items: Array.isArray(v?.items) ? v.items : [] };
+    return { ...DEFAULT, ...v, description: v?.description ?? DEFAULT_DESCRIPTION, backgroundScale: v?.backgroundScale ?? 1, backgroundX: v?.backgroundX ?? 0, backgroundY: v?.backgroundY ?? 0, items: Array.isArray(v?.items) ? v.items : [] };
   } catch { return DEFAULT; }
 }
 
@@ -166,7 +166,7 @@ export default function RoomPage() {
 
   const addBackground = async (file: File) => {
     const id = await putBlob(file);
-    save({ ...room, background: id, backgroundFit: room.backgroundFit ?? 'cover' });
+    save({ ...room, background: id, backgroundScale: 1, backgroundX: 0, backgroundY: 0 });
     toast('배경을 저장했습니다');
   };
 
@@ -212,7 +212,7 @@ export default function RoomPage() {
   };
 
   const setDescription = (value: string) => save({ ...room, description: value });
-  const toggleBackgroundFit = () => save({ ...room, backgroundFit: room.backgroundFit === 'contain' ? 'cover' : 'contain' });
+  const updateBackground = (patch: Partial<Pick<RoomState, 'backgroundScale' | 'backgroundX' | 'backgroundY'>>) => save({ ...room, ...patch });
 
   if (!loaded) return <section className="page"><div className="panel">불러오는 중…</div></section>;
 
@@ -245,9 +245,15 @@ export default function RoomPage() {
           <label className="btn btn-ghost">배경 바꾸기
             <input type="file" accept="image/*" hidden onChange={e => { const f=e.target.files?.[0]; e.target.value=''; if(f) void addBackground(f); }} />
           </label>
-          <button className="btn btn-ghost" onClick={toggleBackgroundFit}>
-            배경 비율: {room.backgroundFit === 'contain' ? '전체 보이기' : '꽉 채우기'}
-          </button>
+          <label className="btn btn-ghost" style={{display:'inline-flex',alignItems:'center',gap:6}}>배경 확대
+            <input type="range" min="1" max="3" step="0.05" value={room.backgroundScale ?? 1} onChange={e=>updateBackground({backgroundScale:Number(e.target.value)})} />
+          </label>
+          <label className="btn btn-ghost" style={{display:'inline-flex',alignItems:'center',gap:6}}>위·아래
+            <input type="range" min="-100" max="100" step="1" value={room.backgroundY ?? 0} onChange={e=>updateBackground({backgroundY:Number(e.target.value)})} />
+          </label>
+          <label className="btn btn-ghost" style={{display:'inline-flex',alignItems:'center',gap:6}}>좌·우
+            <input type="range" min="-100" max="100" step="1" value={room.backgroundX ?? 0} onChange={e=>updateBackground({backgroundX:Number(e.target.value)})} />
+          </label>
           {selected && <button className="btn btn-ghost" onClick={() => moveZ('top')}>맨 위</button>}
           {selected && <button className="btn btn-ghost" onClick={() => moveZ('bottom')}>맨 아래</button>}
           {selected && <button className="btn btn-ghost" onClick={remove}>삭제</button>}
@@ -261,8 +267,11 @@ export default function RoomPage() {
       <div style={{ display:'grid', gridTemplateColumns: editOn ? 'minmax(0,1fr) 245px' : 'minmax(0,1fr)', gap:12, alignItems:'start' }}>
       <div ref={canvas} onPointerDown={() => setSelected(null)}
         style={{ position:'relative', width:'100%', aspectRatio:'16 / 10', overflow:'hidden',
-          background: bgSrc ? 'url("' + bgSrc + '") center / ' + (room.backgroundFit === 'contain' ? 'contain' : 'cover') + ' no-repeat' : 'var(--bg)',
+          background: 'var(--bg)',
           border: editOn ? '1px dashed var(--line)' : '1px solid var(--line)', borderRadius:10 }}>
+        {bgSrc && <div style={{position:'absolute',inset:0,overflow:'hidden',pointerEvents:'none'}}>
+          <div style={{position:'absolute',inset:'-20%',background:'url("' + bgSrc + '") center / cover no-repeat',transform:'translate(' + (room.backgroundX ?? 0) + 'px,' + (room.backgroundY ?? 0) + 'px) scale(' + (room.backgroundScale ?? 1) + ')',transformOrigin:'center center'}} />
+        </div>}
         {room.items.map(x => (
           <div key={x.id} style={{ position:'absolute', left:(x.x / ROOM_W * 100) + '%', top:(x.y / ROOM_H * 100) + '%',
             width:(x.w / ROOM_W * 100) + '%', height:(x.h / ROOM_H * 100) + '%',
