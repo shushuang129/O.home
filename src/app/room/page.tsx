@@ -18,13 +18,13 @@ const STICKER_KEY = 'ohome.room.stickers.v1';
 const ROOM_W = 1000;
 const ROOM_H = 625;
 const DEFAULT_DESCRIPTION = '이미지와 스티커로 나만의 미니홈피를 꾸며보세요.';
-const DEFAULT: RoomState = { items: [], description: DEFAULT_DESCRIPTION, backgroundScale: 1, backgroundX: 0, backgroundY: 0 };
+const DEFAULT: RoomState = { items: [], description: DEFAULT_DESCRIPTION, backgroundScale: 1, backgroundX: 50, backgroundY: 50 };
 const DEFAULT_STICKERS: StickerLibraryItem[] = [];
 
 function readRoom(): RoomState {
   try {
     const v = getSetting<RoomState>(KEY, DEFAULT);
-    return { ...DEFAULT, ...v, description: v?.description ?? DEFAULT_DESCRIPTION, backgroundScale: v?.backgroundScale ?? 1, backgroundX: v?.backgroundX ?? 0, backgroundY: v?.backgroundY ?? 0, items: Array.isArray(v?.items) ? v.items : [] };
+    return { ...DEFAULT, ...v, description: v?.description ?? DEFAULT_DESCRIPTION, backgroundScale: v?.backgroundScale ?? 1, backgroundX: v?.backgroundX ?? 50, backgroundY: v?.backgroundY ?? 50, items: Array.isArray(v?.items) ? v.items : [] };
   } catch { return DEFAULT; }
 }
 
@@ -123,6 +123,8 @@ export default function RoomPage() {
   const [editOn, setEditOn] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [stickers, setStickers] = useState<StickerLibraryItem[]>(DEFAULT_STICKERS);
+  const [descriptionEditing, setDescriptionEditing] = useState(false);
+  const [descriptionHover, setDescriptionHover] = useState(false);
   const canvas = useRef<HTMLDivElement>(null);
   const bgSrc = useBlobUrl(room.background);
 
@@ -223,14 +225,38 @@ export default function RoomPage() {
       <div className="page-head">
         <div>
           <h1 style={{ margin: 0 }}>ROOM</h1>
-          <p
-            className="hint"
-            contentEditable={isAdmin}
-            suppressContentEditableWarning
-            onBlur={e => { if (isAdmin) setDescription(e.currentTarget.textContent?.trim() || DEFAULT_DESCRIPTION); }}
-            style={{ marginBottom: 0, outline: isAdmin ? '1px dashed var(--line)' : undefined, borderRadius: 6, padding: isAdmin ? '3px 5px' : undefined, cursor: isAdmin ? 'text' : undefined }}
-            title={isAdmin ? '클릭해서 문구를 수정할 수 있어요' : undefined}
-          >{room.description ?? DEFAULT_DESCRIPTION}</p>
+          <div
+            onMouseEnter={() => setDescriptionHover(true)}
+            onMouseLeave={() => setDescriptionHover(false)}
+            style={{display:'inline-flex',alignItems:'center',gap:4,maxWidth:'100%'}}
+          >
+            {descriptionEditing ? (
+              <p
+                className="hint"
+                contentEditable={isAdmin}
+                suppressContentEditableWarning
+                autoFocus
+                onBlur={e => {
+                  if (isAdmin) setDescription(e.currentTarget.textContent?.trim() || DEFAULT_DESCRIPTION);
+                  setDescriptionEditing(false);
+                }}
+                style={{margin:0,outline:'1px dashed var(--line)',borderRadius:6,padding:'3px 5px',cursor:'text'}}
+              >{room.description ?? DEFAULT_DESCRIPTION}</p>
+            ) : (
+              <>
+                <p className="hint" style={{margin:0,padding:'3px 5px'}}>{room.description ?? DEFAULT_DESCRIPTION}</p>
+                {isAdmin && descriptionHover && (
+                  <button
+                    type="button"
+                    aria-label="문구 수정"
+                    onClick={() => setDescriptionEditing(true)}
+                    style={{border:0,background:'transparent',padding:2,cursor:'pointer',fontSize:13,lineHeight:1,opacity:.65}}
+                    title="문구 수정"
+                  >✎</button>
+                )}
+              </>
+            )}
+          </div>
         </div>
         {isAdmin && <div className="head-actions">
           <button className="btn btn-dark" onClick={() => setEditOn(v => !v)}>{editOn ? '꾸미기 끝' : '꾸미기'}</button>
@@ -249,10 +275,10 @@ export default function RoomPage() {
             <input type="range" min="1" max="3" step="0.05" value={room.backgroundScale ?? 1} onChange={e=>updateBackground({backgroundScale:Number(e.target.value)})} />
           </label>
           <label className="btn btn-ghost" style={{display:'inline-flex',alignItems:'center',gap:6}}>위·아래
-            <input type="range" min="-100" max="100" step="1" value={room.backgroundY ?? 0} onChange={e=>updateBackground({backgroundY:Number(e.target.value)})} />
+            <input type="range" min="0" max="100" step="1" value={room.backgroundY ?? 50} onChange={e=>updateBackground({backgroundY:Number(e.target.value)})} />
           </label>
           <label className="btn btn-ghost" style={{display:'inline-flex',alignItems:'center',gap:6}}>좌·우
-            <input type="range" min="-100" max="100" step="1" value={room.backgroundX ?? 0} onChange={e=>updateBackground({backgroundX:Number(e.target.value)})} />
+            <input type="range" min="0" max="100" step="1" value={room.backgroundX ?? 50} onChange={e=>updateBackground({backgroundX:Number(e.target.value)})} />
           </label>
           {selected && <button className="btn btn-ghost" onClick={() => moveZ('top')}>맨 위</button>}
           {selected && <button className="btn btn-ghost" onClick={() => moveZ('bottom')}>맨 아래</button>}
@@ -270,7 +296,22 @@ export default function RoomPage() {
           background: 'var(--bg)',
           border: editOn ? '1px dashed var(--line)' : '1px solid var(--line)', borderRadius:10 }}>
         {bgSrc && <div style={{position:'absolute',inset:0,overflow:'hidden',pointerEvents:'none'}}>
-          <div style={{position:'absolute',inset:'-20%',background:'url("' + bgSrc + '") center / cover no-repeat',transform:'translate(' + (room.backgroundX ?? 0) + 'px,' + (room.backgroundY ?? 0) + 'px) scale(' + (room.backgroundScale ?? 1) + ')',transformOrigin:'center center'}} />
+          {/* object-fit: cover keeps the image ratio; object-position chooses which part is shown. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={bgSrc}
+            alt=""
+            draggable={false}
+            style={{
+              width:'100%',
+              height:'100%',
+              display:'block',
+              objectFit:'cover',
+              objectPosition:(room.backgroundX ?? 50) + '% ' + (room.backgroundY ?? 50) + '%',
+              transform:'scale(' + (room.backgroundScale ?? 1) + ')',
+              transformOrigin:'center center'
+            }}
+          />
         </div>}
         {room.items.map(x => (
           <div key={x.id} style={{ position:'absolute', left:(x.x / ROOM_W * 100) + '%', top:(x.y / ROOM_H * 100) + '%',
