@@ -108,20 +108,31 @@ function BackgroundCropper({ file, onCancel, onDone }: { file: File; onCancel: (
   </div>;
 }
 
-function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate, onOpen }: {
+function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate, onOpen, rot }: {
   id: string; selected: boolean; editOn: boolean; onSelect: () => void;
   onMove: (dx: number, dy: number) => void; onResize: (dw: number, dh: number) => void;
-  onRotate: (deg: number) => void; onOpen: () => void;
+  onRotate: (deg: number) => void; onOpen: () => void; rot: number;
 }) {
   const src = useBlobUrl(id);
   const drag = useRef<{ x:number; y:number; mode:'move'|'resize' } | null>(null);
   const rotateDrag = useRef<{ lastAngle:number } | null>(null);
+  const rotation = useRef(rot);
+  const snapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const snapTarget = useRef<number | null>(null);
+
+  const clearSnap = () => {
+    if (snapTimer.current) clearTimeout(snapTimer.current);
+    snapTimer.current = null;
+    snapTarget.current = null;
+  };
 
   const beginRotate = (e: React.PointerEvent<HTMLButtonElement>) => {
     if (!editOn || !selected || e.button !== 0) return;
     e.preventDefault();
     e.stopPropagation();
     onSelect();
+    clearSnap();
+    rotation.current = rot;
 
     const box = e.currentTarget.parentElement?.getBoundingClientRect();
     if (!box) return;
@@ -149,11 +160,36 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
     if (delta < -Math.PI) delta += Math.PI * 2;
     d.lastAngle = angle;
 
-    onRotate(delta * 180 / Math.PI);
+    const deltaDeg = delta * 180 / Math.PI;
+    rotation.current += deltaDeg;
+    onRotate(deltaDeg);
+
+    const nearest = Math.round(rotation.current / 90) * 90;
+    const distance = Math.abs(rotation.current - nearest);
+    const SNAP_RANGE = 7;
+    if (distance <= SNAP_RANGE && Math.abs(deltaDeg) < 4) {
+      if (snapTarget.current !== nearest) {
+        clearSnap();
+        snapTarget.current = nearest;
+        snapTimer.current = setTimeout(() => {
+          if (snapTarget.current !== nearest) return;
+          const currentDistance = Math.abs(rotation.current - nearest);
+          if (currentDistance <= SNAP_RANGE) {
+            const correction = nearest - rotation.current;
+            rotation.current = nearest;
+            onRotate(correction);
+          }
+          snapTimer.current = null;
+        }, 300);
+      }
+    } else {
+      clearSnap();
+    }
   };
 
   const endRotate = (e: React.PointerEvent<HTMLButtonElement>) => {
     rotateDrag.current = null;
+    clearSnap();
     e.stopPropagation();
     try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {}
   };
@@ -391,6 +427,7 @@ export default function RoomPage() {
               onMove={(dx,dy) => moveItem(x.id, dx,dy)}
               onResize={(dw,dh) => resizeItem(x.id, dw,dh)}
               onRotate={deg => updateItem(x.id, { rot:x.rot + deg })}
+              rot={x.rot}
               onOpen={() => { if (x.link) window.open(x.link, '_blank', 'noopener,noreferrer'); }} />
           </div>
         ))}
