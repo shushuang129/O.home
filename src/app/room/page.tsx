@@ -29,6 +29,13 @@ function readRoom(): RoomState {
   } catch { return DEFAULT; }
 }
 
+
+function RoomProfileImage({ id }: { id: string }) {
+  const src = useBlobUrl(id);
+  if (!src) return null;
+  return <img src={src} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />;
+}
+
 function StickerLibraryCard({ sticker, onAdd, onRemove }: { sticker: StickerLibraryItem; onAdd: () => void; onRemove: () => void }) {
   const src = useBlobUrl(sticker.imgId);
   if (!src) return null;
@@ -288,7 +295,7 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
 }
 
 export default function RoomPage() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
   const toast = useToast();
   const [room, setRoom] = useState<RoomState>(DEFAULT);
   const [loaded, setLoaded] = useState(false);
@@ -424,6 +431,34 @@ export default function RoomPage() {
       </div>
 
       <div style={{ position:'relative', width:'800px', maxWidth:'100%', margin:'28px auto 0' }}>
+        <aside className="room-side-card" style={{ position:'absolute', right:'calc(100% + 18px)', top:0, width:170, boxSizing:'border-box', padding:14, borderRadius:16, background:'var(--panel)', border:'1px solid var(--line)', boxShadow:'0 10px 24px rgba(0,0,0,.07)' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
+            <span style={{ fontSize:9, letterSpacing:'.16em', color:'var(--faint)' }}>PROFILE</span>
+            <span style={{ fontSize:12, opacity:.55 }}>✦</span>
+          </div>
+          <div style={{ width:92, height:92, margin:'0 auto 10px', padding:4, borderRadius:'50%', border:'1px solid var(--line)', background:'var(--bg)', boxSizing:'border-box' }}>
+            <div style={{ width:'100%', height:'100%', borderRadius:'50%', overflow:'hidden', background:user?.avatarColor ?? 'linear-gradient(135deg,#ddd8cf,#aaa39a)' }}>
+              {user?.avatarUrl && <RoomProfileImage id={user.avatarUrl} />}
+            </div>
+          </div>
+          <div style={{ textAlign:'center' }}>
+            <strong style={{ display:'block', fontFamily:'var(--serif)', fontSize:17 }}>{user?.nickname ?? 'MY ROOM'}</strong>
+            <span style={{ display:'block', marginTop:3, fontSize:8, letterSpacing:'.14em', color:'var(--faint)' }}>{user ? 'MY PROFILE' : 'WELCOME'}</span>
+          </div>
+          <p style={{ margin:'10px 2px 12px', textAlign:'center', fontFamily:'var(--serif)', fontSize:10.5, lineHeight:1.6, color:'var(--faint)' }}>
+            my little room<br/>my little diary
+          </p>
+          <div style={{ borderTop:'1px dashed var(--line)', paddingTop:10 }}>
+            <div style={{ display:'flex', justifyContent:'space-between', fontSize:7.5, letterSpacing:'.1em', color:'var(--faint)' }}>
+              <span>NOW PLAYING</span><span>♪</span>
+            </div>
+            <div style={{ marginTop:5, fontFamily:'var(--serif)', fontSize:10.5, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>my little playlist</div>
+            <div style={{ height:2, margin:'8px 0', background:'var(--line)', borderRadius:2, overflow:'hidden' }}><span style={{ display:'block', width:'38%', height:'100%', background:'var(--accent)', opacity:.65 }} /></div>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:12, color:'var(--faint)', fontSize:9 }}>
+              <span>◂◂</span><span style={{ display:'grid', placeItems:'center', width:23, height:23, borderRadius:'50%', background:'var(--text)', color:'var(--panel)' }}>▶</span><span>▸▸</span>
+            </div>
+          </div>
+        </aside>
       {editOn && <aside className="panel" style={{ position:'absolute', left:-145, top:0, width:'120px', boxSizing:'border-box', padding:10, borderRadius:14, boxShadow:'0 8px 20px rgba(0,0,0,.06)', zIndex:40 }}>
         <div style={{ fontSize:10, letterSpacing:'.08em', opacity:.55, marginBottom:7 }}>EDIT</div>
         <div style={{ display:'grid', gap:6 }}>
