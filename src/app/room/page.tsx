@@ -53,24 +53,26 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
     e.preventDefault();
     e.stopPropagation();
     onSelect();
+    e.currentTarget.setPointerCapture(e.pointerId);
     drag.current = { x:e.clientX, y:e.clientY, mode };
+  };
 
-    const move = (ev: PointerEvent) => {
-      const d = drag.current;
-      if (!d) return;
-      const dx = ev.clientX - d.x;
-      const dy = ev.clientY - d.y;
-      drag.current = { x:ev.clientX, y:ev.clientY, mode:d.mode };
-      if (d.mode === 'move') onMove(dx,dy);
-      else onResize(dx,dy);
-    };
-    const up = () => {
-      drag.current = null;
-      window.removeEventListener('pointermove', move);
-      window.removeEventListener('pointerup', up);
-    };
-    window.addEventListener('pointermove', move);
-    window.addEventListener('pointerup', up);
+  const move = (e: React.PointerEvent) => {
+    const d = drag.current;
+    if (!d) return;
+    e.preventDefault();
+    const dx = e.clientX - d.x;
+    const dy = e.clientY - d.y;
+    drag.current = { x:e.clientX, y:e.clientY, mode:d.mode };
+    if (d.mode === 'move') onMove(dx,dy);
+    else onResize(dx,dy);
+  };
+
+  const end = (e: React.PointerEvent) => {
+    if (!drag.current) return;
+    e.preventDefault();
+    drag.current = null;
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {}
   };
 
   if (!src) return null;
@@ -78,6 +80,9 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
   return (
     <div
       onPointerDown={e => begin(e,'move')}
+      onPointerMove={move}
+      onPointerUp={end}
+      onPointerCancel={end}
       onClick={e => { e.stopPropagation(); if (!editOn) onOpen(); }}
       style={{ width:'100%', height:'100%', position:'relative', cursor:editOn?'move':'pointer', touchAction:'none' }}
     >
@@ -97,6 +102,9 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
             style={{position:'absolute',right:-30,top:-30,width:26,height:26,border:'1px solid var(--line)',borderRadius:999,background:'var(--panel)',zIndex:30,cursor:'pointer'}}>↷</button>
           <button type="button" aria-label="resize"
             onPointerDown={e=>begin(e,'resize')}
+            onPointerMove={move}
+            onPointerUp={end}
+            onPointerCancel={end}
             style={{position:'absolute',right:-10,bottom:-10,width:24,height:24,border:'1px solid var(--line)',borderRadius:7,background:'var(--panel)',zIndex:30,cursor:'nwse-resize'}}>↘</button>
         </>
       )}
@@ -142,11 +150,13 @@ export default function RoomPage() {
     setSelected(item.id);
     toast('이미지를 방에 넣었어요');
   };
+
   const addStickerToLibrary = async (file: File) => {
     const imgId = await putBlob(file);
     const next = [...stickers, { id:newId(), imgId, name:file.name.replace(/\.[^/.]+$/,'') }];
     setStickers(next); setSetting(STICKER_KEY,next); addStickerToRoom(imgId);
   };
+
   const removeStickerFromLibrary = (id: string) => {
     const next = stickers.filter(x=>x.id!==id);
     setStickers(next); setSetting(STICKER_KEY,next); toast('스티커 보관함에서 삭제했어요');
@@ -160,6 +170,24 @@ export default function RoomPage() {
 
   const updateItem = (id: string, patch: Partial<RoomItem>) =>
     save({ ...room, items: room.items.map(x => x.id === id ? { ...x, ...patch } : x) });
+
+  const moveItem = (id: string, dx: number, dy: number) => {
+    setRoom(prev => {
+      const next = { ...prev, items: prev.items.map(x => x.id === id ? { ...x, x:x.x + dx, y:x.y + dy } : x) };
+      setSetting(KEY, next);
+      return next;
+    });
+  };
+
+  const resizeItem = (id: string, dw: number, dh: number) => {
+    setRoom(prev => {
+      const next = { ...prev, items: prev.items.map(x => x.id === id ? {
+        ...x, w:Math.max(50,x.w + dw), h:Math.max(50,x.h + dh)
+      } : x) };
+      setSetting(KEY, next);
+      return next;
+    });
+  };
 
   const remove = () => {
     if (!selected) return;
@@ -217,8 +245,8 @@ export default function RoomPage() {
             zIndex:x.z, transform:'rotate(' + x.rot + 'deg)', outline:editOn && selected === x.id ? '1px dashed var(--accent)' : undefined }}>
             <RoomImage id={x.imgId} selected={selected === x.id} editOn={editOn}
               onSelect={() => setSelected(x.id)}
-              onMove={(dx,dy) => updateItem(x.id, { x:x.x + dx, y:x.y + dy })}
-              onResize={(dw,dh) => updateItem(x.id, { w:Math.max(50,x.w + dw), h:Math.max(50,x.h + dh) })}
+              onMove={(dx,dy) => moveItem(x.id, dx, dy)}
+              onResize={(dw,dh) => resizeItem(x.id, dw, dh)}
               onRotate={deg => updateItem(x.id, { rot:x.rot + deg })}
               onOpen={() => { if (x.link) window.open(x.link, '_blank', 'noopener,noreferrer'); }} />
           </div>
