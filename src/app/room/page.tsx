@@ -743,6 +743,98 @@ export default function RoomPage() {
           position:absolute;left:15px;top:15px;
           width:9px;height:9px;border-radius:50%;background:#f7c6df;
         }
+
+        /* 큰 장식들이 서로 겹쳐 보이는 미니홈피 레이어 */
+        .room-page .deco-window{
+          left:-12px;top:38px;width:142px;height:94px;
+          padding:7px;
+          border-radius:12px;
+          z-index:1;
+          transform:rotate(-1deg);
+        }
+        .room-page .deco-window:before{
+          height:14px;margin:-2px -2px 7px;
+          border-radius:8px 8px 3px 3px;
+        }
+        .room-page .deco-window:after{
+          width:66px;height:7px;margin-left:8px;
+          box-shadow:0 13px 0 #e8f8fc,0 26px 0 #dff6fb;
+        }
+
+        .room-page .deco-pill{
+          left:47%;top:12px;width:176px;height:30px;
+          z-index:3;
+          box-shadow:3px 4px 0 rgba(98,198,226,.15);
+        }
+        .room-page .deco-pill:after{
+          width:70px;height:6px;margin:9px auto;
+        }
+
+        .room-page .deco-orb{
+          right:18px;top:18px;width:64px;height:64px;
+          z-index:3;
+        }
+
+        .room-page .deco-note{
+          left:-4px;top:222px;width:116px;height:136px;
+          padding:18px 13px;
+          z-index:1;
+          transform:rotate(-3deg);
+        }
+        .room-page .deco-note:before{
+          width:58px;height:7px;margin-bottom:14px;
+          box-shadow:0 17px 0 #d9f5fb,0 34px 0 #d9f5fb,0 51px 0 #d9f5fb,0 68px 0 #d9f5fb;
+        }
+
+        .room-page .deco-screen{
+          right:-18px;top:142px;width:132px;height:92px;
+          padding:7px;
+          z-index:1;
+          transform:rotate(3deg);
+        }
+        .room-page .deco-screen:before{
+          height:56px;
+        }
+        .room-page .deco-screen:after{
+          width:52px;height:6px;margin:7px auto 0;
+        }
+
+        .room-page .deco-tag{
+          right:42px;top:92px;width:112px;height:24px;
+          z-index:3;
+          transform:rotate(-2deg);
+        }
+        .room-page .deco-tag:after{
+          width:48px;height:6px;margin:6px auto;
+        }
+
+        .room-page .deco-badge{
+          left:30px;bottom:20px;width:94px;height:68px;
+          z-index:3;
+        }
+        .room-page .deco-badge:before{
+          margin-top:8px;font-size:27px;
+        }
+        .room-page .deco-badge:after{
+          width:42px;height:5px;margin:4px auto;
+        }
+
+        .room-page .deco-flower{
+          right:26px;bottom:18px;width:64px;height:64px;
+          z-index:3;
+        }
+        .room-page .deco-flower:after{
+          left:23px;top:23px;width:13px;height:13px;
+        }
+
+        /* 방 프레임 위로 살짝 올라오는 장식 */
+        .room-page .deco-pill,
+        .room-page .deco-orb,
+        .room-page .deco-tag,
+        .room-page .deco-badge,
+        .room-page .deco-flower{
+          filter:drop-shadow(1px 2px 0 rgba(98,198,226,.12));
+        }
         @media(max-width:960px){
           .room-page{padding-left:14px !important;padding-right:14px !important}
           .room-page .room-side-card{display:none}
