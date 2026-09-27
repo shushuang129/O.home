@@ -610,10 +610,10 @@ export default function RoomPage() {
           text-shadow:0 1px 3px rgba(67,164,193,.35);
           font-size:20px;
         }
-        .room-page .room-spark.s1{left:8%;top:18%;transform:rotate(-12deg)}
-        .room-page .room-spark.s2{right:9%;top:13%;font-size:14px;transform:rotate(16deg)}
-        .room-page .room-spark.s3{left:14%;bottom:12%;font-size:15px;transform:rotate(8deg)}
-        .room-page .room-spark.s4{right:15%;bottom:18%;font-size:23px;transform:rotate(-9deg)}
+        .room-page .room-spark.s1{left:8%;top:18%;transform:rotate(0deg)}
+        .room-page .room-spark.s2{right:9%;top:13%;font-size:14px;transform:rotate(0deg)}
+        .room-page .room-spark.s3{left:14%;bottom:12%;font-size:15px;transform:rotate(0deg)}
+        .room-page .room-spark.s4{right:15%;bottom:18%;font-size:23px;transform:rotate(0deg)}
 
         /* 미니홈피 장식 UI */
         .room-shell{
@@ -636,7 +636,7 @@ export default function RoomPage() {
           border-radius:10px;
           background:rgba(255,253,248,.9);
           box-shadow:3px 4px 0 rgba(98,198,226,.16);
-          transform:rotate(10deg) translateY(3px);
+          transform:rotate(0deg) translateY(3px);
           zoom:1.2;
         }
         .room-under-frame .deco-window:before{
@@ -664,7 +664,7 @@ export default function RoomPage() {
         .room-page .room-deco-back{z-index:0}
         .room-page .room-deco-back .deco-note{z-index:2}
         .room-page .room-deco-back .deco-window{z-index:-1}
-        .room-page .room-deco-back .deco-screen{z-index:0;transform:rotate(5deg) translateX(12px)}
+        .room-page .room-deco-back .deco-screen{z-index:0;transform:rotate(0deg) translateX(12px)}
         .room-page .room-deco-front{z-index:5}
         .room-page .deco-player{
           right:-68px;top:304px;width:126px;height:64px;
@@ -673,7 +673,7 @@ export default function RoomPage() {
           border-radius:7px 12px 10px 7px;
           background:#fffdf8;
           box-shadow:4px 5px 0 rgba(98,198,226,.13);
-          transform:rotate(5deg);
+          transform:rotate(0deg);
           zoom:1.2;
         }
         .room-page .deco-player:before{
@@ -688,7 +688,7 @@ export default function RoomPage() {
           letter-spacing:.08em;
         }
         .room-page .deco-player:after{
-          content:"────────\A  small note  ♡";
+          content:"────────\A  ────────";
           white-space:pre;
           line-height:1.7;
           font-size:8px;
@@ -701,7 +701,7 @@ export default function RoomPage() {
           border-radius:50%;
           background:rgba(255,253,248,.92);
           box-shadow:3px 4px 0 rgba(98,198,226,.12);
-          transform:rotate(8deg);
+          transform:rotate(0deg);
           zoom:1.2;
         }
         .room-page .deco-orbit:before{
@@ -743,7 +743,7 @@ export default function RoomPage() {
           border:2px solid rgba(98,198,226,.52);
           border-radius:9px;
           background:#fffdf8;
-          transform:rotate(-5deg) translateY(3px);
+          transform:rotate(0deg) translateY(3px);
           box-shadow:4px 5px 0 rgba(98,198,226,.14);
         }
         .room-page .deco-note:before{
