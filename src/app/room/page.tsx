@@ -504,7 +504,7 @@ export default function RoomPage() {
           --room-white:#fffdf8;
           position:relative;
           min-height:calc(100vh - 110px);
-          padding:26px 24px 50px !important;
+          padding:25px 24px 50px !important;
           overflow:hidden;
           background:
             linear-gradient(rgba(255,255,255,.28) 1px,transparent 1px),
@@ -541,7 +541,7 @@ export default function RoomPage() {
           position:relative;
           z-index:2;
           width:min(800px,100%);
-          margin:8px auto 0;
+          margin:18px auto 0;
           padding:13px 17px;
           box-sizing:border-box;
           background:rgba(255,253,248,.9);
