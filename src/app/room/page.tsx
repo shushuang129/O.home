@@ -539,7 +539,7 @@ export default function RoomPage() {
         }
         .room-page .page-head{
           position:relative;
-          z-index:2;
+          z-index:3;
           width:min(800px,100%);
           margin:0 auto;
           padding:13px 17px;
@@ -556,7 +556,7 @@ export default function RoomPage() {
           text-shadow:1px 1px 0 #fff;
         }
         .room-page .room-stage{
-          z-index:2;
+          z-index:3;
         }
         .room-page .room-canvas{
           border:3px solid rgba(84,184,215,.72) !important;
@@ -612,6 +612,13 @@ export default function RoomPage() {
         .room-page .room-spark.s4{right:15%;bottom:18%;font-size:23px;transform:rotate(-9deg)}
 
         /* 미니홈피 장식 UI */
+        .room-page .room-deco-layer{
+          position:absolute;
+          inset:0;
+          pointer-events:none;
+        }
+        .room-page .room-deco-back{z-index:1}
+        .room-page .room-deco-front{z-index:5}
         .room-page .room-deco{
           position:absolute;
           z-index:4;
@@ -661,7 +668,7 @@ export default function RoomPage() {
           box-shadow:2px 4px 0 rgba(98,198,226,.13);
         }
         .room-page .deco-note{
-          left:-18px;top:205px;width:132px;height:152px;
+          left:-18px;top:310px;width:132px;height:152px;
           box-sizing:border-box;padding:16px 12px;
           border:2px solid rgba(98,198,226,.52);
           border-radius:9px;
@@ -676,7 +683,7 @@ export default function RoomPage() {
           box-shadow:0 12px 0 #d9f5fb,0 24px 0 #d9f5fb,0 36px 0 #d9f5fb;
         }
         .room-page .deco-screen{
-          right:-26px;top:128px;width:154px;height:108px;
+          right:-42px;top:128px;width:154px;height:108px;
           padding:5px;box-sizing:border-box;
           border:2px solid rgba(98,198,226,.6);
           border-radius:10px;
@@ -726,6 +733,17 @@ export default function RoomPage() {
           display:block;width:42px;height:5px;margin:4px auto;
           border-radius:4px;background:#bdeaf5;
         }
+        .room-page .deco-window,
+        .room-page .deco-orb,
+        .room-page .deco-note,
+        .room-page .deco-screen,
+        .room-page .deco-tag,
+        .room-page .deco-badge,
+        .room-page .mini-heart,
+        .room-page .mini-dots,
+        .room-page .mini-ribbon{
+          zoom:1.2;
+        }
         /* 방 프레임 위로 살짝 올라오는 장식 */
         .room-page .deco-pill,
         .room-page .deco-orb,
@@ -748,16 +766,20 @@ export default function RoomPage() {
       <span className="room-spark s2">◇</span>
       <span className="room-spark s3">♡</span>
       <span className="room-spark s4">✧</span>
-      <span className="room-deco deco-window" aria-hidden="true" />
-      <span className="room-deco deco-pill" aria-hidden="true" />
-      <span className="room-deco deco-orb" aria-hidden="true" />
-      <span className="room-deco deco-note" aria-hidden="true" />
-      <span className="room-deco deco-screen" aria-hidden="true" />
-      <span className="room-deco deco-tag" aria-hidden="true" />
-      <span className="room-deco deco-badge" aria-hidden="true" />
-      <span className="room-deco deco-mini mini-heart" aria-hidden="true" />
-      <span className="room-deco deco-mini mini-dots" aria-hidden="true" />
-      <span className="room-deco deco-mini mini-ribbon" aria-hidden="true" />
+      <div className="room-deco-layer room-deco-back" aria-hidden="true">
+        <span className="room-deco deco-window" />
+        <span className="room-deco deco-screen" />
+        <span className="room-deco deco-orb" />
+        <span className="room-deco deco-tag" />
+        <span className="room-deco deco-note" />
+      </div>
+      <div className="room-deco-layer room-deco-front" aria-hidden="true">
+        <span className="room-deco deco-pill" />
+        <span className="room-deco deco-badge" />
+        <span className="room-deco deco-mini mini-heart" />
+        <span className="room-deco deco-mini mini-dots" />
+        <span className="room-deco deco-mini mini-ribbon" />
+      </div>
       <div className="page-head">
         <div>
           <h1 style={{ margin: 0, display:'flex', alignItems:'center', gap:7 }}>
