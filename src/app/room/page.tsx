@@ -762,8 +762,8 @@ export default function RoomPage() {
         }
 
         .room-page .deco-pill{
-          left:43%;top:-4px;width:210px;height:36px;
-          z-index:3;
+          left:50%;top:66px;width:210px;height:36px;
+          z-index:5;
           box-shadow:3px 4px 0 rgba(98,198,226,.15);
         }
         .room-page .deco-pill:after{
