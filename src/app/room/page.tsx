@@ -620,7 +620,7 @@ export default function RoomPage() {
         .room-page .room-deco-back{z-index:1}
         .room-page .room-deco-back .deco-note{z-index:2}
         .room-page .room-deco-back .deco-window{z-index:1}
-        .room-page .room-deco-back .deco-screen{z-index:0}
+        .room-page .room-deco-back .deco-screen{z-index:0;transform:rotate(5deg) translateX(12px)}
         .room-page .room-deco-front{z-index:5}
         .room-page .room-deco{
           position:absolute;
@@ -630,7 +630,7 @@ export default function RoomPage() {
           font-size:9px;
         }
         .room-page .deco-window{
-          left:-34px;top:24px;width:198px;height:130px;
+          left:-72px;top:18px;width:250px;height:164px;
           padding:5px;box-sizing:border-box;
           border:2px solid rgba(98,198,226,.62);
           border-radius:10px;
@@ -671,12 +671,12 @@ export default function RoomPage() {
           box-shadow:2px 4px 0 rgba(98,198,226,.13);
         }
         .room-page .deco-note{
-          left:-32px;top:285px;width:158px;height:182px;
+          left:-48px;top:300px;width:190px;height:218px;
           box-sizing:border-box;padding:16px 12px;
           border:2px solid rgba(98,198,226,.52);
           border-radius:9px;
           background:#fffdf8;
-          transform:rotate(-2deg) translateY(2px);
+          transform:rotate(-5deg) translateY(3px);
           box-shadow:4px 5px 0 rgba(98,198,226,.14);
         }
         .room-page .deco-note:before{
@@ -686,7 +686,7 @@ export default function RoomPage() {
           box-shadow:0 12px 0 #d9f5fb,0 24px 0 #d9f5fb,0 36px 0 #d9f5fb;
         }
         .room-page .deco-screen{
-          right:-58px;top:120px;width:184px;height:128px;
+          right:-82px;top:112px;width:226px;height:158px;
           padding:5px;box-sizing:border-box;
           border:2px solid rgba(98,198,226,.6);
           border-radius:10px;
@@ -717,13 +717,14 @@ export default function RoomPage() {
           display:block;width:46px;height:6px;margin:6px auto;
           border-radius:4px;background:#d1f0f7;
         }
-        .room-page .deco-badge{
-          left:14px;bottom:-10px;width:104px;height:72px;
+        .room-page .deco-badge{z-index:6;
+
+          left:2px;bottom:-30px;width:132px;height:92px;
           border:2px solid rgba(98,198,226,.52);
           border-radius:12px;
           background:rgba(255,253,248,.9);
           box-shadow:3px 4px 0 rgba(98,198,226,.13);
-          transform:rotate(-4deg);
+          transform:rotate(-6deg);
         }
         .room-page .deco-badge:before{
           content:"♡";
