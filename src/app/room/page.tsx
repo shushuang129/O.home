@@ -541,7 +541,7 @@ export default function RoomPage() {
           position:relative;
           z-index:2;
           width:min(800px,100%);
-          margin:0 auto;
+          margin:8px auto 0;
           padding:13px 17px;
           box-sizing:border-box;
           background:rgba(255,253,248,.9);
