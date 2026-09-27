@@ -688,11 +688,7 @@ export default function RoomPage() {
           letter-spacing:.08em;
         }
         .room-page .deco-player:after{
-          content:"────────\A  ────────";
-          white-space:pre;
-          line-height:1.7;
-          font-size:8px;
-          color:#70b8ca;
+          content:"";
         }
         .room-page .deco-orbit{
           right:-35px;top:392px;width:48px;height:48px;
@@ -784,7 +780,8 @@ export default function RoomPage() {
           display:block;width:46px;height:6px;margin:6px auto;
           border-radius:4px;background:#d1f0f7;
         }
-        .room-page .deco-badge{z-index:6;
+        .room-page .deco-badge{
+          transform:rotate(0deg) !important;z-index:6;
 
           left:2px;bottom:-10px;width:132px;height:92px;
           border:2px solid rgba(98,198,226,.52);
