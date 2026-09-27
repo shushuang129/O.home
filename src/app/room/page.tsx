@@ -630,13 +630,13 @@ export default function RoomPage() {
         }
         .room-under-frame .deco-window{
           position:absolute;
-          left:75px;top:18px;width:250px;height:164px;
+          left:85px;top:18px;width:250px;height:164px;
           padding:5px;box-sizing:border-box;
           border:2px solid rgba(98,198,226,.62);
           border-radius:10px;
           background:rgba(255,253,248,.9);
           box-shadow:3px 4px 0 rgba(98,198,226,.16);
-          transform:rotate(-5deg) translateY(3px);
+          transform:rotate(-10deg) translateY(3px);
           zoom:1.2;
         }
         .room-under-frame .deco-window:before{
