@@ -504,7 +504,7 @@ export default function RoomPage() {
           --room-white:#fffdf8;
           position:relative;
           min-height:calc(100vh - 110px);
-          padding:26px 24px 90px !important;
+          padding:26px 24px 50px !important;
           overflow:hidden;
           background:
             linear-gradient(rgba(255,255,255,.28) 1px,transparent 1px),
