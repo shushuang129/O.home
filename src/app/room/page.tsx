@@ -493,7 +493,136 @@ export default function RoomPage() {
   const item = room.items.find(x => x.id === selected);
 
   return (
-    <section className="page" style={{ maxWidth: 1100, width: '100%', boxSizing: 'border-box' }}>
+    <section className="page room-page" style={{ maxWidth: 1180, width: '100%', boxSizing: 'border-box' }}>
+      <style>{`
+        .room-page{
+          --room-sky:#c9effa;
+          --room-sky-deep:#9edff2;
+          --room-blue:#62c6e2;
+          --room-pink:#f7b8d8;
+          --room-yellow:#ffe59a;
+          --room-white:#fffdf8;
+          position:relative;
+          min-height:calc(100vh - 110px);
+          padding:26px 24px 90px !important;
+          overflow:hidden;
+          background:
+            linear-gradient(rgba(255,255,255,.28) 1px,transparent 1px),
+            linear-gradient(90deg,rgba(255,255,255,.28) 1px,transparent 1px),
+            linear-gradient(135deg,#d9f7ff,#bcebf7);
+          background-size:24px 24px,24px 24px,100% 100%;
+          border:2px solid rgba(92,190,218,.42);
+          border-radius:22px;
+          box-shadow:inset 0 0 0 7px rgba(255,255,255,.38),0 18px 45px rgba(61,160,191,.16);
+        }
+        .room-page:before,.room-page:after{
+          content:"";
+          position:absolute;
+          border-radius:999px;
+          pointer-events:none;
+          opacity:.72;
+          filter:blur(.2px);
+        }
+        .room-page:before{
+          width:170px;height:58px;left:-34px;top:96px;
+          background:
+            radial-gradient(circle at 28% 65%,#fff 0 27%,transparent 28%),
+            radial-gradient(circle at 52% 42%,#fff 0 35%,transparent 36%),
+            radial-gradient(circle at 74% 66%,#fff 0 25%,transparent 26%);
+        }
+        .room-page:after{
+          width:210px;height:70px;right:-52px;bottom:58px;
+          background:
+            radial-gradient(circle at 28% 65%,#fff 0 28%,transparent 29%),
+            radial-gradient(circle at 52% 42%,#fff 0 37%,transparent 38%),
+            radial-gradient(circle at 76% 66%,#fff 0 27%,transparent 28%);
+        }
+        .room-page .page-head{
+          position:relative;
+          z-index:2;
+          width:min(800px,100%);
+          margin:0 auto;
+          padding:13px 17px;
+          box-sizing:border-box;
+          background:rgba(255,253,248,.9);
+          border:2px solid rgba(98,198,226,.58);
+          border-radius:15px;
+          box-shadow:4px 5px 0 rgba(98,198,226,.18),0 10px 22px rgba(59,148,177,.12);
+        }
+        .room-page .page-head h1{
+          color:#358eac;
+          letter-spacing:.08em;
+          text-shadow:1px 1px 0 #fff;
+        }
+        .room-page .room-stage{
+          z-index:2;
+        }
+        .room-page .room-canvas{
+          border:3px solid rgba(84,184,215,.72) !important;
+          border-radius:12px !important;
+          box-shadow:
+            0 0 0 4px rgba(255,255,255,.92),
+            0 0 0 7px rgba(91,190,218,.36),
+            8px 10px 0 rgba(73,171,201,.22),
+            0 18px 32px rgba(57,143,170,.18) !important;
+          background:#fffdf8 !important;
+        }
+        .room-page .room-side-card,
+        .room-page .panel{
+          border-color:rgba(91,190,218,.38) !important;
+          background:rgba(255,253,248,.94) !important;
+          box-shadow:4px 5px 0 rgba(98,198,226,.13),0 10px 22px rgba(59,148,177,.12) !important;
+        }
+        .room-page .room-side-card:before{
+          content:"";
+          display:block;
+          width:38px;height:7px;
+          margin:-8px auto 9px;
+          border-radius:999px;
+          background:linear-gradient(90deg,var(--room-pink) 0 50%,var(--room-yellow) 50%);
+          opacity:.9;
+        }
+        .room-page .btn{
+          border-color:rgba(91,190,218,.42);
+        }
+        .room-page .btn-dark{
+          background:#58b9d5;
+          color:white;
+          border-color:#4aaac7;
+          box-shadow:2px 3px 0 rgba(65,154,182,.24);
+        }
+        .room-page .btn-dark:hover{background:#48afce}
+        .room-page .btn-ghost:hover{background:#e7f8fc}
+        .room-page .k-input,.room-page select{
+          border-color:rgba(91,190,218,.38);
+          background:#fffefa;
+        }
+        .room-page .room-spark{
+          position:absolute;
+          z-index:1;
+          pointer-events:none;
+          color:#fff;
+          text-shadow:0 1px 3px rgba(67,164,193,.35);
+          font-size:20px;
+        }
+        .room-page .room-spark.s1{left:8%;top:18%;transform:rotate(-12deg)}
+        .room-page .room-spark.s2{right:9%;top:13%;font-size:14px;transform:rotate(16deg)}
+        .room-page .room-spark.s3{left:14%;bottom:12%;font-size:15px;transform:rotate(8deg)}
+        .room-page .room-spark.s4{right:15%;bottom:18%;font-size:23px;transform:rotate(-9deg)}
+        @media(max-width:960px){
+          .room-page{padding-left:14px !important;padding-right:14px !important}
+          .room-page .room-side-card{display:none}
+        }
+        @media(max-width:620px){
+          .room-page{padding:14px 10px 70px !important;border-radius:16px}
+          .room-page .page-head{border-radius:12px}
+          .room-page .room-spark{display:none}
+        }
+      `}</style>
+      <span className="room-spark s1">✦</span>
+      <span className="room-spark s2">◇</span>
+      <span className="room-spark s3">♡</span>
+      <span className="room-spark s4">✧</span>
       <div className="page-head">
         <div>
           <h1 style={{ margin: 0, display:'flex', alignItems:'center', gap:7 }}>
@@ -508,7 +637,7 @@ export default function RoomPage() {
         </div>}
       </div>
 
-      <div style={{ position:'relative', width:'800px', maxWidth:'100%', margin:'28px auto 0' }}>
+      <div className="room-stage" style={{ position:'relative', width:'800px', maxWidth:'100%', margin:'28px auto 0' }}>
         {!editOn && <aside className="room-side-card" style={{ position:'absolute', right:'calc(100% + 18px)', top:0, width:220, boxSizing:'border-box', padding:17, borderRadius:16, background:'var(--panel)', border:'1px solid var(--line)', boxShadow:'0 10px 24px rgba(0,0,0,.07)' }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
             <span style={{ fontSize:9, letterSpacing:'.16em', color:'var(--faint)' }}>PROFILE</span>
@@ -547,7 +676,7 @@ export default function RoomPage() {
         </div>
       </aside>}
       <div style={{ position:'relative', width:'100%', aspectRatio:'4 / 3', overflow:'visible' }}>
-        <div ref={canvas} onPointerDown={() => setSelected(null)}
+        <div className="room-canvas" ref={canvas} onPointerDown={() => setSelected(null)}
           style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden',
             background: 'var(--bg)',
             border: editOn ? '1px dashed var(--line)' : '1px solid var(--line)', borderRadius:14,
