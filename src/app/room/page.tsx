@@ -617,9 +617,9 @@ export default function RoomPage() {
           inset:0;
           pointer-events:none;
         }
-        .room-page .room-deco-back{z-index:1}
+        .room-page .room-deco-back{z-index:0}
         .room-page .room-deco-back .deco-note{z-index:2}
-        .room-page .room-deco-back .deco-window{z-index:1}
+        .room-page .room-deco-back .deco-window{z-index:-1}
         .room-page .room-deco-back .deco-screen{z-index:0;transform:rotate(5deg) translateX(12px)}
         .room-page .room-deco-front{z-index:5}
         .room-page .room-deco{
@@ -719,7 +719,7 @@ export default function RoomPage() {
         }
         .room-page .deco-badge{z-index:6;
 
-          left:2px;bottom:-30px;width:132px;height:92px;
+          left:2px;bottom:-10px;width:132px;height:92px;
           border:2px solid rgba(98,198,226,.52);
           border-radius:12px;
           background:rgba(255,253,248,.9);
