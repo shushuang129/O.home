@@ -637,7 +637,7 @@ export default function RoomPage() {
         </div>}
       </div>
 
-      <div className="room-stage" style={{ position:'relative', width:'800px', maxWidth:'100%', margin:'28px auto 0' }}>
+      <div className="room-stage" style={{ position:'relative', width:'800px', minWidth:'800px', maxWidth:'none', margin:'28px auto 0' }}>
         {!editOn && <aside className="room-side-card" style={{ position:'absolute', right:'calc(100% + 18px)', top:0, width:220, boxSizing:'border-box', padding:17, borderRadius:16, background:'var(--panel)', border:'1px solid var(--line)', boxShadow:'0 10px 24px rgba(0,0,0,.07)' }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
             <span style={{ fontSize:9, letterSpacing:'.16em', color:'var(--faint)' }}>PROFILE</span>
@@ -675,9 +675,9 @@ export default function RoomPage() {
             value={item?.link ?? ''} onChange={e => selected && updateItem(selected, { link: e.target.value })} />
         </div>
       </aside>}
-      <div style={{ position:'relative', width:'100%', aspectRatio:'4 / 3', overflow:'visible' }}>
+      <div style={{ position:'relative', width:'800px', minWidth:'800px', height:'600px', minHeight:'600px', overflow:'visible', flex:'0 0 800px' }}>
         <div className="room-canvas" ref={canvas} onPointerDown={() => setSelected(null)}
-          style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden',
+          style={{ position:'relative', width:'800px', height:'600px', minWidth:'800px', minHeight:'600px', boxSizing:'border-box', overflow:'hidden',
             background: 'var(--bg)',
             border: editOn ? '1px dashed var(--line)' : '1px solid var(--line)', borderRadius:14,
             boxShadow:'0 10px 24px rgba(0,0,0,.08), 0 0 0 4px var(--panel)' }}>
