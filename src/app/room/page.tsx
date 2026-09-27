@@ -610,6 +610,139 @@ export default function RoomPage() {
         .room-page .room-spark.s2{right:9%;top:13%;font-size:14px;transform:rotate(16deg)}
         .room-page .room-spark.s3{left:14%;bottom:12%;font-size:15px;transform:rotate(8deg)}
         .room-page .room-spark.s4{right:15%;bottom:18%;font-size:23px;transform:rotate(-9deg)}
+
+        /* 미니홈피 장식 UI */
+        .room-page .room-deco{
+          position:absolute;
+          z-index:1;
+          pointer-events:none;
+          color:#5caec5;
+          font-size:9px;
+        }
+        .room-page .deco-window{
+          left:28px;top:42px;width:76px;height:52px;
+          padding:5px;box-sizing:border-box;
+          border:2px solid rgba(98,198,226,.62);
+          border-radius:10px;
+          background:rgba(255,253,248,.9);
+          box-shadow:3px 4px 0 rgba(98,198,226,.16);
+        }
+        .room-page .deco-window:before{
+          content:"";
+          display:block;height:9px;margin:-1px -1px 5px;
+          border-radius:6px 6px 2px 2px;
+          background:linear-gradient(90deg,#f7b8d8 0 43%,#c9effa 43% 76%,#9edff2 76%);
+        }
+        .room-page .deco-window:after{
+          content:"";
+          display:block;width:38px;height:5px;margin-left:5px;
+          border-radius:4px;
+          background:#d8f4fb;
+          box-shadow:0 9px 0 #e8f8fc;
+        }
+        .room-page .deco-pill{
+          left:50%;top:22px;width:108px;height:18px;
+          transform:translateX(-50%);
+          border:2px solid rgba(98,198,226,.55);
+          border-radius:999px;
+          background:rgba(255,253,248,.9);
+          box-shadow:2px 3px 0 rgba(98,198,226,.14);
+        }
+        .room-page .deco-pill:after{
+          content:"";
+          display:block;width:42px;height:4px;margin:5px auto;
+          border-radius:4px;background:#bdeaf5;
+        }
+        .room-page .deco-orb{
+          right:34px;top:30px;width:40px;height:40px;
+          border:2px solid rgba(98,198,226,.55);
+          border-radius:50%;
+          background:radial-gradient(circle at 38% 34%,#fff 0 12%,#d9f6fc 13% 42%,#a9dfed 43% 48%,#fff 49% 56%,#bfeaf4 57%);
+          box-shadow:2px 4px 0 rgba(98,198,226,.13);
+        }
+        .room-page .deco-note{
+          left:28px;top:250px;width:70px;height:88px;
+          box-sizing:border-box;padding:12px 9px;
+          border:2px solid rgba(98,198,226,.52);
+          border-radius:9px;
+          background:#fffdf8;
+          transform:rotate(-2deg);
+          box-shadow:4px 5px 0 rgba(98,198,226,.14);
+        }
+        .room-page .deco-note:before{
+          content:"";
+          display:block;width:34px;height:5px;margin-bottom:9px;
+          border-radius:4px;background:#f7b8d8;
+          box-shadow:0 12px 0 #d9f5fb,0 24px 0 #d9f5fb,0 36px 0 #d9f5fb;
+        }
+        .room-page .deco-screen{
+          right:28px;top:190px;width:82px;height:56px;
+          padding:5px;box-sizing:border-box;
+          border:2px solid rgba(98,198,226,.6);
+          border-radius:10px;
+          background:#fffdf8;
+          transform:rotate(2deg);
+          box-shadow:3px 4px 0 rgba(98,198,226,.14);
+        }
+        .room-page .deco-screen:before{
+          content:"";
+          display:block;height:32px;border-radius:5px;
+          background:linear-gradient(135deg,#d9f7ff,#f7c8df);
+          border:1px solid rgba(98,198,226,.25);
+        }
+        .room-page .deco-screen:after{
+          content:"";
+          display:block;width:32px;height:4px;margin:5px auto 0;
+          border-radius:4px;background:#bdeaf5;
+        }
+        .room-page .deco-tag{
+          right:38px;top:110px;width:66px;height:15px;
+          border:2px solid rgba(98,198,226,.5);
+          border-radius:8px;
+          background:rgba(255,253,248,.92);
+          box-shadow:2px 3px 0 rgba(98,198,226,.12);
+        }
+        .room-page .deco-tag:after{
+          content:"";
+          display:block;width:25px;height:4px;margin:4px auto;
+          border-radius:4px;background:#d1f0f7;
+        }
+        .room-page .deco-badge{
+          left:44px;bottom:30px;width:58px;height:42px;
+          border:2px solid rgba(98,198,226,.52);
+          border-radius:12px;
+          background:rgba(255,253,248,.9);
+          box-shadow:3px 4px 0 rgba(98,198,226,.13);
+          transform:rotate(-3deg);
+        }
+        .room-page .deco-badge:before{
+          content:"♡";
+          display:block;text-align:center;
+          margin-top:5px;font-size:18px;color:#f19fc7;
+          text-shadow:1px 1px 0 #fff;
+        }
+        .room-page .deco-badge:after{
+          content:"";
+          display:block;width:26px;height:4px;margin:2px auto;
+          border-radius:4px;background:#bdeaf5;
+        }
+        .room-page .deco-flower{
+          right:52px;bottom:30px;width:42px;height:42px;
+          border-radius:50%;
+          background:
+            radial-gradient(circle at 50% 20%,#fff 0 18%,transparent 19%),
+            radial-gradient(circle at 80% 50%,#fff 0 18%,transparent 19%),
+            radial-gradient(circle at 50% 80%,#fff 0 18%,transparent 19%),
+            radial-gradient(circle at 20% 50%,#fff 0 18%,transparent 19%),
+            #d9f6fc;
+          border:2px solid rgba(98,198,226,.45);
+          box-shadow:2px 4px 0 rgba(98,198,226,.12);
+        }
+        .room-page .deco-flower:after{
+          content:"";
+          position:absolute;left:15px;top:15px;
+          width:9px;height:9px;border-radius:50%;background:#f7c6df;
+        }
         @media(max-width:960px){
           .room-page{padding-left:14px !important;padding-right:14px !important}
           .room-page .room-side-card{display:none}
@@ -624,6 +757,14 @@ export default function RoomPage() {
       <span className="room-spark s2">◇</span>
       <span className="room-spark s3">♡</span>
       <span className="room-spark s4">✧</span>
+      <span className="room-deco deco-window" aria-hidden="true" />
+      <span className="room-deco deco-pill" aria-hidden="true" />
+      <span className="room-deco deco-orb" aria-hidden="true" />
+      <span className="room-deco deco-note" aria-hidden="true" />
+      <span className="room-deco deco-screen" aria-hidden="true" />
+      <span className="room-deco deco-tag" aria-hidden="true" />
+      <span className="room-deco deco-badge" aria-hidden="true" />
+      <span className="room-deco deco-flower" aria-hidden="true" />
       <div className="page-head">
         <div>
           <h1 style={{ margin: 0, display:'flex', alignItems:'center', gap:7 }}>
