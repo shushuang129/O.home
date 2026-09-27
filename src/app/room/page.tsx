@@ -493,7 +493,11 @@ export default function RoomPage() {
   const item = room.items.find(x => x.id === selected);
 
   return (
-    <section className="page room-page" style={{ maxWidth: 1320, width: '100%', boxSizing: 'border-box' }}>
+    <div className="room-shell">
+      <div className="room-under-frame" aria-hidden="true">
+        <span className="room-deco deco-window" />
+      </div>
+      <section className="page room-page" style={{ maxWidth: 1320, width: '100%', boxSizing: 'border-box' }}>
       <style>{`
         .room-page{
           --room-sky:#c9effa;
@@ -612,6 +616,46 @@ export default function RoomPage() {
         .room-page .room-spark.s4{right:15%;bottom:18%;font-size:23px;transform:rotate(-9deg)}
 
         /* 미니홈피 장식 UI */
+        .room-shell{
+          position:relative;
+          width:100%;
+          isolation:isolate;
+        }
+        .room-under-frame{
+          position:absolute;
+          inset:0;
+          z-index:0;
+          pointer-events:none;
+          overflow:visible;
+        }
+        .room-under-frame .deco-window{
+          position:absolute;
+          left:-72px;top:18px;width:250px;height:164px;
+          padding:5px;box-sizing:border-box;
+          border:2px solid rgba(98,198,226,.62);
+          border-radius:10px;
+          background:rgba(255,253,248,.9);
+          box-shadow:3px 4px 0 rgba(98,198,226,.16);
+          transform:rotate(-5deg) translateY(3px);
+          zoom:1.2;
+        }
+        .room-under-frame .deco-window:before{
+          content:"";
+          display:block;height:14px;margin:-2px -2px 7px;
+          border-radius:6px 6px 2px 2px;
+          background:linear-gradient(90deg,#f7b8d8 0 43%,#c9effa 43% 76%,#9edff2 76%);
+        }
+        .room-under-frame .deco-window:after{
+          content:"";
+          display:block;width:70px;height:7px;margin-left:8px;
+          border-radius:4px;
+          background:#d8f4fb;
+          box-shadow:0 9px 0 #e8f8fc;
+        }
+        .room-page{
+          position:relative;
+          z-index:1;
+        }
         .room-page .room-deco-layer{
           position:absolute;
           inset:0;
@@ -629,27 +673,7 @@ export default function RoomPage() {
           color:#5caec5;
           font-size:9px;
         }
-        .room-page .deco-window{
-          left:-72px;top:18px;width:250px;height:164px;
-          padding:5px;box-sizing:border-box;
-          border:2px solid rgba(98,198,226,.62);
-          border-radius:10px;
-          background:rgba(255,253,248,.9);
-          box-shadow:3px 4px 0 rgba(98,198,226,.16);
-        }
-        .room-page .deco-window:before{
-          content:"";
-          display:block;height:14px;margin:-2px -2px 7px;
-          border-radius:6px 6px 2px 2px;
-          background:linear-gradient(90deg,#f7b8d8 0 43%,#c9effa 43% 76%,#9edff2 76%);
-        }
-        .room-page .deco-window:after{
-          content:"";
-          display:block;width:70px;height:7px;margin-left:8px;
-          border-radius:4px;
-          background:#d8f4fb;
-          box-shadow:0 9px 0 #e8f8fc;
-        }
+
         .room-page .deco-pill{
           left:50%;top:22px;width:108px;height:18px;
           transform:translateX(-50%);
@@ -771,7 +795,6 @@ export default function RoomPage() {
       <span className="room-spark s3">♡</span>
       <span className="room-spark s4">✧</span>
       <div className="room-deco-layer room-deco-back" aria-hidden="true">
-        <span className="room-deco deco-window" />
         <span className="room-deco deco-screen" />
         <span className="room-deco deco-orb" />
         <span className="room-deco deco-tag" />
@@ -967,6 +990,7 @@ export default function RoomPage() {
       {profileCropFile && <ProfileCropper file={profileCropFile} onCancel={()=>setProfileCropFile(null)} onDone={file=>{setProfileCropFile(null);setProfileFile(file);}} />}
       <p className="hint" style={{ marginTop:8, visibility:editOn ? 'visible' : 'hidden' }}>보관함에서 스티커를 여러 번 꺼내 쓸 수 있어요. 방에서 삭제해도 보관함에는 남습니다.</p>
       {backgroundCropFile && <BackgroundCropper file={backgroundCropFile} onCancel={()=>setBackgroundCropFile(null)} onDone={async file=>{setBackgroundCropFile(null);await addBackground(file);}} />}
-    </section>
+      </section>
+    </div>
   );
 }
