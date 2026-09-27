@@ -663,7 +663,7 @@ export default function RoomPage() {
             </div>
           </div>
         </aside>}
-      {editOn && <aside className="panel" style={{ position:'absolute', left:-157, top:0, width:'120px', boxSizing:'border-box', padding:10, borderRadius:14, boxShadow:'0 8px 20px rgba(0,0,0,.06)', zIndex:40 }}>
+      {editOn && <aside className="panel" style={{ position:'absolute', left:-133, top:0, width:'120px', boxSizing:'border-box', padding:10, borderRadius:14, boxShadow:'0 8px 20px rgba(0,0,0,.06)', zIndex:40 }}>
         <div style={{ fontSize:10, letterSpacing:'.08em', opacity:.55, marginBottom:7 }}>EDIT</div>
         <div style={{ display:'grid', gap:6 }}>
           <button className="btn btn-ghost" onClick={() => moveZ('top')} disabled={!selected}>맨 위</button>
@@ -714,7 +714,7 @@ export default function RoomPage() {
         </div>}
       </div>
       </div>
-      {editOn && <aside className="panel" style={{ position:'absolute', left:'calc(100% + 24px)', top:0, width:'200px', boxSizing:'border-box', padding:10, borderRadius:14, maxHeight:'min(70vh,750px)', overflowY:'auto', boxShadow:'0 8px 20px rgba(0,0,0,.06)', zIndex:40 }}>
+      {editOn && <aside className="panel" style={{ position:'absolute', left:'calc(100% + 12px)', top:0, width:'200px', boxSizing:'border-box', padding:10, borderRadius:14, maxHeight:'min(70vh,750px)', overflowY:'auto', boxShadow:'0 8px 20px rgba(0,0,0,.06)', zIndex:40 }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:9 }}>
           <div>
             <div style={{ fontSize:10, letterSpacing:'.08em', opacity:.55 }}>MY COLLECTION</div>
