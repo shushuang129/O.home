@@ -505,7 +505,7 @@ export default function RoomPage() {
           position:relative;
           min-height:calc(100vh - 110px);
           padding:25px 24px 50px !important;
-          overflow:hidden;
+          overflow:visible;
           background:
             linear-gradient(rgba(255,255,255,.28) 1px,transparent 1px),
             linear-gradient(90deg,rgba(255,255,255,.28) 1px,transparent 1px),
@@ -614,7 +614,7 @@ export default function RoomPage() {
         /* 미니홈피 장식 UI */
         .room-page .room-deco{
           position:absolute;
-          z-index:1;
+          z-index:4;
           pointer-events:none;
           color:#5caec5;
           font-size:9px;
@@ -749,7 +749,7 @@ export default function RoomPage() {
           left:-12px;top:38px;width:142px;height:94px;
           padding:7px;
           border-radius:12px;
-          z-index:1;
+          z-index:2;
           transform:rotate(-1deg);
         }
         .room-page .deco-window:before{
@@ -778,7 +778,7 @@ export default function RoomPage() {
         .room-page .deco-note{
           left:-4px;top:222px;width:116px;height:136px;
           padding:18px 13px;
-          z-index:1;
+          z-index:2;
           transform:rotate(-3deg);
         }
         .room-page .deco-note:before{
@@ -789,7 +789,7 @@ export default function RoomPage() {
         .room-page .deco-screen{
           right:-18px;top:142px;width:132px;height:92px;
           padding:7px;
-          z-index:1;
+          z-index:2;
           transform:rotate(3deg);
         }
         .room-page .deco-screen:before{
