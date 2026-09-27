@@ -667,7 +667,7 @@ export default function RoomPage() {
         .room-page .room-deco-back .deco-screen{z-index:0;transform:rotate(0deg) translateX(12px)}
         .room-page .room-deco-front{z-index:5}
         .room-page .deco-player{
-          z-index:1;
+          z-index:0;
           right:-68px;top:304px;width:126px;height:64px;
           box-sizing:border-box;padding:9px 11px;
           border:2px solid rgba(98,198,226,.55);
