@@ -630,7 +630,7 @@ export default function RoomPage() {
         }
         .room-under-frame .deco-window{
           position:absolute;
-          left:25px;top:18px;width:250px;height:164px;
+          left:75px;top:18px;width:250px;height:164px;
           padding:5px;box-sizing:border-box;
           border:2px solid rgba(98,198,226,.62);
           border-radius:10px;
