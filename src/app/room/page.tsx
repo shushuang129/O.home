@@ -636,7 +636,7 @@ export default function RoomPage() {
           border-radius:10px;
           background:rgba(255,253,248,.9);
           box-shadow:3px 4px 0 rgba(98,198,226,.16);
-          transform:rotate(30deg) translateY(3px);
+          transform:rotate(10deg) translateY(3px);
           zoom:1.2;
         }
         .room-under-frame .deco-window:before{
