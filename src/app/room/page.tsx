@@ -713,7 +713,7 @@ export default function RoomPage() {
           border-radius:12px;
           background:rgba(255,253,248,.9);
           box-shadow:3px 4px 0 rgba(98,198,226,.13);
-          transform:rotate(-3deg);
+          transform:rotate(-4deg);
         }
         .room-page .deco-badge:before{
           content:"♡";
@@ -746,11 +746,11 @@ export default function RoomPage() {
 
         /* 큰 장식들이 서로 겹쳐 보이는 미니홈피 레이어 */
         .room-page .deco-window{
-          left:-12px;top:38px;width:142px;height:94px;
+          left:-28px;top:28px;width:178px;height:118px;
           padding:7px;
           border-radius:12px;
           z-index:2;
-          transform:rotate(-1deg);
+          transform:rotate(-2deg);
         }
         .room-page .deco-window:before{
           height:14px;margin:-2px -2px 7px;
@@ -762,7 +762,7 @@ export default function RoomPage() {
         }
 
         .room-page .deco-pill{
-          left:47%;top:12px;width:176px;height:30px;
+          left:43%;top:-4px;width:210px;height:36px;
           z-index:3;
           box-shadow:3px 4px 0 rgba(98,198,226,.15);
         }
@@ -771,12 +771,12 @@ export default function RoomPage() {
         }
 
         .room-page .deco-orb{
-          right:18px;top:18px;width:64px;height:64px;
+          right:-12px;top:6px;width:82px;height:82px;
           z-index:3;
         }
 
         .room-page .deco-note{
-          left:-4px;top:222px;width:116px;height:136px;
+          left:-22px;top:198px;width:146px;height:168px;
           padding:18px 13px;
           z-index:2;
           transform:rotate(-3deg);
@@ -787,10 +787,10 @@ export default function RoomPage() {
         }
 
         .room-page .deco-screen{
-          right:-18px;top:142px;width:132px;height:92px;
+          right:-32px;top:124px;width:164px;height:116px;
           padding:7px;
           z-index:2;
-          transform:rotate(3deg);
+          transform:rotate(4deg);
         }
         .room-page .deco-screen:before{
           height:56px;
@@ -800,7 +800,7 @@ export default function RoomPage() {
         }
 
         .room-page .deco-tag{
-          right:42px;top:92px;width:112px;height:24px;
+          right:20px;top:82px;width:138px;height:28px;
           z-index:3;
           transform:rotate(-2deg);
         }
@@ -809,7 +809,7 @@ export default function RoomPage() {
         }
 
         .room-page .deco-badge{
-          left:30px;bottom:20px;width:94px;height:68px;
+          left:16px;bottom:-8px;width:116px;height:82px;
           z-index:3;
         }
         .room-page .deco-badge:before{
@@ -820,64 +820,11 @@ export default function RoomPage() {
         }
 
         .room-page .deco-flower{
-          right:26px;bottom:18px;width:64px;height:64px;
+          right:8px;bottom:-12px;width:78px;height:78px;
           z-index:3;
         }
         .room-page .deco-flower:after{
           left:23px;top:23px;width:13px;height:13px;
-        }
-
-        /* 둥글고 폭신한 구름 장식 */
-        .room-page .deco-cloud{
-          position:absolute;
-          z-index:2;
-          pointer-events:none;
-          height:42px;
-          border-radius:999px;
-          background:#fffdfd;
-          border:2px solid rgba(98,198,226,.3);
-          box-shadow:3px 5px 0 rgba(98,198,226,.12);
-        }
-        .room-page .deco-cloud:before,
-        .room-page .deco-cloud:after{
-          content:"";
-          position:absolute;
-          bottom:0;
-          border-radius:50%;
-          background:#fffdfd;
-          border:2px solid rgba(98,198,226,.3);
-          border-bottom:0;
-        }
-        .room-page .deco-cloud:before{
-          width:45px;height:45px;left:18px;
-        }
-        .room-page .deco-cloud:after{
-          width:58px;height:58px;left:52px;
-        }
-        .room-page .cloud-a{
-          left:-24px;top:84px;width:116px;
-          transform:rotate(-3deg);
-        }
-        .room-page .cloud-b{
-          right:-30px;top:58px;width:138px;height:48px;
-          transform:rotate(3deg);
-        }
-        .room-page .cloud-b:before{
-          width:50px;height:50px;left:25px;
-        }
-        .room-page .cloud-b:after{
-          width:64px;height:64px;left:70px;
-        }
-        .room-page .cloud-c{
-          right:104px;bottom:4px;width:104px;height:36px;
-          transform:rotate(-2deg);
-          opacity:.9;
-        }
-        .room-page .cloud-c:before{
-          width:38px;height:38px;left:14px;
-        }
-        .room-page .cloud-c:after{
-          width:48px;height:48px;left:49px;
         }
 
         /* 작은 장식 UI */
@@ -890,7 +837,7 @@ export default function RoomPage() {
           box-shadow:2px 3px 0 rgba(98,198,226,.12);
         }
         .room-page .mini-heart{
-          left:154px;top:70px;width:34px;height:28px;
+          left:176px;top:58px;width:42px;height:34px;
           border-radius:9px;
           transform:rotate(-8deg);
         }
@@ -900,7 +847,7 @@ export default function RoomPage() {
           color:#f2a8ca;font-size:21px;line-height:25px;
         }
         .room-page .mini-dots{
-          right:170px;top:82px;width:48px;height:22px;
+          right:190px;top:70px;width:60px;height:26px;
           border-radius:999px;
         }
         .room-page .mini-dots:after{
@@ -909,7 +856,7 @@ export default function RoomPage() {
           color:#78c9dc;font-size:12px;line-height:18px;
         }
         .room-page .mini-ribbon{
-          left:50%;bottom:22px;width:72px;height:18px;
+          left:48%;bottom:-4px;width:92px;height:22px;
           transform:translateX(-50%) rotate(-2deg);
           border-radius:7px;
         }
@@ -949,9 +896,6 @@ export default function RoomPage() {
       <span className="room-deco deco-tag" aria-hidden="true" />
       <span className="room-deco deco-badge" aria-hidden="true" />
       <span className="room-deco deco-flower" aria-hidden="true" />
-      <span className="room-deco deco-cloud cloud-a" aria-hidden="true" />
-      <span className="room-deco deco-cloud cloud-b" aria-hidden="true" />
-      <span className="room-deco deco-cloud cloud-c" aria-hidden="true" />
       <span className="room-deco deco-mini mini-heart" aria-hidden="true" />
       <span className="room-deco deco-mini mini-dots" aria-hidden="true" />
       <span className="room-deco deco-mini mini-ribbon" aria-hidden="true" />
