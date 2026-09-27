@@ -827,6 +827,98 @@ export default function RoomPage() {
           left:23px;top:23px;width:13px;height:13px;
         }
 
+        /* 둥글고 폭신한 구름 장식 */
+        .room-page .deco-cloud{
+          position:absolute;
+          z-index:2;
+          pointer-events:none;
+          height:42px;
+          border-radius:999px;
+          background:#fffdfd;
+          border:2px solid rgba(98,198,226,.3);
+          box-shadow:3px 5px 0 rgba(98,198,226,.12);
+        }
+        .room-page .deco-cloud:before,
+        .room-page .deco-cloud:after{
+          content:"";
+          position:absolute;
+          bottom:0;
+          border-radius:50%;
+          background:#fffdfd;
+          border:2px solid rgba(98,198,226,.3);
+          border-bottom:0;
+        }
+        .room-page .deco-cloud:before{
+          width:45px;height:45px;left:18px;
+        }
+        .room-page .deco-cloud:after{
+          width:58px;height:58px;left:52px;
+        }
+        .room-page .cloud-a{
+          left:-24px;top:84px;width:116px;
+          transform:rotate(-3deg);
+        }
+        .room-page .cloud-b{
+          right:-30px;top:58px;width:138px;height:48px;
+          transform:rotate(3deg);
+        }
+        .room-page .cloud-b:before{
+          width:50px;height:50px;left:25px;
+        }
+        .room-page .cloud-b:after{
+          width:64px;height:64px;left:70px;
+        }
+        .room-page .cloud-c{
+          right:104px;bottom:4px;width:104px;height:36px;
+          transform:rotate(-2deg);
+          opacity:.9;
+        }
+        .room-page .cloud-c:before{
+          width:38px;height:38px;left:14px;
+        }
+        .room-page .cloud-c:after{
+          width:48px;height:48px;left:49px;
+        }
+
+        /* 작은 장식 UI */
+        .room-page .deco-mini{
+          position:absolute;
+          z-index:4;
+          pointer-events:none;
+          border:2px solid rgba(98,198,226,.48);
+          background:rgba(255,253,248,.94);
+          box-shadow:2px 3px 0 rgba(98,198,226,.12);
+        }
+        .room-page .mini-heart{
+          left:154px;top:70px;width:34px;height:28px;
+          border-radius:9px;
+          transform:rotate(-8deg);
+        }
+        .room-page .mini-heart:after{
+          content:"♡";
+          display:block;text-align:center;
+          color:#f2a8ca;font-size:21px;line-height:25px;
+        }
+        .room-page .mini-dots{
+          right:170px;top:82px;width:48px;height:22px;
+          border-radius:999px;
+        }
+        .room-page .mini-dots:after{
+          content:"•  •  •";
+          display:block;text-align:center;
+          color:#78c9dc;font-size:12px;line-height:18px;
+        }
+        .room-page .mini-ribbon{
+          left:50%;bottom:22px;width:72px;height:18px;
+          transform:translateX(-50%) rotate(-2deg);
+          border-radius:7px;
+        }
+        .room-page .mini-ribbon:after{
+          content:"";
+          display:block;width:26px;height:5px;margin:5px auto;
+          border-radius:4px;background:#f7b8d8;
+        }
+
         /* 방 프레임 위로 살짝 올라오는 장식 */
         .room-page .deco-pill,
         .room-page .deco-orb,
@@ -857,6 +949,12 @@ export default function RoomPage() {
       <span className="room-deco deco-tag" aria-hidden="true" />
       <span className="room-deco deco-badge" aria-hidden="true" />
       <span className="room-deco deco-flower" aria-hidden="true" />
+      <span className="room-deco deco-cloud cloud-a" aria-hidden="true" />
+      <span className="room-deco deco-cloud cloud-b" aria-hidden="true" />
+      <span className="room-deco deco-cloud cloud-c" aria-hidden="true" />
+      <span className="room-deco deco-mini mini-heart" aria-hidden="true" />
+      <span className="room-deco deco-mini mini-dots" aria-hidden="true" />
+      <span className="room-deco deco-mini mini-ribbon" aria-hidden="true" />
       <div className="page-head">
         <div>
           <h1 style={{ margin: 0, display:'flex', alignItems:'center', gap:7 }}>
