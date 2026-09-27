@@ -840,6 +840,7 @@ export default function RoomPage() {
         <span className="room-deco deco-orb" />
         <span className="room-deco deco-tag" />
         <span className="room-deco deco-note" />
+        <span className="room-deco deco-player" />
       </div>
       <div className="room-deco-layer room-deco-front" aria-hidden="true">
         <span className="room-deco deco-pill" />
@@ -847,7 +848,6 @@ export default function RoomPage() {
         <span className="room-deco deco-mini mini-heart" />
         <span className="room-deco deco-mini mini-dots" />
         <span className="room-deco deco-mini mini-ribbon" />
-        <span className="room-deco deco-player" />
         <span className="room-deco deco-orbit" />
       </div>
       <div className="page-head">
