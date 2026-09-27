@@ -667,28 +667,32 @@ export default function RoomPage() {
         .room-page .room-deco-back .deco-screen{z-index:0;transform:rotate(5deg) translateX(12px)}
         .room-page .room-deco-front{z-index:5}
         .room-page .deco-player{
-          right:-70px;top:300px;width:150px;height:82px;
-          box-sizing:border-box;padding:10px 12px;
+          right:-68px;top:304px;width:126px;height:64px;
+          box-sizing:border-box;padding:9px 11px;
           border:2px solid rgba(98,198,226,.55);
-          border-radius:12px;
+          border-radius:7px 12px 10px 7px;
           background:#fffdf8;
           box-shadow:4px 5px 0 rgba(98,198,226,.13);
-          transform:rotate(-4deg);
+          transform:rotate(5deg);
           zoom:1.2;
         }
         .room-page .deco-player:before{
-          content:"♫  NOW PLAYING";
+          content:"MEMO";
           display:block;
-          font-size:8px;font-weight:800;letter-spacing:.08em;
-          color:#62b6ce;
-          margin-bottom:9px;
+          width:38px;padding:3px 6px;
+          margin:-16px 0 8px -2px;
+          border-radius:5px;
+          background:#f7b8d8;
+          color:#fff;
+          font-size:8px;font-weight:800;
+          letter-spacing:.08em;
         }
         .room-page .deco-player:after{
-          content:"━━━━━━  ◀  ▶  ━━━";
-          display:block;
-          margin-top:8px;
+          content:"────────\A  small note  ♡";
+          white-space:pre;
+          line-height:1.7;
           font-size:8px;
-          color:#f0a7c9;
+          color:#70b8ca;
         }
         .room-page .deco-orbit{
           right:-35px;top:392px;width:48px;height:48px;
@@ -705,15 +709,6 @@ export default function RoomPage() {
           position:absolute;left:14px;top:9px;
           color:#f1a9c9;font-size:17px;
         }
-        .room-page .deco-right-dots{
-          right:82px;top:420px;width:58px;height:30px;
-          zoom:1.2;
-          transform:rotate(7deg);
-          background:
-            radial-gradient(circle,#f7b8d8 0 3px,transparent 4px) 0 12px/18px 18px,
-            radial-gradient(circle,#9edff2 0 3px,transparent 4px) 9px 0/18px 18px;
-        }
-
         .room-page .room-deco{
           position:absolute;
           z-index:4;
@@ -856,7 +851,6 @@ export default function RoomPage() {
         <span className="room-deco deco-mini mini-ribbon" />
         <span className="room-deco deco-player" />
         <span className="room-deco deco-orbit" />
-        <span className="room-deco deco-right-dots" />
       </div>
       <div className="page-head">
         <div>
