@@ -620,7 +620,7 @@ export default function RoomPage() {
           font-size:9px;
         }
         .room-page .deco-window{
-          left:28px;top:42px;width:76px;height:52px;
+          left:-20px;top:30px;width:166px;height:108px;
           padding:5px;box-sizing:border-box;
           border:2px solid rgba(98,198,226,.62);
           border-radius:10px;
@@ -629,13 +629,13 @@ export default function RoomPage() {
         }
         .room-page .deco-window:before{
           content:"";
-          display:block;height:9px;margin:-1px -1px 5px;
+          display:block;height:14px;margin:-2px -2px 7px;
           border-radius:6px 6px 2px 2px;
           background:linear-gradient(90deg,#f7b8d8 0 43%,#c9effa 43% 76%,#9edff2 76%);
         }
         .room-page .deco-window:after{
           content:"";
-          display:block;width:38px;height:5px;margin-left:5px;
+          display:block;width:70px;height:7px;margin-left:8px;
           border-radius:4px;
           background:#d8f4fb;
           box-shadow:0 9px 0 #e8f8fc;
@@ -661,8 +661,8 @@ export default function RoomPage() {
           box-shadow:2px 4px 0 rgba(98,198,226,.13);
         }
         .room-page .deco-note{
-          left:28px;top:250px;width:70px;height:88px;
-          box-sizing:border-box;padding:12px 9px;
+          left:-18px;top:205px;width:132px;height:152px;
+          box-sizing:border-box;padding:16px 12px;
           border:2px solid rgba(98,198,226,.52);
           border-radius:9px;
           background:#fffdf8;
@@ -671,12 +671,12 @@ export default function RoomPage() {
         }
         .room-page .deco-note:before{
           content:"";
-          display:block;width:34px;height:5px;margin-bottom:9px;
+          display:block;width:58px;height:7px;margin-bottom:13px;
           border-radius:4px;background:#f7b8d8;
           box-shadow:0 12px 0 #d9f5fb,0 24px 0 #d9f5fb,0 36px 0 #d9f5fb;
         }
         .room-page .deco-screen{
-          right:28px;top:190px;width:82px;height:56px;
+          right:-26px;top:128px;width:154px;height:108px;
           padding:5px;box-sizing:border-box;
           border:2px solid rgba(98,198,226,.6);
           border-radius:10px;
@@ -686,17 +686,17 @@ export default function RoomPage() {
         }
         .room-page .deco-screen:before{
           content:"";
-          display:block;height:32px;border-radius:5px;
+          display:block;height:64px;border-radius:6px;
           background:linear-gradient(135deg,#d9f7ff,#f7c8df);
           border:1px solid rgba(98,198,226,.25);
         }
         .room-page .deco-screen:after{
           content:"";
-          display:block;width:32px;height:4px;margin:5px auto 0;
+          display:block;width:52px;height:6px;margin:7px auto 0;
           border-radius:4px;background:#bdeaf5;
         }
         .room-page .deco-tag{
-          right:38px;top:110px;width:66px;height:15px;
+          right:18px;top:82px;width:124px;height:26px;
           border:2px solid rgba(98,198,226,.5);
           border-radius:8px;
           background:rgba(255,253,248,.92);
@@ -704,11 +704,11 @@ export default function RoomPage() {
         }
         .room-page .deco-tag:after{
           content:"";
-          display:block;width:25px;height:4px;margin:4px auto;
+          display:block;width:46px;height:6px;margin:6px auto;
           border-radius:4px;background:#d1f0f7;
         }
         .room-page .deco-badge{
-          left:44px;bottom:30px;width:58px;height:42px;
+          left:14px;bottom:-10px;width:104px;height:72px;
           border:2px solid rgba(98,198,226,.52);
           border-radius:12px;
           background:rgba(255,253,248,.9);
@@ -718,12 +718,12 @@ export default function RoomPage() {
         .room-page .deco-badge:before{
           content:"♡";
           display:block;text-align:center;
-          margin-top:5px;font-size:18px;color:#f19fc7;
+          margin-top:8px;font-size:26px;color:#f19fc7;
           text-shadow:1px 1px 0 #fff;
         }
         .room-page .deco-badge:after{
           content:"";
-          display:block;width:26px;height:4px;margin:2px auto;
+          display:block;width:42px;height:5px;margin:4px auto;
           border-radius:4px;background:#bdeaf5;
         }
         /* 방 프레임 위로 살짝 올라오는 장식 */
