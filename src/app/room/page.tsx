@@ -156,44 +156,8 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
   onRotate: (deg: number) => void; onOpen: () => void; rot: number;
 }) {
   const src = useBlobUrl(id);
-  const [alphaClip, setAlphaClip] = useState('inset(0px)');
   const drag = useRef<{ x:number; y:number; mode:'move'|'resize' } | null>(null);
 
-  // PNG/WebP 등의 투명한 바깥 여백은 클릭 영역에서 제외해 아래 스티커를 선택할 수 있게 한다.
-  const detectAlphaBounds = (img: HTMLImageElement) => {
-    try {
-      const w = img.naturalWidth;
-      const h = img.naturalHeight;
-      if (!w || !h) return;
-      const cv = document.createElement('canvas');
-      cv.width = w;
-      cv.height = h;
-      const ctx = cv.getContext('2d', { willReadFrequently: true });
-      if (!ctx) return;
-      ctx.drawImage(img, 0, 0);
-      const pixels = ctx.getImageData(0, 0, w, h).data;
-      let minX = w, minY = h, maxX = -1, maxY = -1;
-      for (let y = 0; y < h; y++) {
-        for (let x = 0; x < w; x++) {
-          if (pixels[(y * w + x) * 4 + 3] > 8) {
-            if (x < minX) minX = x;
-            if (x > maxX) maxX = x;
-            if (y < minY) minY = y;
-            if (y > maxY) maxY = y;
-          }
-        }
-      }
-      if (maxX < 0) return;
-      const top = minY / h * 100;
-      const right = (w - maxX - 1) / w * 100;
-      const bottom = (h - maxY - 1) / h * 100;
-      const left = minX / w * 100;
-      setAlphaClip(`inset(${top}% ${right}% ${bottom}% ${left}%)`);
-    } catch {
-      // 픽셀 접근이 제한된 이미지라면 기존 클릭 영역을 유지한다.
-      setAlphaClip('inset(0px)');
-    }
-  };
   const rotateDrag = useRef<{ lastAngle:number } | null>(null);
   const rotation = useRef(rot);
   const snapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -339,11 +303,11 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
       onPointerUp={end}
       onPointerCancel={end}
       onClick={e => { e.stopPropagation(); if (!editOn) onOpen(); }}
-      style={{ width:'100%', height:'100%', position:'relative', cursor:editOn?'move':'pointer', touchAction:'none', pointerEvents:'none' }}
+      style={{ width:'100%', height:'100%', position:'relative', cursor:editOn?'move':'pointer', touchAction:'none' }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt="" draggable={false} onLoad={e => detectAlphaBounds(e.currentTarget)}
-        style={{ width:'100%', height:'100%', objectFit:'contain', display:'block', userSelect:'none', pointerEvents:'auto', clipPath:alphaClip }} />
+      <img src={src} alt="" draggable={false}
+        style={{ width:'100%', height:'100%', objectFit:'contain', display:'block', userSelect:'none', pointerEvents:'none' }} />
 
       {editOn && selected && (
         <>
@@ -364,6 +328,53 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
       )}
     </div>
   );
+}
+
+async function trimTransparentMargins(file: File): Promise<{ file: File; width: number; height: number }> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = new Image();
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error('이미지를 읽지 못했어요.'));
+      img.src = url;
+    });
+    const w = img.naturalWidth, h = img.naturalHeight;
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) return { file, width: w, height: h };
+    ctx.drawImage(img, 0, 0);
+    const pixels = ctx.getImageData(0, 0, w, h).data;
+    let minX = w, minY = h, maxX = -1, maxY = -1;
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        if (pixels[(y * w + x) * 4 + 3] > 8) {
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+    if (maxX < 0) return { file, width: w, height: h };
+    const cropW = maxX - minX + 1, cropH = maxY - minY + 1;
+    // 여백이 없다면 원본을 그대로 사용해 불필요한 재인코딩을 피한다.
+    if (minX === 0 && minY === 0 && cropW === w && cropH === h) {
+      return { file, width: w, height: h };
+    }
+    const out = document.createElement('canvas');
+    out.width = cropW; out.height = cropH;
+    const outCtx = out.getContext('2d');
+    if (!outCtx) return { file, width: w, height: h };
+    outCtx.drawImage(img, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
+    const blob = await new Promise<Blob | null>(resolve => out.toBlob(resolve, 'image/png'));
+    if (!blob) return { file, width: w, height: h };
+    const trimmed = new File([blob], file.name.replace(/\\.[^/.]+$/, '') + '.png', { type: 'image/png' });
+    return { file: trimmed, width: cropW, height: cropH };
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 }
 
 export default function RoomPage() {
@@ -434,14 +445,17 @@ export default function RoomPage() {
 
   const save = (next: RoomState) => { setRoom(next); setSetting(KEY, next); };
 
-  const addStickerToRoom = (imgId: string) => {
+  const addStickerToRoom = (imgId: string, sourceWidth = 1, sourceHeight = 1) => {
     if (!canvas.current) return;
-    const size = 120;
+    const maxSize = 120;
+    const ratio = sourceWidth / Math.max(1, sourceHeight);
+    const sizeW = ratio >= 1 ? maxSize : maxSize * ratio;
+    const sizeH = ratio >= 1 ? maxSize / ratio : maxSize;
     const item: RoomItem = {
       id: newId(), imgId,
-      x: ROOM_W / 2 - size / 2,
-      y: ROOM_H / 2 - size / 2,
-      w: size, h: size, rot: 0,
+      x: ROOM_W / 2 - sizeW / 2,
+      y: ROOM_H / 2 - sizeH / 2,
+      w: sizeW, h: sizeH, rot: 0,
       z: Math.max(0, ...room.items.map(x => x.z)) + 1,
     };
     save({ ...room, items: [...room.items, item] });
@@ -450,9 +464,16 @@ export default function RoomPage() {
   };
 
   const addStickerToLibrary = async (file: File) => {
-    const imgId = await putBlob(file);
-    const next = [...stickers, { id:newId(), imgId, name:file.name.replace(/\.[^/.]+$/,'') }];
-    setStickers(next); setSetting(STICKER_KEY,next); addStickerToRoom(imgId);
+    try {
+      const trimmed = await trimTransparentMargins(file);
+      const imgId = await putBlob(trimmed.file);
+      const next = [...stickers, { id:newId(), imgId, name:file.name.replace(/\.[^/.]+$/,'') }];
+      setStickers(next); setSetting(STICKER_KEY,next);
+      addStickerToRoom(imgId, trimmed.width, trimmed.height);
+      toast('투명 여백을 제거해 스티커를 넣었어요');
+    } catch {
+      toast('스티커 이미지를 처리하지 못했어요');
+    }
   };
 
   const removeStickerFromLibrary = (id: string) => {
