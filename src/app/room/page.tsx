@@ -156,7 +156,44 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
   onRotate: (deg: number) => void; onOpen: () => void; rot: number;
 }) {
   const src = useBlobUrl(id);
+  const [alphaClip, setAlphaClip] = useState('inset(0px)');
   const drag = useRef<{ x:number; y:number; mode:'move'|'resize' } | null>(null);
+
+  // PNG/WebP 등의 투명한 바깥 여백은 클릭 영역에서 제외해 아래 스티커를 선택할 수 있게 한다.
+  const detectAlphaBounds = (img: HTMLImageElement) => {
+    try {
+      const w = img.naturalWidth;
+      const h = img.naturalHeight;
+      if (!w || !h) return;
+      const cv = document.createElement('canvas');
+      cv.width = w;
+      cv.height = h;
+      const ctx = cv.getContext('2d', { willReadFrequently: true });
+      if (!ctx) return;
+      ctx.drawImage(img, 0, 0);
+      const pixels = ctx.getImageData(0, 0, w, h).data;
+      let minX = w, minY = h, maxX = -1, maxY = -1;
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          if (pixels[(y * w + x) * 4 + 3] > 8) {
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+          }
+        }
+      }
+      if (maxX < 0) return;
+      const top = minY / h * 100;
+      const right = (w - maxX - 1) / w * 100;
+      const bottom = (h - maxY - 1) / h * 100;
+      const left = minX / w * 100;
+      setAlphaClip(`inset(${top}% ${right}% ${bottom}% ${left}%)`);
+    } catch {
+      // 픽셀 접근이 제한된 이미지라면 기존 클릭 영역을 유지한다.
+      setAlphaClip('inset(0px)');
+    }
+  };
   const rotateDrag = useRef<{ lastAngle:number } | null>(null);
   const rotation = useRef(rot);
   const snapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -302,11 +339,11 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
       onPointerUp={end}
       onPointerCancel={end}
       onClick={e => { e.stopPropagation(); if (!editOn) onOpen(); }}
-      style={{ width:'100%', height:'100%', position:'relative', cursor:editOn?'move':'pointer', touchAction:'none' }}
+      style={{ width:'100%', height:'100%', position:'relative', cursor:editOn?'move':'pointer', touchAction:'none', pointerEvents:'none' }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt="" draggable={false}
-        style={{ width:'100%', height:'100%', objectFit:'contain', display:'block', userSelect:'none', pointerEvents:'none' }} />
+      <img src={src} alt="" draggable={false} onLoad={e => detectAlphaBounds(e.currentTarget)}
+        style={{ width:'100%', height:'100%', objectFit:'contain', display:'block', userSelect:'none', pointerEvents:'auto', clipPath:alphaClip }} />
 
       {editOn && selected && (
         <>
@@ -316,13 +353,13 @@ function RoomImage({ id, selected, editOn, onSelect, onMove, onResize, onRotate,
             onPointerUp={endRotate}
             onPointerCancel={endRotate}
             title="드래그해서 회전"
-            style={{position:'absolute',left:'50%',top:-30,transform:'translateX(-50%)',width:28,height:28,border:'1px solid var(--line)',borderRadius:999,background:'var(--panel)',zIndex:30,cursor:'grab',touchAction:'none'}}>↻</button>
+            style={{position:'absolute',left:'50%',top:-30,transform:'translateX(-50%)',width:28,height:28,border:'1px solid var(--line)',borderRadius:999,background:'var(--panel)',zIndex:30,cursor:'grab',touchAction:'none',pointerEvents:'auto'}}>↻</button>
           <button type="button" aria-label="resize"
             onPointerDown={e=>{ e.stopPropagation(); begin(e,'resize'); }}
             onPointerMove={move}
             onPointerUp={end}
             onPointerCancel={end}
-            style={{position:'absolute',right:-10,bottom:-10,width:24,height:24,border:'1px solid var(--line)',borderRadius:7,background:'var(--panel)',zIndex:30,cursor:'nwse-resize'}}>↘</button>
+            style={{position:'absolute',right:-10,bottom:-10,width:24,height:24,border:'1px solid var(--line)',borderRadius:7,background:'var(--panel)',zIndex:30,cursor:'nwse-resize',pointerEvents:'auto'}}>↘</button>
         </>
       )}
     </div>
