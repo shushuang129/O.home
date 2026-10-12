@@ -888,7 +888,95 @@ export default function RoomPage() {
           .room-page .page-head{border-radius:12px}
           .room-page .room-spark{display:none}
         }
-      `}</style>
+      `}
+        /* ROOM 외부 UI 리프레시 — 중앙의 사용자가 꾸민 room-canvas는 그대로 둡니다. */
+        .room-shell{
+          background:transparent;
+        }
+        .room-under-frame,
+        .room-page .room-deco-layer,
+        .room-page .room-spark,
+        .room-page:before,
+        .room-page:after{
+          display:none !important;
+        }
+        .room-page{
+          --room-sky:#dce9ec;
+          --room-sky-deep:#b9d0d6;
+          --room-blue:#7da6b2;
+          --room-pink:#e8bfd0;
+          --room-yellow:#eee4c1;
+          --room-white:#fbfaf7;
+          background:
+            linear-gradient(rgba(255,255,255,.35) 1px,transparent 1px),
+            linear-gradient(90deg,rgba(255,255,255,.35) 1px,transparent 1px),
+            linear-gradient(140deg,#f3f6f5 0%,#e9f0f1 100%) !important;
+          background-size:28px 28px,28px 28px,100% 100% !important;
+          border:1px solid rgba(137,173,183,.48) !important;
+          border-radius:22px !important;
+          box-shadow:inset 0 0 0 5px rgba(255,255,255,.38),0 16px 38px rgba(66,104,115,.08) !important;
+        }
+        .room-page .page-head{
+          background:rgba(251,250,247,.97) !important;
+          border:1px solid rgba(137,173,183,.58) !important;
+          border-radius:14px !important;
+          box-shadow:0 2px 0 rgba(111,153,165,.10),0 8px 20px rgba(60,88,96,.055) !important;
+        }
+        .room-page .page-head h1{
+          color:#668f9d !important;
+          text-shadow:none !important;
+          letter-spacing:.055em !important;
+        }
+        .room-page .room-side-card,
+        .room-page .panel{
+          border:1px solid rgba(137,173,183,.45) !important;
+          background:rgba(251,250,247,.98) !important;
+          box-shadow:0 3px 0 rgba(111,153,165,.09),0 9px 22px rgba(60,88,96,.065) !important;
+          backdrop-filter:blur(8px);
+        }
+        .room-page .room-side-card{
+          width:190px !important;
+          padding:14px !important;
+          border-radius:15px !important;
+        }
+        .room-page .room-side-card:before{
+          width:34px !important;
+          height:5px !important;
+          margin:-6px auto 9px !important;
+          background:linear-gradient(90deg,#e8bfd0 0 48%,#eee4c1 48%) !important;
+          opacity:.85 !important;
+        }
+        .room-page .room-side-card img{
+          border-radius:9px;
+        }
+        .room-page .btn{
+          border-color:rgba(125,166,178,.42) !important;
+          border-radius:8px;
+          box-shadow:none !important;
+        }
+        .room-page .btn-dark{
+          background:#7da6b2 !important;
+          color:#fff !important;
+          border-color:#729aa6 !important;
+        }
+        .room-page .btn-dark:hover{
+          background:#6d98a5 !important;
+        }
+        .room-page .btn-ghost{
+          color:#647f87;
+        }
+        .room-page .btn-ghost:hover{
+          background:#edf4f4 !important;
+        }
+        .room-page .k-input,
+        .room-page select{
+          border-color:rgba(125,166,178,.38) !important;
+          background:#fffefa !important;
+        }
+        .room-page .hint{
+          color:#8a9da2;
+        }
+</style>
       <span className="room-spark s1">✦</span>
       <span className="room-spark s2">◇</span>
       <span className="room-spark s3">♡</span>
@@ -923,7 +1011,7 @@ export default function RoomPage() {
       </div>
 
       <div className="room-stage" style={{ position:'relative', width:'800px', minWidth:'800px', maxWidth:'none', margin:'28px auto 0' }}>
-        {!editOn && <aside className="room-side-card" style={{ position:'absolute', right:'calc(100% + 18px)', top:0, width:220, boxSizing:'border-box', padding:17, borderRadius:16, background:'var(--panel)', border:'1px solid var(--line)', boxShadow:'0 10px 24px rgba(0,0,0,.07)' }}>
+        {!editOn && <aside className="room-side-card" style={{ position:'absolute', right:'calc(100% + 18px)', top:0, width:190, boxSizing:'border-box', padding:14, borderRadius:16, background:'var(--panel)', border:'1px solid var(--line)', boxShadow:'0 10px 24px rgba(0,0,0,.07)' }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
             <span style={{ fontSize:9, letterSpacing:'.16em', color:'var(--faint)' }}>PROFILE</span>
             <button type="button" className="btn btn-ghost" onClick={()=>setProfileEditOn(true)} style={{ padding:'4px 7px', fontSize:9 }}>EDIT</button>
@@ -932,21 +1020,12 @@ export default function RoomPage() {
             {(profileAvatarRef ?? user?.avatarUrl) && <RoomProfileImage key={profileAvatarRef ?? user?.avatarUrl} id={profileAvatarRef ?? user!.avatarUrl!} />}
           </div>
           <div style={{ textAlign:'center', marginTop:12 }}>
-            <strong style={{ display:'block', fontFamily:familyOf(profileFont) ?? 'var(--serif)', fontSize:20 }}>{user?.nickname ?? 'MY ROOM'}</strong>
+            <strong style={{ display:'block', fontFamily:familyOf(profileFont) ?? 'var(--serif)', fontSize:17 }}>{user?.nickname ?? 'MY ROOM'}</strong>
             <span style={{ display:'block', marginTop:3, fontSize:8, letterSpacing:'.14em', color:'var(--faint)' }}>{user ? 'MY PROFILE' : 'WELCOME'}</span>
           </div>
           <p style={{ margin:'10px 2px 13px', textAlign:'center', fontFamily:'var(--serif)', fontSize:10.5, lineHeight:1.6, color:'var(--faint)' }}>
           </p>
-          <div style={{ borderTop:'1px dashed var(--line)', paddingTop:11 }}>
-            <div style={{ display:'flex', justifyContent:'space-between', fontSize:7.5, letterSpacing:'.1em', color:'var(--faint)' }}>
-              <span>NOW PLAYING</span><span style={{fontSize:18}}>♪</span>
-            </div>
-            <div style={{ height:2, margin:'8px 0', background:'var(--line)', borderRadius:2, overflow:'hidden' }}><span style={{ display:'block', width:'38%', height:'100%', background:'var(--accent)', opacity:.65 }} /></div>
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:16, color:'var(--faint)', fontSize:11 }}>
-              <span style={{fontSize:21}}>◂◂</span><span style={{ display:'grid', placeItems:'center', width:44, height:44, borderRadius:'50%', background:'var(--text)', color:'var(--faint)', fontSize:18 }}>▶</span><span style={{fontSize:21}}>▸▸</span>
-            </div>
-          </div>
-        </aside>}
+                  </aside>}
       {editOn && <aside className="panel" style={{ position:'absolute', left:-133, top:0, width:'120px', boxSizing:'border-box', padding:10, borderRadius:14, boxShadow:'0 8px 20px rgba(0,0,0,.06)', zIndex:40 }}>
         <div style={{ fontSize:10, letterSpacing:'.08em', opacity:.55, marginBottom:7 }}>EDIT</div>
         <div style={{ display:'grid', gap:6 }}>
