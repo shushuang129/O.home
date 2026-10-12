@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Hahmlet:wght@700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap');
-.page{--blue:#287cff;--blue-soft:#c8dcff;--paper:#f4f8ff;--ink:#287cff;position:relative;isolation:isolate;min-height:calc(100vh - 58px);padding:0;overflow:hidden;background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-serif}
+.page{--blue:#7da6b2;--blue-soft:#c8d9dd;--paper:#f3f6f5;--ink:#668f9d;position:relative;isolation:isolate;min-height:calc(100vh - 58px);padding:0;overflow:hidden;background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-serif}
 .page *{box-sizing:border-box}
 .grid{position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(to right,var(--blue-soft) 1.5px,transparent 1.5px),linear-gradient(to bottom,var(--blue-soft) 1.5px,transparent 1.5px);background-size:42px 42px}
 .archiveHeader,.archiveBrand,.brandMark,.since{display:none}
@@ -9,19 +9,19 @@
 .hero h1{margin:13px 0 7px;font:800 clamp(35px,5.2vw,66px)/1.16 'Hahmlet',serif;letter-spacing:-2px;color:var(--blue);overflow-wrap:anywhere}
 .hero p{margin:0;font:16px 'Bebas Neue',sans-serif;letter-spacing:5px;color:var(--blue);opacity:.9}
 .startButton{position:absolute;right:0;bottom:11.5%;width:min(36vw,640px);min-width:420px;height:52px;display:flex;align-items:center;gap:14px;padding:0 17px 0 0;border:0;background:transparent;color:white;text-align:left;cursor:pointer;overflow:visible;font-family:'Bebas Neue',sans-serif;isolation:isolate;transition:transform .34s cubic-bezier(.2,.7,.25,1)}
-.startButton:before{content:'';position:absolute;left:0;top:0;width:100%;height:100%;background:var(--blue);clip-path:polygon(28px 0,100% 0,100% 100%,28px 100%,0 50%);filter:drop-shadow(0 3px 0 #1769d7) drop-shadow(0 7px 7px rgba(12,72,166,.22));z-index:0;transition:filter .34s ease}
+.startButton:before{content:'';position:absolute;left:0;top:0;width:100%;height:100%;background:var(--blue);clip-path:polygon(28px 0,100% 0,100% 100%,28px 100%,0 50%);filter:drop-shadow(0 3px 0 #648d99) drop-shadow(0 7px 7px rgba(75,113,122,.18));z-index:0;transition:filter .34s ease}
 .startButton:after{content:'';position:absolute;left:-74px;top:25px;width:63px;border-top:2px dotted var(--blue)}
 .buttonNumber{position:relative;z-index:1;display:grid;place-items:center;flex:0 0 53px;width:53px;height:53px;margin-left:12px;background:var(--blue);color:var(--blue);border:0;font-size:18px;letter-spacing:0;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);transform:rotate(0deg);transform-origin:center;transition:transform 1.05s cubic-bezier(.18,.78,.24,1)}
 .buttonNumber:before{content:'';position:absolute;inset:2px;background:var(--paper);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
 .numberLabel{position:relative;z-index:1;display:block;color:var(--blue);line-height:1}
-.buttonChevrons{position:relative;z-index:1;font:bold 28px/1 Arial,sans-serif;letter-spacing:-5px;color:transparent;background-image:linear-gradient(90deg,#a9ceff 0%,#a9ceff 34%,#fff 47%,#a9ceff 61%,#a9ceff 100%);background-size:230% 100%;background-position:100% 0;background-clip:text;-webkit-background-clip:text;transition:color .2s ease}
+.buttonChevrons{position:relative;z-index:1;font:bold 28px/1 Arial,sans-serif;letter-spacing:-5px;color:transparent;background-image:linear-gradient(90deg,#c2d6da 0%,#c2d6da 34%,#fff 47%,#c2d6da 61%,#c2d6da 100%);background-size:230% 100%;background-position:100% 0;background-clip:text;-webkit-background-clip:text;transition:color .2s ease}
 .buttonCopy{position:relative;z-index:1;display:flex;flex:1;min-width:0;flex-direction:column;gap:1px}
 .buttonCopy strong{font-size:23px;line-height:1.05;letter-spacing:1.5px}
-.buttonCopy small{font:11px 'Noto Sans KR',sans-serif;color:#d8e7ff}
-.buttonTarget{position:relative;z-index:1;display:grid;place-items:center;flex:0 0 35px;width:35px;height:35px;border:1px solid #91bdff;border-radius:50%;color:#a9ceff;transform:rotate(0deg);transform-origin:center;transition:transform .48s cubic-bezier(.2,.7,.25,1),border-color .3s ease,color .3s ease}
+.buttonCopy small{font:11px 'Noto Sans KR',sans-serif;color:#edf3f3}
+.buttonTarget{position:relative;z-index:1;display:grid;place-items:center;flex:0 0 35px;width:35px;height:35px;border:1px solid #bdd2d6;border-radius:50%;color:#c2d6da;transform:rotate(0deg);transform-origin:center;transition:transform .48s cubic-bezier(.2,.7,.25,1),border-color .3s ease,color .3s ease}
 .buttonTarget svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.1;stroke-linecap:round;stroke-linejoin:round}
 .startButton:hover,.startButton:focus-visible{transform:translateX(-15px)}
-.startButton:hover:before,.startButton:focus-visible:before{filter:drop-shadow(0 4px 0 #1769d7) drop-shadow(0 9px 9px rgba(12,72,166,.28))}
+.startButton:hover:before,.startButton:focus-visible:before{filter:drop-shadow(0 4px 0 #648d99) drop-shadow(0 9px 9px rgba(75,113,122,.23))}
 .startButton:hover .buttonNumber,.startButton:focus-visible .buttonNumber{transform:rotate(720deg)}
 .startButton:hover .buttonChevrons,.startButton:focus-visible .buttonChevrons{animation:sendSignal .78s linear infinite}
 .startButton:hover .buttonTarget,.startButton:focus-visible .buttonTarget{transform:rotate(45deg);border-color:#fff;color:#fff}
@@ -35,7 +35,7 @@
 .quizPanel{width:100%;padding:24px 28px 28px;border:2px solid var(--blue);background:rgba(255,255,255,.95);box-shadow:7px 7px 0 var(--blue-soft);animation:rise .35s ease both}
 .topline{display:flex;justify-content:space-between;align-items:center;gap:10px;font:16px 'Bebas Neue',sans-serif;letter-spacing:2px}
 .topline b{font-size:21px}.progressText{opacity:.7}
-.progress{height:4px;background:#e0ebff;margin:11px 0 22px}.progress span{display:block;height:100%;background:var(--blue);transition:width .3s ease}
+.progress{height:4px;background:#e5eeee;margin:11px 0 22px}.progress span{display:block;height:100%;background:var(--blue);transition:width .3s ease}
 .questionTitle{margin:0 0 17px;font:700 clamp(22px,3vw,29px)/1.4 'Hahmlet',serif;color:var(--blue)}
 .audioRow{display:flex;align-items:center;gap:18px;padding:18px;border:1px solid var(--blue-soft);min-height:108px}
 .record{flex:0 0 68px;width:68px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:repeating-radial-gradient(circle,#171717 0 2px,#333 3px 4px,#111 5px 7px)}
@@ -43,9 +43,9 @@
 .spinning{animation:spin 4s linear infinite}
 .audio{display:block;width:100%;min-width:0;height:40px}
 .answerForm{display:flex;gap:8px;margin-top:16px}
-.answerForm input{flex:1;min-width:0;height:47px;padding:0 14px;border:1px solid var(--blue-soft);background:#fff;color:#183b70;font:14px 'Noto Sans KR',sans-serif;outline-color:var(--blue)}
+.answerForm input{flex:1;min-width:0;height:47px;padding:0 14px;border:1px solid var(--blue-soft);background:#fff;color:#4e6870;font:14px 'Noto Sans KR',sans-serif;outline-color:var(--blue)}
 .answerForm button,.feedback button,.againButton{border:0;background:var(--blue);color:#fff;font:500 14px 'Noto Sans KR',sans-serif;padding:13px 24px;cursor:pointer;transition:transform .2s,background .2s}
-.answerForm button:hover,.feedback button:hover,.againButton:hover{transform:translateY(-2px);background:#1268ed}
+.answerForm button:hover,.feedback button:hover,.againButton:hover{transform:translateY(-2px);background:#668e99}
 .feedback{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:16px;padding:13px 15px;border:1px solid var(--blue-soft);font-size:14px;color:var(--blue);animation:appear .25s ease both}
 .feedback button{padding:10px 15px;white-space:nowrap}
 .result{text-align:center;color:var(--blue)}.resultLabel{font:14px 'Bebas Neue',sans-serif;letter-spacing:4px}.result h2{margin:7px 0;font:700 30px 'Hahmlet',serif}.score{font:700 45px 'Bebas Neue',sans-serif;margin:0 0 18px}.score span{font-size:20px;opacity:.6}
