@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TRACK ID | SONG TITLE QUIZ</title>
+  <title>퀴즈</title>
   <link rel="stylesheet" href="./style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +13,6 @@
 <body>
   <div class="bg-grid" aria-hidden="true"></div>
   <div class="bg-fade" aria-hidden="true"></div>
-
   <div id="app">
     <main class="home">
       <div class="deco-top-left">
@@ -33,13 +32,13 @@
       <section class="deco-info">
         <h2 class="info-heading">WELCOME TO ARCHIVE</h2>
         <span class="info-rule"></span>
-        <p class="info-text">자캐와 페어를 소개하는 공간입니다.<br>오른쪽 메뉴를 눌러 둘러보세요.</p>
+        <p class="info-text">음원을 듣고 노래 제목을 맞혀 보세요.<br>퀴즈를 시작하려면 오른쪽 메뉴를 눌러주세요.</p>
       </section>
       <header class="title-area">
         <div class="title-inner">
           <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
           <p class="title-tag">MAIN HOME</p>
-          <h1 class="title-text">TRACK ID</h1>
+          <h1 class="title-text">퀴즈</h1>
           <p class="title-sub"><span>SONG TITLE QUIZ</span></p>
         </div>
       </header>
@@ -66,7 +65,6 @@
       </nav>
     </main>
   </div>
-
   <section id="quiz-screen" class="quiz-screen" hidden aria-live="polite">
     <div class="quiz-shell">
       <div class="quiz-topline">
@@ -99,7 +97,7 @@
       <button id="next-btn" class="quiz-next" hidden type="button">다음 문제 →</button>
       <section id="result-screen" hidden>
         <p class="quiz-kicker">QUIZ COMPLETED</p>
-        <h2 class="quiz-title">LISTENING REPORT</h2>
+        <h2 class="quiz-title">QUIZ REPORT</h2>
         <p class="quiz-score"><strong id="final-score">0</strong> / 3</p>
         <p id="result-message"></p>
         <div id="answer-review" class="quiz-review"></div>
