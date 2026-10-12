@@ -1,7 +1,8 @@
+/* 나루 메인홈 템플릿의 디자인/움직임을 유지한 퀴즈 페이지 */
 :root {
-  --bg:#ffffff; --title:#222222; --sub-text:#4e4e4e;
-  --menu-bar:#222222; --menu-text:#ffffff; --menu-desc:#c5c5c5;
-  --accent:#ffffff; --accent-text:#222222; --icon:#858585; --dots:#222222; --deco:#222222;
+  --bg:#fff; --title:#111; --sub-text:#2a2a2a;
+  --menu-bar:#0d0d0d; --menu-text:#fff; --menu-desc:#a8a8a8;
+  --accent:#fff; --accent-text:#0d0d0d; --icon:#555; --dots:#333; --deco:#111;
   --font-title:'Hahmlet',serif; --font-menu:'Bebas Neue',sans-serif; --font-body:'Noto Sans KR',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -9,9 +10,9 @@ html,body{height:100%}
 body{min-width:320px;min-height:720px;overflow-x:hidden;background:var(--bg);font-family:var(--font-body),sans-serif;color:var(--menu-text)}
 a{text-decoration:none;color:inherit}
 button,input{font:inherit}
-.bg-grid,.bg-fade{position:fixed;inset:0;pointer-events:none}
-.bg-grid{z-index:0;background-image:linear-gradient(to right,var(--grid-color,#222) var(--grid-line,2px),transparent var(--grid-line)),linear-gradient(to bottom,var(--grid-color,#222) var(--grid-line,2px),transparent var(--grid-line));background-size:var(--grid-size,46px) var(--grid-size,46px);opacity:.18}
-.bg-fade{z-index:0;top:auto;height:45%;background:linear-gradient(to top,var(--fade-color,#fff) 0%,transparent 100%);opacity:.9}
+.bg-grid,.bg-fade{position:fixed;inset:0;pointer-events:none;z-index:0}
+.bg-grid{background-image:linear-gradient(to right,var(--grid-color,#000) var(--grid-line,2px),transparent var(--grid-line)),linear-gradient(to bottom,var(--grid-color,#000) var(--grid-line,2px),transparent var(--grid-line));background-size:var(--grid-size,46px) var(--grid-size,46px);opacity:.14}
+.bg-fade{top:auto;height:32%;background:linear-gradient(to top,var(--fade-color,#fff),transparent);opacity:.8}
 #app{position:relative;z-index:1}
 #app.page-in{animation:appIn .45s ease both}
 @keyframes appIn{from{opacity:0}to{opacity:1}}
@@ -58,9 +59,10 @@ button,input{font:inherit}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideIn{from{opacity:0;transform:translateX(80px)}to{opacity:1;transform:none}}
 @keyframes chevron{0%,100%{opacity:.3}50%{opacity:1}}
+/* 퀴즈 화면은 기존 메인홈에서 이어지는 같은 톤의 화면 */
 .quiz-screen[hidden],#result-screen[hidden],.quiz-feedback[hidden],.quiz-next[hidden]{display:none!important}
 .quiz-screen{position:fixed;inset:0;z-index:9999;overflow-y:auto;background:var(--bg);color:var(--title);padding:32px 20px}
-.quiz-shell{width:min(820px,100%);margin:0 auto;padding:clamp(20px,4vw,42px);border:2px solid var(--deco);background:var(--bg);box-shadow:12px 12px 0 var(--menu-bar)}
+.quiz-shell{width:min(820px,100%);margin:0 auto;padding:clamp(20px,4vw,42px);border:2px solid var(--deco);background:var(--bg);box-shadow:12px 12px 0 var(--menu-bar);animation:fadeDown .45s ease both}
 .quiz-topline{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:16px;border-bottom:2px dotted var(--deco);color:var(--deco);font-family:var(--font-menu);letter-spacing:2px}.quiz-topline b{font-size:1.2em}
 .quiz-back,.quiz-replay{border:0;background:transparent;color:inherit;font:inherit;cursor:pointer}
 .quiz-progress{height:5px;background:rgba(34,34,34,.15);margin:18px 0 30px}.quiz-progress span{display:block;width:0;height:100%;background:var(--menu-bar);transition:width .25s}
@@ -73,5 +75,5 @@ button,input{font:inherit}
 .quiz-answer-form{margin-top:28px}.quiz-answer-form label{display:flex;justify-content:space-between;gap:12px;margin-bottom:10px;font-size:13px}.quiz-answer-form label span:first-child{font-family:var(--font-menu);letter-spacing:2px}
 .quiz-answer-row{display:flex;gap:8px}.quiz-answer-row input{min-width:0;flex:1;padding:14px;border:1px solid var(--deco);background:transparent;color:inherit;font:inherit}.quiz-answer-row button,.quiz-next{border:0;background:var(--menu-bar);color:var(--menu-text);padding:14px 20px;font:inherit;cursor:pointer}
 .quiz-note{margin-top:8px;font-size:12px;opacity:.7}.quiz-feedback{margin-top:20px;padding:16px;border:1px solid var(--deco);line-height:1.6}.quiz-next{margin-top:14px}.quiz-score{font-size:20px;margin:12px 0}.quiz-score strong{font-size:42px}.quiz-review{margin-top:16px}.quiz-review-row{display:flex;justify-content:space-between;gap:12px;border-top:1px dotted var(--deco);padding:12px 0}.quiz-review-row span:last-child{font-family:var(--font-menu)}
-@media(max-width:800px){.deco-top-left{right:30px}.top-label{font-size:12px;letter-spacing:2px}.deco-top-right{right:24px;font-size:13px}.deco-side{left:20px}.deco-info{left:24px;bottom:24px;width:min(280px,42vw)}.info-heading{font-size:24px}.title-text{font-size:clamp(42px,8vw,76px)}.title-inner{padding:22px 34px}.title-sub{font-size:16px;letter-spacing:4px}.menu-item{width:min(68vw,520px)}.menu-area{top:calc(50% + 95px)}}
+@media(max-width:1000px){.deco-top-left{right:30px}.top-label{font-size:12px;letter-spacing:2px}.deco-top-right{right:24px;font-size:13px}.deco-side{left:20px}.deco-info{left:24px;bottom:24px;width:min(280px,42vw)}.info-heading{font-size:24px}.title-text{font-size:clamp(42px,8vw,76px)}.title-inner{padding:22px 34px}.title-sub{font-size:16px;letter-spacing:4px}.menu-item{width:min(68vw,520px)}.menu-area{top:calc(50% + 95px)}}
 @media(max-width:600px){body{min-height:640px}.home{min-height:640px}.deco-top-left{top:20px;left:16px;right:16px;gap:8px}.badge{width:40px;height:40px;font-size:15px}.top-label{font-size:10px;letter-spacing:1px}.deco-top-right{top:70px;right:18px}.deco-side{display:none}.deco-info{left:18px;bottom:18px;width:calc(100% - 36px)}.info-heading{font-size:23px}.title-area{top:35%}.title-inner{padding:20px 24px}.title-tag{font-size:12px;letter-spacing:3px}.title-text{font-size:44px}.title-sub{font-size:13px;letter-spacing:3px;gap:8px}.title-sub:before,.title-sub:after{width:22px}.menu-area{top:calc(50% + 75px);width:100%}.menu-item{width:78vw;height:54px}.menu-link{padding-left:32px;padding-right:12px}.menu-title{font-size:22px}.menu-icon{width:30px;height:30px}.quiz-screen{padding:12px}.quiz-shell{padding:18px;box-shadow:5px 5px 0 var(--menu-bar)}.quiz-audio-box{grid-template-columns:1fr;gap:14px;padding:16px}.quiz-record{width:88px}.quiz-answer-row{flex-direction:column}.quiz-answer-row button{min-height:48px}}
