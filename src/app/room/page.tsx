@@ -990,7 +990,19 @@ export default function RoomPage() {
                 });
               }}
               rot={x.rot}
-              onOpen={() => { if (x.link) window.open(x.link, '_blank', 'noopener,noreferrer'); }} />
+              onOpen={() => {
+                if (!x.link) return;
+                try {
+                  const target = new URL(x.link, window.location.origin);
+                  if (target.origin === window.location.origin) {
+                    window.location.assign(target.pathname + target.search + target.hash);
+                  } else if (target.protocol === 'http:' || target.protocol === 'https:') {
+                    window.open(target.href, '_blank', 'noopener,noreferrer');
+                  }
+                } catch {
+                  // 유효한 URL이 아닌 경우 이동하지 않습니다.
+                }
+              }} />
           </div>
         ))}
         {room.items.length === 0 && !room.background && <div style={{ position:'absolute', inset:0, display:'grid', placeItems:'center', color:'var(--faint)' }}>
