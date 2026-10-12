@@ -39,9 +39,15 @@ export default function QuizPage() {
     e.preventDefault();
     if (checked || !input.trim()) return;
     const correct = [question.title, ...question.answers].some(a => normalize(a) === normalize(input));
-    setChecked(true); setFeedback(correct ? '정답!' : '정답: ' + question.title);
-    if (correct) setScore(s => s + 1);
-    setResults(r => [...r, { title: question.title, correct }]);
+    if (!correct) {
+      setFeedback('틀렸어요! 다시 입력해 보세요.');
+      setInput('');
+      return;
+    }
+    setChecked(true);
+    setFeedback('정답!');
+    setScore(s => s + 1);
+    setResults(r => [...r, { title: question.title, correct: true }]);
     if (audioRef.current) audioRef.current.pause();
     setPlaying(false);
   };
@@ -63,10 +69,13 @@ export default function QuizPage() {
             <div className={[styles.record, playing ? styles.spinning : ''].join(' ')} aria-hidden="true"><span /></div>
             <audio ref={audioRef} className={styles.audio} controls preload="metadata" src={question.audio} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onEnded={() => setPlaying(false)} />
           </div>
-          {!checked ? <form className={styles.answerForm} onSubmit={submit}>
-            <input aria-label="노래 제목 입력" value={input} onChange={e => setInput(e.target.value)} placeholder="노래 제목을 입력하세요" autoComplete="off" required />
-            <button type="submit">확인 ↗</button>
-          </form> : <div className={styles.feedback}><span>{feedback}</span><button type="button" onClick={next}>{index === QUESTIONS.length - 1 ? '결과 보기' : '다음 문제'} ↗</button></div>}
+          {!checked ? <>
+            <form className={styles.answerForm} onSubmit={submit}>
+              <input aria-label="노래 제목 입력" value={input} onChange={e => setInput(e.target.value)} placeholder="노래 제목을 입력하세요" autoComplete="off" required />
+              <button type="submit">확인 ↗</button>
+            </form>
+            {feedback && <div className={styles.feedback} role="status"><span>{feedback}</span></div>}
+          </> : <div className={styles.feedback}><span>{feedback}</span><button type="button" onClick={next}>{index === QUESTIONS.length - 1 ? '결과 보기' : '다음 문제'} ↗</button></div>}
         </> : <div className={styles.result}>
           <p className={styles.resultLabel}>QUIZ COMPLETED</p><h2>결과</h2><p className={styles.score}>{score}<span> / {QUESTIONS.length}</span></p>
           <div className={styles.review}>{results.map((r, i) => <div className={styles.reviewRow} key={i}><span>문제 {i + 1}</span><b>{r.correct ? '정답' : '오답'}</b></div>)}</div>
