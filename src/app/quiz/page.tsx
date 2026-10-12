@@ -5,8 +5,8 @@ import styles from './quiz.module.css';
 type Question = { title: string; answers: string[]; audio: string };
 
 // 시작 화면 중앙 문구는 이 세 항목만 바꾸면 수정할 수 있어요.
-const HERO_LABEL = 'MAIN HOME';
-const HERO_TITLE = '노래 제목 맞히기';
+const HERO_LABEL = 'MUSIC QUIZ!';
+const HERO_TITLE = '역재생 듣고 맞추기';
 const HERO_SUBTITLE = '— LISTEN & GUESS QUIZ —';
 const QUESTIONS: Question[] = [
   { title: '짝사랑', answers: ['카타오모이'], audio: '/song/song01.mp3' },
