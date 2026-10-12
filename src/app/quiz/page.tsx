@@ -3,6 +3,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import styles from './quiz.module.css';
 
 type Question = { title: string; answers: string[]; audio: string };
+
+// 시작 화면 중앙 문구는 이 세 항목만 바꾸면 수정할 수 있어요.
+const HERO_LABEL = 'MAIN HOME';
+const HERO_TITLE = '노래 제목 맞히기';
+const HERO_SUBTITLE = '— LISTEN & GUESS QUIZ —';
 const QUESTIONS: Question[] = [
   { title: '짝사랑', answers: ['카타오모이'], audio: '/song/song01.mp3' },
   { title: '좋아하니까', answers: ['스키다카라'], audio: '/song/song02.mp3' },
@@ -55,12 +60,26 @@ export default function QuizPage() {
 
   return <section className={['page', styles.page].join(' ')}>
     <div className={styles.grid} aria-hidden="true" />
-    <main className={styles.canvas}>
+    {!started ? <>
+      <header className={styles.archiveHeader}>
+        <div className={styles.archiveBrand}><span className={styles.brandMark}>OC</span><span>ORIGINAL CHARACTER ARCHIVE</span><i /></div>
+        <div className={styles.since}><span>≪</span> SINCE 2026</div>
+      </header>
+      <main className={styles.hero}>
+        <span className={styles.heroCorner} aria-hidden="true" />
+        <span className={styles.heroLabel}>{HERO_LABEL}</span>
+        <h1>{HERO_TITLE}</h1>
+        <p>{HERO_SUBTITLE}</p>
+      </main>
+      <button className={styles.startButton} type="button" onClick={start}>
+        <span className={styles.buttonNumber}>01</span>
+        <span className={styles.buttonChevrons} aria-hidden="true">›››</span>
+        <span className={styles.buttonCopy}><strong>QUIZ START</strong><small>노래 제목 맞히기</small></span>
+        <span className={styles.buttonTarget} aria-hidden="true">◎</span>
+      </button>
+    </> : <main className={styles.canvas}>
       <header className={styles.heading}><span className={styles.kicker}>LISTEN &amp; GUESS</span><h1>퀴즈</h1><span className={styles.rule} /></header>
-      {!started ? <section className={styles.startPanel}>
-        <p className={styles.startMark}>♫</p>
-        <button className={styles.startButton} type="button" onClick={start}>퀴즈 풀기 <span>↗</span></button>
-      </section> : <section className={styles.quizPanel} aria-live="polite">
+      <section className={styles.quizPanel} aria-live="polite">
         {!finished ? <>
           <div className={styles.topline}><span>QUESTION <b>{String(index + 1).padStart(2, '0')}</b> / {String(QUESTIONS.length).padStart(2, '0')}</span><span className={styles.progressText}>{Math.round((index + (checked ? 1 : 0)) / QUESTIONS.length * 100)}%</span></div>
           <div className={styles.progress}><span style={{ width: ((index + (checked ? 1 : 0)) / QUESTIONS.length * 100) + '%' }} /></div>
@@ -81,7 +100,7 @@ export default function QuizPage() {
           <div className={styles.review}>{results.map((r, i) => <div className={styles.reviewRow} key={i}><span>문제 {i + 1}</span><b>{r.correct ? '정답' : '오답'}</b></div>)}</div>
           <button className={styles.againButton} type="button" onClick={start}>다시 풀기 ↻</button>
         </div>}
-      </section>}
-    </main>
+      </section>
+    </main>}
   </section>;
 }
