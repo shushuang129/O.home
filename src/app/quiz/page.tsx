@@ -68,7 +68,7 @@ export default function QuizPage() {
         <p>{HERO_SUBTITLE}</p>
       </main>
       <button className={styles.startButton} type="button" onClick={start}>
-        <span className={styles.buttonNumber}>01</span>
+        <span className={styles.buttonNumber}><span className={styles.numberLabel}>01</span></span>
         <span className={styles.buttonChevrons} aria-hidden="true">›››</span>
         <span className={styles.buttonCopy}><strong>QUIZ START</strong><small>노래 제목 맞히기</small></span>
         <span className={styles.buttonTarget} aria-hidden="true">
