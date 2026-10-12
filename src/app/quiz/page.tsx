@@ -61,10 +61,6 @@ export default function QuizPage() {
   return <section className={['page', styles.page].join(' ')}>
     <div className={styles.grid} aria-hidden="true" />
     {!started ? <>
-      <header className={styles.archiveHeader}>
-        <div className={styles.archiveBrand}><span className={styles.brandMark}>OC</span><span>ORIGINAL CHARACTER ARCHIVE</span><i /></div>
-        <div className={styles.since}><span>≪</span> SINCE 2026</div>
-      </header>
       <main className={styles.hero}>
         <span className={styles.heroCorner} aria-hidden="true" />
         <span className={styles.heroLabel}>{HERO_LABEL}</span>
