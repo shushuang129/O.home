@@ -12,6 +12,7 @@ const QUESTIONS: Question[] = [
   { title: '짝사랑', answers: ['카타오모이'], audio: '/song/song01.mp3' },
   { title: '좋아하니까', answers: ['스키다카라'], audio: '/song/song02.mp3' },
   { title: 'w/x/y', answers: ['wxy'], audio: '/song/song03.mp3' },
+  { title: '히로인', answers: ['히로인'], audio: '/song/song04.mp3' },
 ];
 function normalize(value: string) { return value.normalize('NFKC').toLocaleLowerCase().replace(/[\\s\\u3000"'“”‘’「」『』【】()[\\]{}.,!?！？・:：~〜—–_-]/g, ''); }
 function shuffledOrder() { return [...QUESTIONS.keys()].sort(() => Math.random() - 0.5); }
