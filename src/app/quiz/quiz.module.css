@@ -9,7 +9,7 @@
 .hero h1{margin:13px 0 7px;font:800 clamp(35px,5.2vw,66px)/1.16 'Hahmlet',serif;letter-spacing:-2px;color:var(--blue);overflow-wrap:anywhere}
 .hero p{margin:0;font:16px 'Bebas Neue',sans-serif;letter-spacing:5px;color:var(--blue);opacity:.9}
 .startButton{position:absolute;right:0;bottom:11.5%;width:min(36vw,640px);min-width:420px;height:52px;display:flex;align-items:center;gap:14px;padding:0 17px 0 0;border:0;background:transparent;color:white;text-align:left;cursor:pointer;overflow:visible;font-family:'Bebas Neue',sans-serif;isolation:isolate;transition:transform .34s cubic-bezier(.2,.7,.25,1)}
-.startButton:before{content:'';position:absolute;left:38px;top:0;width:calc(100% - 38px);height:100%;background:var(--blue);clip-path:none;filter:drop-shadow(0 3px 0 #648d99) drop-shadow(0 7px 7px rgba(75,113,122,.18));z-index:0;transition:filter .34s ease}
+.startButton:before{content:'';position:absolute;left:38px;top:0;width:calc(100% - 38px);height:100%;background:var(--blue);clip-path:none;filter:none;z-index:0;transition:filter .42s ease}
 .startButton:after{content:'';position:absolute;left:-74px;top:25px;width:63px;border-top:2px dotted var(--blue)}
 .buttonNumber{position:relative;z-index:1;display:grid;place-items:center;flex:0 0 53px;width:53px;height:53px;margin-left:12px;background:var(--blue);color:var(--blue);border:0;font-size:18px;letter-spacing:0;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);transform:rotate(0deg);transform-origin:center;transition:transform 1.05s cubic-bezier(.18,.78,.24,1)}
 .buttonNumber:before{content:'';position:absolute;inset:3px;background:var(--paper);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
@@ -21,7 +21,7 @@
 .buttonTarget{position:relative;z-index:1;display:grid;place-items:center;flex:0 0 35px;width:35px;height:35px;border:1px solid #bdd2d6;border-radius:50%;color:#c2d6da;transform:rotate(0deg);transform-origin:center;transition:transform .48s cubic-bezier(.2,.7,.25,1),border-color .3s ease,color .3s ease}
 .buttonTarget svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.1;stroke-linecap:round;stroke-linejoin:round}
 .startButton:hover,.startButton:focus-visible{transform:translateX(-15px)}
-.startButton:hover:before,.startButton:focus-visible:before{filter:drop-shadow(0 4px 0 #648d99) drop-shadow(0 9px 9px rgba(75,113,122,.23))}
+.startButton:hover:before,.startButton:focus-visible:before{filter:drop-shadow(0 9px 13px rgba(75,113,122,.28))}
 .startButton:hover .buttonNumber,.startButton:focus-visible .buttonNumber{transform:rotate(720deg)}
 .startButton:hover .buttonChevrons,.startButton:focus-visible .buttonChevrons{animation:sendSignal .78s linear infinite}
 .startButton:hover .buttonTarget,.startButton:focus-visible .buttonTarget{transform:rotate(45deg);border-color:#fff;color:#fff}
