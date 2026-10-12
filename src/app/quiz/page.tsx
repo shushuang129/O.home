@@ -71,7 +71,15 @@ export default function QuizPage() {
         <span className={styles.buttonNumber}>01</span>
         <span className={styles.buttonChevrons} aria-hidden="true">›››</span>
         <span className={styles.buttonCopy}><strong>QUIZ START</strong><small>노래 제목 맞히기</small></span>
-        <span className={styles.buttonTarget} aria-hidden="true">◎</span>
+        <span className={styles.buttonTarget} aria-hidden="true">
+          <svg viewBox="0 0 36 36" focusable="false">
+            <circle cx="18" cy="18" r="13.5" />
+            <circle cx="18" cy="18" r="8.2" />
+            <circle cx="18" cy="18" r="2.8" />
+            <path d="M18 1.5v6 M18 28.5v6 M1.5 18h6 M28.5 18h6" />
+            <path d="M6.3 6.3l4.2 4.2 M25.5 25.5l4.2 4.2 M29.7 6.3l-4.2 4.2 M10.5 25.5l-4.2 4.2" opacity=".5" />
+          </svg>
+        </span>
       </button>
     </> : <main className={styles.canvas}>
       <header className={styles.heading}><span className={styles.kicker}>LISTEN &amp; GUESS</span><h1>퀴즈</h1><span className={styles.rule} /></header>
