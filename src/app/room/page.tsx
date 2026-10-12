@@ -888,7 +888,6 @@ export default function RoomPage() {
           .room-page .page-head{border-radius:12px}
           .room-page .room-spark{display:none}
         }
-      `}
         /* ROOM 외부 UI 리프레시 — 중앙의 사용자가 꾸민 room-canvas는 그대로 둡니다. */
         .room-shell{
           background:transparent;
@@ -976,7 +975,7 @@ export default function RoomPage() {
         .room-page .hint{
           color:#8a9da2;
         }
-</style>
+      `}</style>
       <span className="room-spark s1">✦</span>
       <span className="room-spark s2">◇</span>
       <span className="room-spark s3">♡</span>
