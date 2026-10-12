@@ -38,8 +38,8 @@
 .progress{height:4px;background:#e0ebff;margin:11px 0 22px}.progress span{display:block;height:100%;background:var(--blue);transition:width .3s ease}
 .questionTitle{margin:0 0 17px;font:700 clamp(22px,3vw,29px)/1.4 'Hahmlet',serif;color:var(--blue)}
 .audioRow{display:flex;align-items:center;gap:18px;padding:18px;border:1px solid var(--blue-soft);min-height:108px}
-.record{flex:0 0 68px;width:68px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:repeating-radial-gradient(circle,#173f80 0 2px,#367fe0 3px 4px,#173f80 5px 7px)}
-.record span{width:20px;height:20px;border-radius:50%;background:#fff;border:5px solid var(--blue)}
+.record{flex:0 0 68px;width:68px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:repeating-radial-gradient(circle,#171717 0 2px,#333 3px 4px,#111 5px 7px)}
+.record span{width:20px;height:20px;border-radius:50%;background:#fff;border:5px solid #111}
 .spinning{animation:spin 4s linear infinite}
 .audio{display:block;width:100%;min-width:0;height:40px}
 .answerForm{display:flex;gap:8px;margin-top:16px}
