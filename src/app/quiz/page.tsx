@@ -70,7 +70,7 @@ export default function QuizPage() {
       <button className={styles.startButton} type="button" onClick={start}>
         <span className={styles.buttonNumber}><span className={styles.numberLabel}>01</span></span>
         <span className={styles.buttonChevrons} aria-hidden="true">›››</span>
-        <span className={styles.buttonCopy}><strong>QUIZ START</strong><small>노래 제목 맞히기</small></span>
+        <span className={styles.buttonCopy}><strong>QUIZ START</strong></span>
         <span className={styles.buttonTarget} aria-hidden="true">
           <svg viewBox="0 0 36 36" focusable="false">
             <circle cx="18" cy="18" r="13.5" />
@@ -95,10 +95,10 @@ export default function QuizPage() {
           {!checked ? <>
             <form className={styles.answerForm} onSubmit={submit}>
               <input aria-label="노래 제목 입력" value={input} onChange={e => setInput(e.target.value)} placeholder="노래 제목을 입력하세요" autoComplete="off" required />
-              <button type="submit">확인 ↗</button>
+              <button type="submit">확인</button>
             </form>
             {feedback && <div className={styles.feedback} role="status"><span>{feedback}</span></div>}
-          </> : <div className={styles.feedback}><span>{feedback}</span><button type="button" onClick={next}>{index === QUESTIONS.length - 1 ? '결과 보기' : '다음 문제'} ↗</button></div>}
+          </> : <div className={styles.feedback}><span>{feedback}</span><button type="button" onClick={next}>{index === QUESTIONS.length - 1 ? '결과 보기' : '다음 문제'}</button></div>}
         </> : <div className={styles.result}>
           <p className={styles.resultLabel}>QUIZ COMPLETED</p><h2>결과</h2><p className={styles.score}>{score}<span> / {QUESTIONS.length}</span></p>
           <div className={styles.review}>{results.map((r, i) => <div className={styles.reviewRow} key={i}><span>문제 {i + 1}</span><b>{r.correct ? '정답' : '오답'}</b></div>)}</div>
