@@ -49,7 +49,7 @@ import { useFonts, fontCssUrl, FontDef, FontRole, ROLE_LABEL, FOLLOW_MENU, FOLLO
 import { useToast } from '@/components/ui/Toast';
 import { PageTitle, EditableDesc, getPageText, setPageText } from '@/components/ui/PageText';
 import { putBlob } from '@/lib/blobStore';
-import { getSetting, setSetting, pushLocalSettings, unsyncedSettingKeys, SETTING_KEYS, QUIZ_BONUS_URL_KEY } from '@/lib/settingStore';
+import { getSetting, setSetting, pushLocalSettings, unsyncedSettingKeys, SETTING_KEYS, QUIZ_BONUS_URL_KEY, GUESTBOOK_VIEW_MODE_KEY } from '@/lib/settingStore';
 import { isServerMode, createBackend, backend } from '@/lib/backend';
 import type { BackendConfig, BackendKind } from '@/lib/backend/types';
 import { CONTENT_COLLECTIONS } from '@/lib/backend/types';
@@ -59,7 +59,7 @@ import { migrateTo, findOrphanFiles } from '@/lib/transfer';
 import { FIRESTORE_RULES, STORAGE_RULES } from '@/lib/firebaseRules';
 
 const CATEGORIES = [
-  '디자인', '메인 페이지', '위젯', '메뉴 관리', '게시판 관리', '자관 질문', '커미션', '감상타래', '메모장',
+  '디자인', '메인 페이지', '위젯', '메뉴 관리', '게시판 관리', '방명록', '자관 질문', '커미션', '감상타래', '메모장',
   '폰트', '마우스 커서', 'BGM', '퀴즈', '무드 리스트', '회원/보안', '데이터 백업',
 ] as const;
 
@@ -3216,6 +3216,44 @@ function QuizBonusPane() {
   );
 }
 
+
+/** 방문자 모두에게 적용되는 방명록 표시 방식 */
+type GuestbookViewMode = 'latest' | 'chronological';
+function GuestbookPane() {
+  const toast = useToast();
+  const [mode, setMode] = useState<GuestbookViewMode>(() =>
+    getSetting<GuestbookViewMode>(GUESTBOOK_VIEW_MODE_KEY, 'latest')
+  );
+
+  const chooseMode = (next: GuestbookViewMode) => {
+    setMode(next);
+    setSetting(GUESTBOOK_VIEW_MODE_KEY, next);
+    toast(next === 'latest'
+      ? '방명록을 기존 최신순 보기로 설정했습니다'
+      : '방명록을 시간순 · 하나씩 등장으로 설정했습니다');
+  };
+
+  return (
+    <div className="set-sec">
+      <h3>방명록 표시 방식</h3>
+      <div className="d">여기서 선택한 방식은 관리자와 개별 방문자의 브라우저 선택이 아니라 사이트 전체에 적용됩니다.</div>
+      <div className="set-row" style={{ flexWrap: 'wrap' }}>
+        <div className="l">
+          <b>글 정렬 및 표시</b>
+          <small>시간순 보기는 오래된 글부터 표시하고, 각 글이 약 2초 간격으로 차례대로 나타납니다.</small>
+        </div>
+        <div className="mini-seg">
+          <button className={mode === 'latest' ? 'on' : ''} aria-pressed={mode === 'latest'}
+            onClick={() => chooseMode('latest')}>기존 보기 · 최신순</button>
+          <button className={mode === 'chronological' ? 'on' : ''} aria-pressed={mode === 'chronological'}
+            onClick={() => chooseMode('chronological')}>시간순 · 하나씩 등장</button>
+        </div>
+      </div>
+      <p className="hint">변경은 자동 저장되며 방명록을 다시 열면 방문자 모두에게 적용됩니다.</p>
+    </div>
+  );
+}
+
 function SettingsInner() {
   const { isAdmin } = useAuth();
   const router = useRouter();
@@ -3338,6 +3376,8 @@ function SettingsInner() {
             <MenuPane />
           ) : tab === '게시판 관리' ? (
             <BoardPane />
+          ) : tab === '방명록' ? (
+            <GuestbookPane />
           ) : tab === '자관 질문' ? (
             <RelQPane />
           ) : tab === '커미션' ? (
