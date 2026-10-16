@@ -1,6 +1,6 @@
 'use client';
 // 방명록 (4.7) — 게스트 작성(닉네임) · 비밀글 · 답글(모두, v2.0)
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/lib/auth';
 import {
   useLocalList, GUEST_SEED, GuestEntry, newId, fmtDate, Comment,
@@ -13,6 +13,33 @@ import { EditableDesc, PageTitle } from '@/components/ui/PageText';
 import { useToast } from '@/components/ui/Toast';
 import { pushNotif, notifyAdmins } from '@/lib/notifStore';
 import { getSetting, onSettingChange, GUESTBOOK_VIEW_MODE_KEY } from '@/lib/settingStore';
+
+
+/** 한 번 애니메이션을 시작한 글은 페이지를 바꿔도 다시 실행하지 않는다. */
+function GuestbookReveal({
+  id, active, delay, seen, children,
+}: {
+  id: string;
+  active: boolean;
+  delay: number;
+  seen: React.MutableRefObject<Set<string>>;
+  children: React.ReactNode;
+}) {
+  // 최초 마운트에서만 결정하므로 부모가 다시 렌더링돼도 애니메이션 클래스가 유지된다.
+  const [animate] = useState(() => active && !seen.current.has(id));
+  useEffect(() => {
+    if (animate) seen.current.add(id);
+  }, [animate, id, seen]);
+
+  return (
+    <div
+      className={`gb-item ${animate ? 'ohome-guest-reveal' : ''}`}
+      style={animate ? { animationDelay: `${delay}ms` } : undefined}
+    >
+      {children}
+    </div>
+  );
+}
 
 export default function GuestbookPage() {
   const { user, isAdmin } = useAuth();
@@ -27,7 +54,8 @@ export default function GuestbookPage() {
   const [secret, setSecret] = useState(false);
   const [gName, setGName] = useState('');
   const [q, setQ] = useState('');
-  type GuestViewMode = 'latest' | 'chronological';
+  type GuestViewMode = 'latest' | 'chronological' | 'oldest';
+  const animatedEntryIds = useRef<Set<string>>(new Set());
   const [viewMode, setViewMode] = useState<GuestViewMode>(() =>
     getSetting<GuestViewMode>(GUESTBOOK_VIEW_MODE_KEY, 'latest')
   );
@@ -126,14 +154,14 @@ export default function GuestbookPage() {
     }
   }), []);
 
-  // 기존 보기는 최신 글부터, 연출 보기는 오래된 글부터 날짜순으로 표시한다.
+  // 최신순은 날짜 내림차순, 나머지 두 방식은 오래된 글부터 표시한다.
   const visible = (q
     ? entries.filter(e => canRead(e) && (e.body.includes(q) || e.author.includes(q)))
     : entries
   ).slice().sort((a, b) =>
-    viewMode === 'chronological'
-      ? a.date.localeCompare(b.date)
-      : b.date.localeCompare(a.date)
+    viewMode === 'latest'
+      ? b.date.localeCompare(a.date)
+      : a.date.localeCompare(b.date)
   );
 
   // 방명록이 쌓이면 페이지로 (v2.0 사용자 요청) — 한 페이지 15개.
@@ -171,10 +199,12 @@ export default function GuestbookPage() {
       {/* 목록 */}
       <div className="panel flush">
         {visible.slice(start, start + PER_GB).map((e, i) => (
-          <div
-            className={`gb-item ${viewMode === 'chronological' ? 'ohome-guest-reveal' : ''}`}
-            key={e.id}
-            style={viewMode === 'chronological' ? { animationDelay: `${i * 2000}ms` } : undefined}
+          <GuestbookReveal
+            key={`${e.id}:${viewMode}`}
+            id={e.id}
+            active={viewMode === 'chronological'}
+            delay={i * 2000}
+            seen={animatedEntryIds}
           >
             <div className="hd">
               {canRead(e)
@@ -210,7 +240,7 @@ export default function GuestbookPage() {
                 )}
               </div>
             ))}
-          </div>
+          </GuestbookReveal>
         ))}
         {visible.length === 0 && (
           <div style={{ padding: 36, textAlign: 'center', fontSize: 12.5, color: 'var(--faint)' }}>아직 방명록이 없습니다</div>
