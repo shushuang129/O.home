@@ -13,6 +13,8 @@ import { backend, isServerMode } from './backend';
 const cache = new Map<string, unknown>();
 let primed = false;
 const EVT = 'ohome-settings';
+/** 관리자 설정 — 정답특전 유튜브 링크 */
+export const QUIZ_BONUS_URL_KEY = 'ohome.quizBonusUrl.v1';
 /** 서버 저장 실패 알림 — SettingSync가 받아 화면에 띄운다 */
 export const ERR_EVT = 'ohome-setting-error';
 
@@ -43,7 +45,7 @@ export const SETTING_KEYS = [
   'ohome.commset.v1', 'ohome.memoset.v1', 'ohome.threadset.v1', 'ohome.room.v1',
   'ohome.relqsets.v1', 'ohome.main.v1', 'ohome.sched.v1',
   'ohome.membertags.v1', 'ohome.invite.v1', 'ohome.roadnext.v1', 'ohome.repo.v1',
-  'ohome.sections.v1', 'ohome.intro.v1', 'ohome.links.v1',
+  'ohome.sections.v1', 'ohome.intro.v1', 'ohome.links.v1', QUIZ_BONUS_URL_KEY,
 ];
 
 /** 앱 시작 시 1회 — 서버에 저장된 설정을 전부 받아 캐시 */
