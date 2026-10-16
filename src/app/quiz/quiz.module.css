@@ -50,6 +50,26 @@
 .feedback button{padding:10px 15px;white-space:nowrap}
 .result{text-align:center;color:var(--blue)}.resultLabel{font:14px 'Bebas Neue',sans-serif;letter-spacing:4px}.result h2{margin:7px 0;font:700 30px 'Hahmlet',serif}.score{font:700 45px 'Bebas Neue',sans-serif;margin:0 0 18px}.score span{font-size:20px;opacity:.6}
 .review{max-width:420px;margin:0 auto 18px}.reviewRow{display:flex;justify-content:space-between;padding:10px 4px;border-top:1px dotted var(--blue-soft);font-size:13px}.againButton{margin-top:5px}
+.celebration{position:relative;isolation:isolate;min-height:365px;overflow:hidden;margin:-24px -28px -28px;padding:38px 22px 28px;text-align:center;color:var(--blue);background:radial-gradient(ellipse at 50% 40%,rgba(200,217,221,.34),transparent 65%);animation:celebrationEntrance .55s ease both}
+.celebrationLabel{position:relative;z-index:1;display:inline-block;padding:4px 12px 2px;background:var(--blue);color:#fff;font:14px 'Bebas Neue',sans-serif;letter-spacing:4px}
+.celebration h2{position:relative;z-index:1;margin:15px 0 4px;font:800 clamp(39px,6vw,58px)/1.2 'Hahmlet',serif;letter-spacing:-1.5px;color:var(--blue)}
+.celebrationLead{position:relative;z-index:1;margin:0;font-size:15px;color:#668f9d}
+.celebrationScore{position:relative;z-index:1;margin:7px 0 13px;font:18px 'Bebas Neue',sans-serif;letter-spacing:1px}
+.celebrationScore strong{font-size:42px;line-height:1}
+.celebrationScore span{opacity:.65}
+.celebrationSongs{position:relative;z-index:1;display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin:0 auto 18px;max-width:460px}
+.songTag{display:inline-block;padding:6px 10px;border:1px solid var(--blue-soft);background:rgba(255,255,255,.78);font-size:12px;color:#668f9d}
+.celebration .againButton{position:relative;z-index:1;margin-top:0}
+.firework{position:absolute;left:10%;top:33%;width:126px;height:126px;border-radius:50%;z-index:0;pointer-events:none;opacity:0;background:repeating-conic-gradient(from 0deg,transparent 0deg 8deg,rgba(125,166,178,.9) 9deg 11deg,transparent 12deg 22.5deg);-webkit-mask-image:radial-gradient(circle,transparent 0 10%,#000 11% 100%);mask-image:radial-gradient(circle,transparent 0 10%,#000 11% 100%);animation:fireworkBurst 2.5s cubic-bezier(.12,.7,.22,1) infinite}
+.fireworkSecond{left:auto;right:9%;top:19%;width:102px;height:102px;--firework-delay:.65s;background:repeating-conic-gradient(from 7deg,transparent 0deg 8deg,rgba(231,184,176,.9) 9deg 11deg,transparent 12deg 22.5deg);animation-delay:var(--firework-delay)}
+.fireworkThird{left:47%;top:auto;bottom:7%;width:85px;height:85px;--firework-delay:1.25s;background:repeating-conic-gradient(from 2deg,transparent 0deg 8deg,rgba(208,190,143,.9) 9deg 11deg,transparent 12deg 22.5deg);animation-delay:var(--firework-delay)}
+.confetti{position:absolute;inset:0;overflow:hidden;z-index:2;pointer-events:none}
+.confettiPiece{position:absolute;left:var(--piece-left);top:-12px;width:6px;height:11px;border-radius:2px;background:#7da6b2;opacity:0;animation:confettiFall var(--fall-duration) linear var(--fall-delay) infinite}
+.confettiPiece:nth-child(4n){background:#e7b8b0}
+.confettiPiece:nth-child(4n + 1){background:#d3c18f}
+.confettiPiece:nth-child(4n + 2){background:#a9c7cd}
+.confettiPiece:nth-child(4n + 3){background:#f8ded9}
+
 @keyframes appear{from{opacity:0}to{opacity:1}}@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:760px){.hero{top:42%;min-height:160px}.hero h1{letter-spacing:-1px}.hero p{font-size:13px;letter-spacing:3px}.startButton{bottom:7%;width:min(82vw,520px);min-width:0;height:51px;gap:10px}.startButton:before{left:36px;width:calc(100% - 36px);clip-path:none}.startButton:after{left:-48px;width:40px}.buttonNumber{flex-basis:51px;width:51px;height:51px;margin-left:10px}.buttonCopy strong{font-size:21px}.buttonTarget{width:31px;height:31px;font-size:28px}.canvas{padding-top:28px}}
 @media(max-width:440px){.hero h1{font-size:clamp(29px,9vw,42px)}.hero p{font-size:11px;letter-spacing:2px}.startButton{width:82vw}.buttonChevrons{font-size:25px;letter-spacing:0;padding-right:6px;margin-right:-6px}.buttonCopy strong{font-size:19px}.quizPanel{padding:18px 15px 20px}.audioRow{padding:12px;gap:12px}.record{flex-basis:48px;width:48px}.record span{width:16px;height:16px;border-width:4px}.answerForm button{padding:0 12px}.feedback{align-items:stretch;flex-direction:column}.feedback button{align-self:flex-end}}
