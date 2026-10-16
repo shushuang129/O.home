@@ -2805,7 +2805,7 @@ function BgmTrackRow({ t, onPatch, onDelete }: {
       } else {
         const vid = parseVideoId(url);
         if (!vid) { toast('올바른 유튜브 URL(또는 영상 ID)을 입력해 주세요'); return; }
-        onPatch({ title: title.trim(), desc: desc.trim(), videoId: vid, audioUrl: undefined });
+        onPatch({ title: title.trim(), desc: desc.trim(), videoId: vid });
       }
       setEditing(false);
       toast('곡이 수정되었습니다');
