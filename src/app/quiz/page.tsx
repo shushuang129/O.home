@@ -138,7 +138,7 @@ export default function QuizPage() {
           <div className={styles.celebrationActions}>
             <button className={styles.againButton} type="button" onClick={start}>다시 풀기 ↻</button>
             {bonusUrl ? (
-              <a className={styles.bonusButton} href={bonusUrl} target="_blank" rel="noopener noreferrer">정답 특전 받기</a>
+              <a className={styles.bonusButton} href={bonusUrl} target="_blank" rel="noopener noreferrer">정답 특전 보기</a>
             ) : (
               <button className={[styles.bonusButton, styles.bonusButtonDisabled].join(' ')} type="button" disabled
                 title="환경설정의 퀴즈 탭에서 유튜브 링크를 등록해 주세요">정답특전</button>
