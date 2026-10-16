@@ -49,7 +49,7 @@ import { useFonts, fontCssUrl, FontDef, FontRole, ROLE_LABEL, FOLLOW_MENU, FOLLO
 import { useToast } from '@/components/ui/Toast';
 import { PageTitle, EditableDesc, getPageText, setPageText } from '@/components/ui/PageText';
 import { putBlob } from '@/lib/blobStore';
-import { getSetting, setSetting, pushLocalSettings, unsyncedSettingKeys, SETTING_KEYS } from '@/lib/settingStore';
+import { getSetting, setSetting, pushLocalSettings, unsyncedSettingKeys, SETTING_KEYS, QUIZ_BONUS_URL_KEY } from '@/lib/settingStore';
 import { isServerMode, createBackend, backend } from '@/lib/backend';
 import type { BackendConfig, BackendKind } from '@/lib/backend/types';
 import { CONTENT_COLLECTIONS } from '@/lib/backend/types';
@@ -60,7 +60,7 @@ import { FIRESTORE_RULES, STORAGE_RULES } from '@/lib/firebaseRules';
 
 const CATEGORIES = [
   '디자인', '메인 페이지', '위젯', '메뉴 관리', '게시판 관리', '자관 질문', '커미션', '감상타래', '메모장',
-  '폰트', '마우스 커서', 'BGM', '무드 리스트', '회원/보안', '데이터 백업',
+  '폰트', '마우스 커서', 'BGM', '퀴즈', '무드 리스트', '회원/보안', '데이터 백업',
 ] as const;
 
 /** 색 항목 한 쌍 렌더 헬퍼 */
@@ -3085,6 +3085,67 @@ function FontPane() {
   );
 }
 
+
+function isYoutubeVideoUrl(value: string): boolean {
+  try {
+    const parsed = new URL(value);
+    const host = parsed.hostname.toLowerCase();
+    const isYoutubeHost =
+      host === 'youtu.be' ||
+      host === 'youtube.com' ||
+      host.endsWith('.youtube.com') ||
+      host === 'youtube-nocookie.com' ||
+      host.endsWith('.youtube-nocookie.com');
+    return parsed.protocol === 'https:' && isYoutubeHost;
+  } catch {
+    return false;
+  }
+}
+
+/** 퀴즈 완료 화면의 정답특전 링크 설정 */
+function QuizBonusPane() {
+  const toast = useToast();
+  const [url, setUrl] = useState('');
+  useEffect(() => {
+    setUrl(getSetting<string>(QUIZ_BONUS_URL_KEY, ''));
+  }, []);
+
+  const save = () => {
+    const trimmed = url.trim();
+    if (trimmed && !isYoutubeVideoUrl(trimmed)) {
+      toast('https://youtu.be/... 또는 https://www.youtube.com/watch?... 형식의 유튜브 링크를 입력해 주세요');
+      return;
+    }
+    setSetting(QUIZ_BONUS_URL_KEY, trimmed);
+    setUrl(trimmed);
+    toast(trimmed ? '정답특전 유튜브 링크를 저장했습니다' : '정답특전 링크를 비웠습니다');
+  };
+
+  return (
+    <div className="set-sec">
+      <h3>정답특전</h3>
+      <div className="d">4문제를 모두 맞혔을 때 나오는 축하 화면의 「정답특전」 버튼에 연결할 유튜브 영상 주소를 설정합니다.</div>
+      <div className="set-row" style={{ flexWrap: 'wrap' }}>
+        <div className="l">
+          <b>유튜브 링크</b>
+          <small>예: https://youtu.be/영상ID · 비워 두고 저장하면 버튼이 비활성화됩니다</small>
+        </div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flex: '1 1 340px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+          <KInput
+            placeholder="https://www.youtube.com/watch?v=..."
+            value={url}
+            onChange={e => setUrl(e.target.value)}
+            style={{ flex: '1 1 260px', minWidth: 220 }}
+          />
+          <button className="btn btn-dark" style={{ height: 35, padding: '0 15px', whiteSpace: 'nowrap' }} onClick={save}>SAVE</button>
+          <button className="btn btn-ghost" style={{ height: 35, padding: '0 12px', whiteSpace: 'nowrap' }}
+            onClick={() => { setSetting(QUIZ_BONUS_URL_KEY, ''); setUrl(''); toast('정답특전 링크를 비웠습니다'); }}>링크 비우기</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SettingsInner() {
   const { isAdmin } = useAuth();
   const router = useRouter();
@@ -3220,6 +3281,8 @@ function SettingsInner() {
             <MoodPane />
           ) : tab === 'BGM' ? (
             <BgmPane />
+          ) : tab === '퀴즈' ? (
+            <QuizBonusPane />
           ) : tab === '폰트' ? (
             <FontPane />
           ) : tab === '마우스 커서' ? (
