@@ -3,6 +3,7 @@
 // 기본 위치 오른쪽 아래 · 곡 리스트 팝업 (v1.9) · 페이지 이동에도 유지(레이아웃 상주)
 // 브라우저 정책상 소리 재생은 사용자의 첫 클릭부터 시작
 import React, { useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useBgm } from '@/lib/bgmStore';
 
 /** 흐르는 글씨 — 재생 중이고 글자가 넘칠 때만 무한 스크롤, 평소엔 말줄임.
@@ -62,6 +63,7 @@ const ListIcon = () => (
 export function BgmPlayer() {
   const { state } = useBgm();
   const { tracks, settings } = state;
+  const pathname = usePathname();
   const [idx, setIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [listOpen, setListOpen] = useState(false);
@@ -69,6 +71,7 @@ export function BgmPlayer() {
   // 접기 상태 — 방문자별 기억 (4.1)
   const [folded, setFolded] = useState(false);
   const playerRef = useRef<YTPlayer | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const readyRef = useRef(false);       // onReady 이후에만 playVideo가 실제 동작 (그 전엔 무시됨)
   const startedRef = useRef(false);     // 한 번이라도 실제 재생 시작됨 — 첫 재생은 loadVideoById 경로 필수
   const rootRef = useRef<HTMLDivElement>(null);
@@ -77,8 +80,15 @@ export function BgmPlayer() {
   const idxRef = useRef(0);
   idxRef.current = idx;
   const track = tracks[idx] ?? tracks[0];
+  const trackRef = useRef(track);
+  trackRef.current = track;
+  const youtubeTracksSignature = tracks.map(t => t.videoId || '').join('|');
 
-  useEffect(() => { setVolume(settings.volume); playerRef.current?.setVolume(settings.volume); }, [settings.volume]);
+  useEffect(() => {
+    setVolume(settings.volume);
+    playerRef.current?.setVolume(settings.volume);
+    if (audioRef.current) audioRef.current.volume = settings.volume / 100;
+  }, [settings.volume]);
 
   useEffect(() => {
     try { setFolded(localStorage.getItem('ohome.bgm.fold') === '1'); } catch { /* 무시 */ }
@@ -89,15 +99,16 @@ export function BgmPlayer() {
     try { localStorage.setItem('ohome.bgm.fold', v ? '1' : '0'); } catch { /* 무시 */ }
   };
 
-  // YT API 로드 + 플레이어 생성
+  // YT API 로드 + 플레이어 생성 — 파일 음원만 있을 때는 유튜브 API를 불러오지 않는다
   useEffect(() => {
-    if (!settings.enabled || tracks.length === 0) return;
+    const firstYoutubeTrack = tracks.find(t => !!t.videoId);
+    if (!settings.enabled || !firstYoutubeTrack) return;
     let cancelled = false;
     const create = () => {
       if (cancelled || !holderRef.current || playerRef.current) return;
       playerRef.current = new window.YT!.Player(holderRef.current, {
         width: 0, height: 0,
-        videoId: tracks[0].videoId,
+        videoId: firstYoutubeTrack.videoId,
         playerVars: { controls: 0, disablekb: 1 },
         events: {
           onReady: () => {
@@ -109,6 +120,8 @@ export function BgmPlayer() {
             }
           },
           onStateChange: (e: { data: number }) => {
+            // 오디오 파일 트랙을 선택한 동안에는 숨겨진 YouTube 플레이어 상태를 무시한다
+            if (!trackRef.current?.videoId) return;
             // 1=재생, 2=일시정지, 0=종료 — 버퍼링(3)·큐(5) 같은 과도 상태는 무시
             if (e.data === 0) {
               nextRef.current(); // 곡 종료 → 반복/다음 곡 (셔플 지원)
@@ -145,12 +158,39 @@ export function BgmPlayer() {
       playerRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.enabled, tracks.length > 0]);
+  }, [settings.enabled, youtubeTracksSignature]);
 
   const playAt = (i: number) => {
     const t = tracks[i];
-    if (!t || !playerRef.current) { setIdx(i); return; }
+    if (!t) return;
     setIdx(i);
+    idxRef.current = i;
+
+    // 업로드한 오디오 파일 트랙
+    if (t.audioUrl) {
+      armedRef.current = false;
+      playerRef.current?.pauseVideo();
+      startedRef.current = false;
+      const audio = audioRef.current;
+      if (!audio) { setPlaying(false); return; }
+      const targetUrl = new URL(t.audioUrl, window.location.href).href;
+      if (audio.src !== targetUrl) {
+        audio.src = t.audioUrl;
+        audio.load();
+      }
+      audio.volume = volume / 100;
+      void audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+      return;
+    }
+
+    // YouTube 트랙
+    audioRef.current?.pause();
+    if (!t.videoId) { setPlaying(false); return; }
+    if (!playerRef.current || !readyRef.current) {
+      armedRef.current = true;
+      setPlaying(false);
+      return;
+    }
     startedRef.current = true;
     // loadVideoById는 로드 + 즉시 재생 — 큐만 된 첫 영상의 playVideo()가 무시되는
     // 유튜브 IFrame 이슈를 피하기 위해 첫 재생도 반드시 이 경로를 탄다
@@ -193,13 +233,8 @@ export function BgmPlayer() {
       // 여기서 먼저 재생을 시작하면 곧이어 오는 버튼 click이 "일시정지"로 뒤집힘
       if (rootRef.current?.contains(ev.target as Node)) return;
       if (playingRef.current) return;
-      if (readyRef.current && playerRef.current) {
-        // 첫 재생은 loadVideoById 경로 (큐 상태 playVideo 무시 이슈 회피)
-        playAtRef.current(idxRef.current);
-      } else {
-        // 플레이어 준비 전(onReady 이전)에는 재생 명령이 무시됨 — 준비되는 즉시 재생하도록 무장
-        armedRef.current = true;
-      }
+      // YouTube와 업로드 파일 모두 동일한 재생 경로 사용
+      playAtRef.current(idxRef.current);
     };
     const remove = () => {
       window.removeEventListener('pointerdown', fire, true);
@@ -209,11 +244,42 @@ export function BgmPlayer() {
     window.addEventListener('keydown', fire, true);
     return remove;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.autoplay, settings.enabled, tracks.length]);
+  }, [settings.autoplay, settings.enabled, tracks.length, youtubeTracksSignature]);
+
+  // 방명록에 진입하면 재생을 시도한다. 브라우저가 차단할 경우 첫 상호작용에서 다시 시도한다.
+  useEffect(() => {
+    if (pathname !== '/guest' || !settings.enabled || tracks.length === 0) return;
+    if (!playingRef.current) playAtRef.current(idxRef.current);
+    if (settings.autoplay) return;
+    const retry = (ev: Event) => {
+      if (rootRef.current?.contains(ev.target as Node)) return;
+      if (playingRef.current) { remove(); return; }
+      remove();
+      playAtRef.current(idxRef.current);
+    };
+    const remove = () => {
+      window.removeEventListener('pointerdown', retry, true);
+      window.removeEventListener('keydown', retry, true);
+    };
+    window.addEventListener('pointerdown', retry, true);
+    window.addEventListener('keydown', retry, true);
+    return remove;
+  }, [pathname, settings.enabled, settings.autoplay, tracks.length, youtubeTracksSignature]);
 
   const prev = () => playAt((idxRef.current - 1 + tracks.length) % tracks.length);
 
   const togglePlay = () => {
+    if (track?.audioUrl) {
+      const audio = audioRef.current;
+      if (!audio) return;
+      if (playing) {
+        audio.pause();
+        setPlaying(false);
+      } else {
+        void audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+      }
+      return;
+    }
     if (!playerRef.current) return;
     if (playing) {
       playerRef.current.pauseVideo();
@@ -237,6 +303,7 @@ export function BgmPlayer() {
       const v = Math.round(Math.min(1, Math.max(0, (clientX - r.left) / r.width)) * 100);
       setVolume(v);
       playerRef.current?.setVolume(v);
+      if (audioRef.current) audioRef.current.volume = v / 100;
     };
     set(e.clientX);
     const mv = (ev: PointerEvent) => set(ev.clientX);
@@ -258,6 +325,10 @@ export function BgmPlayer() {
       {/* 숨겨진 유튜브 플레이어 */}
       <div style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden', opacity: 0, pointerEvents: 'none' }}>
         <div ref={holderRef} />
+        <audio ref={audioRef} preload="auto"
+          onPlay={() => setPlaying(true)}
+          onPause={() => { if (trackRef.current?.audioUrl) setPlaying(false); }}
+          onEnded={() => { if (trackRef.current?.audioUrl) nextRef.current(); }} />
       </div>
       <div className="disc" style={{ animationPlayState: playing ? 'running' : 'paused' }} />
       <div className="title">
