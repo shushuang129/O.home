@@ -56,6 +56,8 @@ export default function QuizPage() {
     setResults(r => [...r, { title: question.title, correct: true }]);
     if (audioRef.current) audioRef.current.pause();
     setPlaying(false);
+    // 마지막 문제까지 정답이면 결과 확인 버튼 없이 축하 화면으로 바로 전환
+    if (index === QUESTIONS.length - 1) setFinished(true);
   };
   const next = () => { if (index < QUESTIONS.length - 1) setIndex(i => i + 1); else setFinished(true); };
 
@@ -99,10 +101,31 @@ export default function QuizPage() {
               <button type="submit">확인</button>
             </form>
             {feedback && <div className={styles.feedback} role="status"><span>{feedback}</span></div>}
-          </> : <div className={styles.feedback}><span>{feedback}</span><button type="button" onClick={next}>{index === QUESTIONS.length - 1 ? '결과 보기' : '다음 문제'}</button></div>}
-        </> : <div className={styles.result}>
-          <p className={styles.resultLabel}>QUIZ COMPLETED</p><h2>결과</h2><p className={styles.score}>{score}<span> / {QUESTIONS.length}</span></p>
-          <div className={styles.review}>{results.map((r, i) => <div className={styles.reviewRow} key={i}><span>문제 {i + 1}</span><b>{r.correct ? '정답' : '오답'}</b></div>)}</div>
+          </> : <div className={styles.feedback}><span>{feedback}</span><button type="button" onClick={next}>다음 문제</button></div>}
+        </> : <div className={styles.celebration} role="status" aria-live="polite">
+          <span className={styles.firework} aria-hidden="true" />
+          <span className={[styles.firework, styles.fireworkSecond].join(' ')} aria-hidden="true" />
+          <span className={[styles.firework, styles.fireworkThird].join(' ')} aria-hidden="true" />
+          <div className={styles.confetti} aria-hidden="true">
+            {Array.from({ length: 36 }, (_, i) => (
+              <span
+                key={i}
+                className={styles.confettiPiece}
+                style={{
+                  '--piece-left': `${(i * 37 + 7) % 100}%`,
+                  '--fall-delay': `${-((i % 11) * 0.19)}s`,
+                  '--fall-duration': `${2.2 + (i % 5) * 0.32}s`,
+                } as React.CSSProperties}
+              />
+            ))}
+          </div>
+          <span className={styles.celebrationLabel}>PERFECT CLEAR!</span>
+          <h2>다 맞췄다!</h2>
+          <p className={styles.celebrationLead}>모든 문제를 맞혔어요!</p>
+          <p className={styles.celebrationScore}><strong>{score}</strong><span> / {QUESTIONS.length}</span></p>
+          <div className={styles.celebrationSongs}>
+            {results.map((r, i) => <span className={styles.songTag} key={i}>✓ {r.title}</span>)}
+          </div>
           <button className={styles.againButton} type="button" onClick={start}>다시 풀기 ↻</button>
         </div>}
       </section>
