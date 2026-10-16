@@ -226,7 +226,8 @@ export function BgmPlayer() {
   playingRef.current = playing;
   const armedRef = useRef(false);
   useEffect(() => {
-    if (!settings.autoplay || !settings.enabled || tracks.length === 0) return;
+    // 방명록 전용 자동 재생·재시도는 아래 효과가 처리한다
+    if (pathname === '/guest' || !settings.autoplay || !settings.enabled || tracks.length === 0) return;
     const fire = (ev: Event) => {
       remove();
       // 플레이어 자체를 조작하는 클릭(재생/이전/다음 등)은 버튼 핸들러에 맡김 —
@@ -244,13 +245,12 @@ export function BgmPlayer() {
     window.addEventListener('keydown', fire, true);
     return remove;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.autoplay, settings.enabled, tracks.length, youtubeTracksSignature]);
+  }, [pathname, settings.autoplay, settings.enabled, tracks.length, youtubeTracksSignature]);
 
   // 방명록에 진입하면 재생을 시도한다. 브라우저가 차단할 경우 첫 상호작용에서 다시 시도한다.
   useEffect(() => {
     if (pathname !== '/guest' || !settings.enabled || tracks.length === 0) return;
     if (!playingRef.current) playAtRef.current(idxRef.current);
-    if (settings.autoplay) return;
     const retry = (ev: Event) => {
       if (rootRef.current?.contains(ev.target as Node)) return;
       if (playingRef.current) { remove(); return; }
@@ -264,7 +264,7 @@ export function BgmPlayer() {
     window.addEventListener('pointerdown', retry, true);
     window.addEventListener('keydown', retry, true);
     return remove;
-  }, [pathname, settings.enabled, settings.autoplay, tracks.length, youtubeTracksSignature]);
+  }, [pathname, settings.enabled, tracks.length, youtubeTracksSignature]);
 
   const prev = () => playAt((idxRef.current - 1 + tracks.length) % tracks.length);
 
@@ -275,6 +275,8 @@ export function BgmPlayer() {
       if (playing) {
         audio.pause();
         setPlaying(false);
+      } else if (!audio.src) {
+        playAt(idxRef.current);
       } else {
         void audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
       }
