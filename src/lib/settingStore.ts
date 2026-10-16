@@ -15,6 +15,7 @@ let primed = false;
 const EVT = 'ohome-settings';
 /** 관리자 설정 — 정답특전 유튜브 링크 */
 export const QUIZ_BONUS_URL_KEY = 'ohome.quizBonusUrl.v1';
+// Import this same key in both the settings editor and quiz completion page.
 /** 서버 저장 실패 알림 — SettingSync가 받아 화면에 띄운다 */
 export const ERR_EVT = 'ohome-setting-error';
 
