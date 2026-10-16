@@ -2899,7 +2899,8 @@ function BgmPane() {
       mp3: 'audio/mpeg', wav: 'audio/wav', ogg: 'audio/ogg',
       m4a: 'audio/mp4', aac: 'audio/aac', flac: 'audio/flac', webm: 'audio/webm',
     };
-    const blob = file.type ? file : new Blob([file], { type: mimeByExt[ext] ?? 'application/octet-stream' });
+    // 파일 시스템이 돌려주는 MIME이 비어 있거나 부정확할 수 있으므로 확장자 기준 MIME으로 서버에 올린다.
+    const blob = new Blob([file], { type: mimeByExt[ext] ?? 'application/octet-stream' });
     const trackTitle = title.trim() || file.name.replace(/\.[^.]+$/, '');
     setUploading(true);
     try {
