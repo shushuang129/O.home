@@ -2881,14 +2881,17 @@ function BgmPane() {
     const allowed = ['mp3', 'wav', 'ogg', 'm4a', 'aac', 'flac', 'webm'];
     if (!allowed.includes(ext)) {
       toast('MP3, WAV, OGG, M4A, AAC, FLAC, WEBM 음원 파일을 선택해 주세요');
+      if (fileRef.current) fileRef.current.value = '';
       return;
     }
-    if (file.size > 25 * 1024 * 1024) {
-      toast('음원 파일은 25MB 이하로 올려 주세요');
+    if (file.size >= 19 * 1024 * 1024) {
+      toast('음원 파일은 19MB 미만으로 올려 주세요');
+      if (fileRef.current) fileRef.current.value = '';
       return;
     }
     if (!isServerMode() || !backend()) {
       toast('파일 업로드를 사용하려면 Supabase 또는 Firebase 서버 저장소를 먼저 연결해 주세요');
+      if (fileRef.current) fileRef.current.value = '';
       return;
     }
 
@@ -2944,7 +2947,7 @@ function BgmPane() {
         <button className="btn btn-dark" disabled={uploading} onClick={() => fileRef.current?.click()}>
           {uploading ? '업로드 중…' : '↑ 음원 파일 업로드'}
         </button>
-        <small style={{ color: 'var(--faint)', fontSize: 11 }}>MP3 등 오디오 파일 · 최대 25MB · 서버 저장소 필요</small>
+        <small style={{ color: 'var(--faint)', fontSize: 11 }}>MP3 등 오디오 파일 · 19MB 미만 · 서버 저장소 필요</small>
       </div>
 
       <div className="set-row" style={{ marginTop: 16 }}>
