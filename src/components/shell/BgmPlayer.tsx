@@ -165,6 +165,7 @@ export function BgmPlayer() {
     if (!t) return;
     setIdx(i);
     idxRef.current = i;
+    trackRef.current = t; // 재생 상태 이벤트가 늦게 와도 방금 선택한 트랙 타입을 기준으로 처리
 
     // 업로드한 오디오 파일 트랙
     if (t.audioUrl) {
@@ -177,6 +178,9 @@ export function BgmPlayer() {
       if (audio.src !== targetUrl) {
         audio.src = t.audioUrl;
         audio.load();
+      } else {
+        // 목록에서 같은 곡을 다시 선택했을 때 처음부터 재생
+        try { audio.currentTime = 0; } catch { /* 메타데이터 로드 전이면 무시 */ }
       }
       audio.volume = volume / 100;
       void audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
