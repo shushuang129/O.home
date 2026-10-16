@@ -2879,7 +2879,7 @@ function BgmPane() {
     if (!file) return;
     const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
     const allowed = ['mp3', 'wav', 'ogg', 'm4a', 'aac', 'flac', 'webm'];
-    if (!allowed.includes(ext) || (!file.type.startsWith('audio/') && !['mp3', 'm4a', 'aac', 'flac'].includes(ext))) {
+    if (!allowed.includes(ext)) {
       toast('MP3, WAV, OGG, M4A, AAC, FLAC, WEBM 음원 파일을 선택해 주세요');
       return;
     }
