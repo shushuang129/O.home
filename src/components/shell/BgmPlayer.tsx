@@ -230,22 +230,22 @@ export function BgmPlayer() {
   const armedRef = useRef(false);
 
   // 자동 재생이 켜져 있을 때 방명록 진입 시 재생을 시도한다.
-  // 브라우저가 차단하면 방명록 첫 상호작용에서 재시도하며 다른 페이지에서는 자동 시작하지 않는다.
+  // 차단되면 방명록에서 첫 마우스 클릭 한 번만 재시도한다.
+  // 첫 클릭이 플레이어 안에서 일어나도 감지기를 즉시 해제해,
+  // 사용자가 일시정지한 뒤 다른 곳을 눌러 음악이 다시 켜지는 일을 막는다.
   useEffect(() => {
     if (pathname !== '/guest' || !settings.autoplay || !settings.enabled || tracks.length === 0) return;
     if (!playingRef.current) playAtRef.current(idxRef.current);
-    const retry = (ev: Event) => {
-      if (rootRef.current?.contains(ev.target as Node)) return;
-      if (playingRef.current) { remove(); return; }
+    const retry = (ev: PointerEvent) => {
       remove();
+      if (rootRef.current?.contains(ev.target as Node)) return;
+      if (playingRef.current) return;
       playAtRef.current(idxRef.current);
     };
     const remove = () => {
       window.removeEventListener('pointerdown', retry, true);
-      window.removeEventListener('keydown', retry, true);
     };
     window.addEventListener('pointerdown', retry, true);
-    window.addEventListener('keydown', retry, true);
     return remove;
   }, [pathname, settings.autoplay, settings.enabled, tracks.length, youtubeTracksSignature]);
 
