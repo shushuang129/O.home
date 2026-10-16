@@ -2798,25 +2798,40 @@ function BgmTrackRow({ t, onPatch, onDelete }: {
   const [url, setUrl] = useState(t.videoId);
 
   if (editing) {
+    const saveText = () => {
+      if (!title.trim()) { toast('곡 제목을 입력해 주세요'); return; }
+      if (t.audioUrl) {
+        onPatch({ title: title.trim(), desc: desc.trim() });
+      } else {
+        const vid = parseVideoId(url);
+        if (!vid) { toast('올바른 유튜브 URL(또는 영상 ID)을 입력해 주세요'); return; }
+        onPatch({ title: title.trim(), desc: desc.trim(), videoId: vid, audioUrl: undefined });
+      }
+      setEditing(false);
+      toast('곡이 수정되었습니다');
+    };
+
     return (
       <div style={{ display: 'grid', gap: 7, padding: '10px 0', borderBottom: '1px dashed var(--line)', width: '100%' }}>
         <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
           <KInput placeholder="곡 제목" value={title} onChange={e => setTitle(e.target.value)} style={{ maxWidth: 150 }} />
           <KInput placeholder="설명 (선택)" value={desc} onChange={e => setDesc(e.target.value)} style={{ flex: 1, minWidth: 130 }} />
         </div>
-        <div style={{ display: 'flex', gap: 7 }}>
-          <KInput placeholder="유튜브 URL 또는 영상 ID" value={url} onChange={e => setUrl(e.target.value)} />
-          <button className="btn btn-dark" style={{ whiteSpace: 'nowrap' }}
-            onClick={() => {
-              const vid = parseVideoId(url);
-              if (!title.trim() || !vid) { toast('제목과 올바른 유튜브 URL(또는 영상 ID)을 입력해 주세요'); return; }
-              onPatch({ title: title.trim(), desc: desc.trim(), videoId: vid });
-              setEditing(false);
-              toast('곡이 수정되었습니다');
-            }}>SAVE</button>
-          <button className="btn btn-ghost" style={{ whiteSpace: 'nowrap' }}
-            onClick={() => { setEditing(false); setTitle(t.title); setDesc(t.desc); setUrl(t.videoId); }}>CANCEL</button>
-        </div>
+        {!t.audioUrl && (
+          <div style={{ display: 'flex', gap: 7 }}>
+            <KInput placeholder="유튜브 URL 또는 영상 ID" value={url} onChange={e => setUrl(e.target.value)} />
+            <button className="btn btn-dark" style={{ whiteSpace: 'nowrap' }} onClick={saveText}>SAVE</button>
+            <button className="btn btn-ghost" style={{ whiteSpace: 'nowrap' }}
+              onClick={() => { setEditing(false); setTitle(t.title); setDesc(t.desc); setUrl(t.videoId); }}>CANCEL</button>
+          </div>
+        )}
+        {t.audioUrl && (
+          <div style={{ display: 'flex', gap: 7, justifyContent: 'flex-end' }}>
+            <button className="btn btn-dark" style={{ whiteSpace: 'nowrap' }} onClick={saveText}>SAVE</button>
+            <button className="btn btn-ghost" style={{ whiteSpace: 'nowrap' }}
+              onClick={() => { setEditing(false); setTitle(t.title); setDesc(t.desc); setUrl(t.videoId); }}>CANCEL</button>
+          </div>
+        )}
       </div>
     );
   }
@@ -2825,7 +2840,10 @@ function BgmTrackRow({ t, onPatch, onDelete }: {
     <div className="set-row" style={{ width: '100%' }}>
       <div className="l" style={{ display: 'flex', gap: 11, alignItems: 'center' }}>
         <span className="drag-h">⠿</span>
-        <div><b>{t.title}</b><small>{t.desc || t.videoId}</small></div>
+        <div>
+          <b>{t.title}{t.audioUrl ? ' · 파일 음원' : ''}</b>
+          <small>{t.desc || (t.audioUrl ? '서버에 저장된 파일 음원' : t.videoId)}</small>
+        </div>
       </div>
       <div style={{ display: 'flex', gap: 6 }}>
         <button className="btn btn-ghost" style={{ padding: '4px 10px', fontSize: 10.5 }}
@@ -2839,12 +2857,14 @@ function BgmTrackRow({ t, onPatch, onDelete }: {
 
 /** BGM 탭 (5.2 v1.9) — 곡 목록 등록(미니 플레이어 리스트에 노출) + 재생 설정 */
 function BgmPane() {
-  const { state, setTracks, addTrack, removeTrack, setSettings } = useBgm();
+  const { state, setTracks, addTrack, addAudioTrack, removeTrack, setSettings } = useBgm();
   const toast = useToast();
   const del = useConfirmDelete();
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
   const [url, setUrl] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const add = () => {
     if (addTrack(title, desc, url)) {
@@ -2855,10 +2875,49 @@ function BgmPane() {
     }
   };
 
+  const uploadAudio = async (file?: File) => {
+    if (!file) return;
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+    const allowed = ['mp3', 'wav', 'ogg', 'm4a', 'aac', 'flac', 'webm'];
+    if (!allowed.includes(ext) || (!file.type.startsWith('audio/') && !['mp3', 'm4a', 'aac', 'flac'].includes(ext))) {
+      toast('MP3, WAV, OGG, M4A, AAC, FLAC, WEBM 음원 파일을 선택해 주세요');
+      return;
+    }
+    if (file.size > 25 * 1024 * 1024) {
+      toast('음원 파일은 25MB 이하로 올려 주세요');
+      return;
+    }
+    if (!isServerMode() || !backend()) {
+      toast('파일 업로드를 사용하려면 Supabase 또는 Firebase 서버 저장소를 먼저 연결해 주세요');
+      return;
+    }
+
+    const mimeByExt: Record<string, string> = {
+      mp3: 'audio/mpeg', wav: 'audio/wav', ogg: 'audio/ogg',
+      m4a: 'audio/mp4', aac: 'audio/aac', flac: 'audio/flac', webm: 'audio/webm',
+    };
+    const blob = file.type ? file : new Blob([file], { type: mimeByExt[ext] ?? 'application/octet-stream' });
+    const trackTitle = title.trim() || file.name.replace(/\.[^.]+$/, '');
+    setUploading(true);
+    try {
+      const audioUrl = await backend()!.uploadFile(blob, ext);
+      const ok = addAudioTrack(trackTitle, desc, audioUrl);
+      if (!ok) { toast('곡 제목을 확인해 주세요'); return; }
+      setTitle(''); setDesc(''); setUrl('');
+      toast('음원 파일을 서버에 저장하고 목록에 추가했습니다');
+    } catch (err) {
+      const message = err instanceof Error && err.message ? ` — ${err.message}` : '';
+      toast(`음원 업로드에 실패했습니다${message}`);
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
+  };
+
   return (
     <div className="set-sec">
       <h3>BGM</h3>
-      <div className="d">유튜브 곡 목록 관리 — 미니 플레이어 리스트에 노출 · 화면은 숨기고 소리만 재생</div>
+      <div className="d">유튜브 링크 또는 직접 업로드한 음원 파일을 등록합니다. 업로드한 파일은 서버 저장소에 저장되어 모든 방문자에게 재생됩니다.</div>
 
       <DragList
         items={state.tracks}
@@ -2873,10 +2932,19 @@ function BgmPane() {
       {del.element}
 
       <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
-        <KInput placeholder="곡 제목" value={title} onChange={e => setTitle(e.target.value)} style={{ maxWidth: 150 }} />
-        <KInput placeholder="설명 (선택)" value={desc} onChange={e => setDesc(e.target.value)} style={{ maxWidth: 130 }} />
+        <KInput placeholder="곡 제목 (파일 업로드 시 비워 두면 파일명 사용)" value={title} onChange={e => setTitle(e.target.value)} style={{ maxWidth: 240 }} />
+        <KInput placeholder="설명 (선택)" value={desc} onChange={e => setDesc(e.target.value)} style={{ maxWidth: 160 }} />
         <KInput placeholder="유튜브 URL 또는 영상 ID" value={url} onChange={e => setUrl(e.target.value)} style={{ flex: 1, minWidth: 180 }} />
-        <button className="btn btn-dark" onClick={add}>＋ ADD</button>
+        <button className="btn btn-dark" onClick={add}>＋ YOUTUBE</button>
+      </div>
+
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginTop: 9 }}>
+        <input ref={fileRef} type="file" accept="audio/*,.mp3,.wav,.ogg,.m4a,.aac,.flac,.webm" style={{ display: 'none' }}
+          onChange={e => { void uploadAudio(e.target.files?.[0]); }} />
+        <button className="btn btn-dark" disabled={uploading} onClick={() => fileRef.current?.click()}>
+          {uploading ? '업로드 중…' : '↑ 음원 파일 업로드'}
+        </button>
+        <small style={{ color: 'var(--faint)', fontSize: 11 }}>MP3 등 오디오 파일 · 최대 25MB · 서버 저장소 필요</small>
       </div>
 
       <div className="set-row" style={{ marginTop: 16 }}>
@@ -2903,12 +2971,10 @@ function BgmPane() {
         <KToggle checked={state.settings.enabled} onChange={v => setSettings({ enabled: v })} />
       </div>
       <div className="set-row">
-        <div className="l"><b>재생 방식</b><small>자동: 접속 후 처음 클릭/키 입력하는 순간 재생 (브라우저 정책상 완전 무동작 자동재생은 불가) · 수동: 재생 버튼을 눌러야 재생</small></div>
+        <div className="l"><b>재생 방식</b><small>사이트 전체 자동 재생은 첫 상호작용 시 시도하고, 방명록에 진입할 때도 재생을 시도합니다. 브라우저 정책상 차단될 경우 첫 클릭/키 입력 후 재생됩니다.</small></div>
         <div className="mini-seg">
-          <button className={state.settings.autoplay ? 'on' : ''}
-            onClick={() => setSettings({ autoplay: true })}>접속 시 자동 재생</button>
-          <button className={!state.settings.autoplay ? 'on' : ''}
-            onClick={() => setSettings({ autoplay: false })}>버튼 눌러야 재생</button>
+          <button className={state.settings.autoplay ? 'on' : ''} onClick={() => setSettings({ autoplay: true })}>접속 시 자동 재생</button>
+          <button className={!state.settings.autoplay ? 'on' : ''} onClick={() => setSettings({ autoplay: false })}>버튼 눌러야 재생</button>
         </div>
       </div>
     </div>
