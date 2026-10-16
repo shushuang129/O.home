@@ -12,6 +12,7 @@ import { Modal, useConfirmDelete } from '@/components/ui/Modal';
 import { EditableDesc, PageTitle } from '@/components/ui/PageText';
 import { useToast } from '@/components/ui/Toast';
 import { pushNotif, notifyAdmins } from '@/lib/notifStore';
+import { getSetting, onSettingChange, GUESTBOOK_VIEW_MODE_KEY } from '@/lib/settingStore';
 
 export default function GuestbookPage() {
   const { user, isAdmin } = useAuth();
@@ -27,7 +28,9 @@ export default function GuestbookPage() {
   const [gName, setGName] = useState('');
   const [q, setQ] = useState('');
   type GuestViewMode = 'latest' | 'chronological';
-  const [viewMode, setViewMode] = useState<GuestViewMode>('latest');
+  const [viewMode, setViewMode] = useState<GuestViewMode>(() =>
+    getSetting<GuestViewMode>(GUESTBOOK_VIEW_MODE_KEY, 'latest')
+  );
   const [replyFor, setReplyFor] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
   const [replyName, setReplyName] = useState('');   // 손님 답글 닉네임
@@ -114,19 +117,14 @@ export default function GuestbookPage() {
   const removeReply = (c: Comment) =>
     del.ask('이 답글을 삭제하시겠습니까?', () => setCmtRows(cmtRows.filter(x => x.id !== c.id)));
 
-  // 보기 방식은 이 브라우저에 기억한다. 기본은 기존 최신순 보기.
-  useEffect(() => {
-    try {
-      if (localStorage.getItem('ohome.guest.viewMode.v1') === 'chronological') {
-        setViewMode('chronological');
-      }
-    } catch { /* 저장을 사용할 수 없어도 방명록은 계속 동작 */ }
-  }, []);
-  const changeViewMode = (mode: GuestViewMode) => {
-    setViewMode(mode);
-    setPage(1);
-    try { localStorage.setItem('ohome.guest.viewMode.v1', mode); } catch { /* 무시 */ }
-  };
+  // 사이트 전체 방명록 설정을 사용한다. 같은 브라우저에서 설정이 갱신되면 즉시 반영.
+  useEffect(() => onSettingChange(key => {
+    if (key === GUESTBOOK_VIEW_MODE_KEY) {
+      const next = getSetting<GuestViewMode>(GUESTBOOK_VIEW_MODE_KEY, 'latest');
+      setViewMode(next);
+      setPage(1);
+    }
+  }), []);
 
   // 기존 보기는 최신 글부터, 연출 보기는 오래된 글부터 날짜순으로 표시한다.
   const visible = (q
@@ -170,32 +168,13 @@ export default function GuestbookPage() {
         </div>
       </div>
 
-      {/* 보기 방식 */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
-        <span style={{ fontSize: 11, letterSpacing: '.08em', color: 'var(--faint)' }}>방명록 보기</span>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          <button
-            className={viewMode === 'latest' ? 'btn btn-dark' : 'btn btn-ghost'}
-            style={{ minHeight: 32, padding: '0 12px', fontSize: 11 }}
-            aria-pressed={viewMode === 'latest'}
-            onClick={() => changeViewMode('latest')}
-          >기존 보기 · 최신순</button>
-          <button
-            className={viewMode === 'chronological' ? 'btn btn-dark' : 'btn btn-ghost'}
-            style={{ minHeight: 32, padding: '0 12px', fontSize: 11 }}
-            aria-pressed={viewMode === 'chronological'}
-            onClick={() => changeViewMode('chronological')}
-          >시간순 · 하나씩 등장</button>
-        </div>
-      </div>
-
       {/* 목록 */}
       <div className="panel flush">
         {visible.slice(start, start + PER_GB).map((e, i) => (
           <div
             className={`gb-item ${viewMode === 'chronological' ? 'ohome-guest-reveal' : ''}`}
             key={e.id}
-            style={viewMode === 'chronological' ? { animationDelay: `${Math.min(i * 150, 2100)}ms` } : undefined}
+            style={viewMode === 'chronological' ? { animationDelay: `${i * 2000}ms` } : undefined}
           >
             <div className="hd">
               {canRead(e)
@@ -268,7 +247,7 @@ export default function GuestbookPage() {
         }
         .gb-item.ohome-guest-reveal {
           opacity: 0;
-          animation: ohomeGuestbookEntry 460ms cubic-bezier(.2, .7, .2, 1) both;
+          animation: ohomeGuestbookEntry 650ms cubic-bezier(.2, .7, .2, 1) both;
         }
         @media (prefers-reduced-motion: reduce) {
           .gb-item.ohome-guest-reveal {
