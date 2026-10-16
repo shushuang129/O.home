@@ -297,7 +297,8 @@ export function BgmPlayer() {
     window.addEventListener('pointerup', up);
   };
 
-  if (!settings.enabled || tracks.length === 0) return null;
+  // BGM 플레이어 UI는 방명록 페이지에서만 표시한다.
+  if (pathname !== '/guest' || !settings.enabled || tracks.length === 0) return null;
 
   return (
     <div
