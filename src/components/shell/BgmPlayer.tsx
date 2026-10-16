@@ -224,36 +224,15 @@ export function BgmPlayer() {
   const nextRef = useRef(next);
   nextRef.current = next;
 
-  // 입장 자동 재생 (4.1) — 브라우저 정책상 완전 자동재생은 불가하므로
-  // 방문자의 "첫 상호작용(클릭/키)"과 동시에 재생을 시작 (1회만)
+  // 자동 재생 상태는 기존 플레이어와 공유하지만, 자동 시작은 방명록 효과에서만 처리한다.
   const playingRef = useRef(playing);
   playingRef.current = playing;
   const armedRef = useRef(false);
-  useEffect(() => {
-    // 방명록 전용 자동 재생·재시도는 아래 효과가 처리한다
-    if (pathname === '/guest' || !settings.autoplay || !settings.enabled || tracks.length === 0) return;
-    const fire = (ev: Event) => {
-      remove();
-      // 플레이어 자체를 조작하는 클릭(재생/이전/다음 등)은 버튼 핸들러에 맡김 —
-      // 여기서 먼저 재생을 시작하면 곧이어 오는 버튼 click이 "일시정지"로 뒤집힘
-      if (rootRef.current?.contains(ev.target as Node)) return;
-      if (playingRef.current) return;
-      // YouTube와 업로드 파일 모두 동일한 재생 경로 사용
-      playAtRef.current(idxRef.current);
-    };
-    const remove = () => {
-      window.removeEventListener('pointerdown', fire, true);
-      window.removeEventListener('keydown', fire, true);
-    };
-    window.addEventListener('pointerdown', fire, true);
-    window.addEventListener('keydown', fire, true);
-    return remove;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname, settings.autoplay, settings.enabled, tracks.length, youtubeTracksSignature]);
 
-  // 방명록에 진입하면 재생을 시도한다. 브라우저가 차단할 경우 첫 상호작용에서 다시 시도한다.
+  // 자동 재생이 켜져 있을 때 방명록 진입 시 재생을 시도한다.
+  // 브라우저가 차단하면 방명록 첫 상호작용에서 재시도하며 다른 페이지에서는 자동 시작하지 않는다.
   useEffect(() => {
-    if (pathname !== '/guest' || !settings.enabled || tracks.length === 0) return;
+    if (pathname !== '/guest' || !settings.autoplay || !settings.enabled || tracks.length === 0) return;
     if (!playingRef.current) playAtRef.current(idxRef.current);
     const retry = (ev: Event) => {
       if (rootRef.current?.contains(ev.target as Node)) return;
@@ -268,7 +247,7 @@ export function BgmPlayer() {
     window.addEventListener('pointerdown', retry, true);
     window.addEventListener('keydown', retry, true);
     return remove;
-  }, [pathname, settings.enabled, tracks.length, youtubeTracksSignature]);
+  }, [pathname, settings.autoplay, settings.enabled, tracks.length, youtubeTracksSignature]);
 
   const prev = () => playAt((idxRef.current - 1 + tracks.length) % tracks.length);
 
