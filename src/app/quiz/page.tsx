@@ -1,6 +1,7 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './quiz.module.css';
+import { getSetting, onSettingChange, QUIZ_BONUS_URL_KEY } from '@/lib/settingStore';
 
 type Question = { title: string; answers: string[]; audio: string };
 
@@ -29,7 +30,15 @@ export default function QuizPage() {
   const [finished, setFinished] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [feedback, setFeedback] = useState('');
+  const [bonusUrl, setBonusUrl] = useState('');
   const question = QUESTIONS[order[index] ?? 0];
+
+  useEffect(() => {
+    setBonusUrl(getSetting<string>(QUIZ_BONUS_URL_KEY, ''));
+    return onSettingChange(key => {
+      if (key === QUIZ_BONUS_URL_KEY) setBonusUrl(getSetting<string>(QUIZ_BONUS_URL_KEY, ''));
+    });
+  }, []);
 
   useEffect(() => {
     setInput(''); setChecked(false); setFeedback(''); setPlaying(false);
@@ -126,7 +135,15 @@ export default function QuizPage() {
           <div className={styles.celebrationSongs}>
             {results.map((r, i) => <span className={styles.songTag} key={i}>✓ {r.title}</span>)}
           </div>
-          <button className={styles.againButton} type="button" onClick={start}>다시 풀기 ↻</button>
+          <div className={styles.celebrationActions}>
+            <button className={styles.againButton} type="button" onClick={start}>다시 풀기 ↻</button>
+            {bonusUrl ? (
+              <a className={styles.bonusButton} href={bonusUrl} target="_blank" rel="noopener noreferrer">정답특전 ↗</a>
+            ) : (
+              <button className={[styles.bonusButton, styles.bonusButtonDisabled].join(' ')} type="button" disabled
+                title="환경설정의 퀴즈 탭에서 유튜브 링크를 등록해 주세요">정답특전</button>
+            )}
+          </div>
         </div>}
       </section>
     </main>}
