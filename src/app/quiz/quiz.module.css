@@ -60,6 +60,13 @@
 .celebrationSongs{position:relative;z-index:1;display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin:0 auto 18px;max-width:460px}
 .songTag{display:inline-block;padding:6px 10px;border:1px solid var(--blue-soft);background:rgba(255,255,255,.78);font-size:12px;color:#668f9d}
 .celebration .againButton{position:relative;z-index:1;margin-top:0}
+.celebrationActions{position:relative;z-index:1;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:9px;margin-top:0}
+.celebrationActions .againButton{margin-top:0}
+.bonusButton{display:inline-flex;align-items:center;justify-content:center;min-height:43px;padding:11px 19px;border:1px solid var(--blue);background:transparent;color:var(--blue);font:500 14px 'Noto Sans KR',sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer;transition:background .2s,color .2s,transform .2s,border-color .2s}
+.bonusButton:hover:not(:disabled){transform:translateY(-2px);background:var(--blue);color:#fff}
+.bonusButton:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.bonusButtonDisabled,.bonusButtonDisabled:disabled{opacity:.42;cursor:not-allowed}
+
 .firework{position:absolute;left:10%;top:33%;width:126px;height:126px;border-radius:50%;z-index:0;pointer-events:none;opacity:0;background:repeating-conic-gradient(from 0deg,transparent 0deg 8deg,rgba(125,166,178,.9) 9deg 11deg,transparent 12deg 22.5deg);-webkit-mask-image:radial-gradient(circle,transparent 0 10%,#000 11% 100%);mask-image:radial-gradient(circle,transparent 0 10%,#000 11% 100%);animation:fireworkBurst 2.5s cubic-bezier(.12,.7,.22,1) infinite}
 .fireworkSecond{left:auto;right:9%;top:19%;width:102px;height:102px;--firework-delay:.65s;background:repeating-conic-gradient(from 7deg,transparent 0deg 8deg,rgba(231,184,176,.9) 9deg 11deg,transparent 12deg 22.5deg);animation-delay:var(--firework-delay)}
 .fireworkThird{left:47%;top:auto;bottom:7%;width:85px;height:85px;--firework-delay:1.25s;background:repeating-conic-gradient(from 2deg,transparent 0deg 8deg,rgba(208,190,143,.9) 9deg 11deg,transparent 12deg 22.5deg);animation-delay:var(--firework-delay)}
