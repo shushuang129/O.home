@@ -18,7 +18,7 @@ export interface BgmSettings {
   shuffle: boolean;
   repeat: boolean;
   enabled: boolean;            // 플레이어 표시 여부
-  autoplay: boolean;           // 입장 후 첫 상호작용 시 자동 재생 (4.1 — 정책상 완전 자동재생은 불가)
+  autoplay: boolean;           // 방명록 진입 시 자동 재생 시도 (브라우저 정책에 따라 첫 상호작용 필요)
 }
 
 interface BgmState { tracks: BgmTrack[]; settings: BgmSettings }
