@@ -8,7 +8,8 @@ export interface BgmTrack {
   id: string;
   title: string;
   desc: string;
-  videoId: string;   // 유튜브 영상 ID
+  videoId: string;   // 유튜브 영상 ID (파일 음원은 빈 문자열)
+  audioUrl?: string; // 서버 저장소에 업로드한 파일 음원 공개 URL
 }
 
 export interface BgmSettings {
@@ -34,6 +35,7 @@ interface BgmCtx {
   state: BgmState;
   setTracks: (t: BgmTrack[]) => void;
   addTrack: (title: string, desc: string, urlOrId: string) => boolean;
+  addAudioTrack: (title: string, desc: string, audioUrl: string) => boolean;
   removeTrack: (id: string) => void;
   setSettings: (patch: Partial<BgmSettings>) => void;
 }
@@ -79,6 +81,15 @@ export function BgmStoreProvider({ children }: { children: React.ReactNode }) {
     return true;
   }, []);
 
+  const addAudioTrack = useCallback((title: string, desc: string, audioUrl: string): boolean => {
+    if (!title.trim() || !audioUrl.trim()) return false;
+    setState(s => {
+      const n = { ...s, tracks: [...s.tracks, { id: newId(), title: title.trim(), desc: desc.trim(), videoId: '', audioUrl: audioUrl.trim() }] };
+      persist(n); return n;
+    });
+    return true;
+  }, []);
+
   const removeTrack = useCallback((id: string) => {
     setState(s => { const n = { ...s, tracks: s.tracks.filter(t => t.id !== id) }; persist(n); return n; });
   }, []);
@@ -87,7 +98,7 @@ export function BgmStoreProvider({ children }: { children: React.ReactNode }) {
     setState(s => { const n = { ...s, settings: { ...s.settings, ...patch } }; persist(n); return n; });
   }, []);
 
-  return <Ctx.Provider value={{ state, setTracks, addTrack, removeTrack, setSettings }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ state, setTracks, addTrack, addAudioTrack, removeTrack, setSettings }}>{children}</Ctx.Provider>;
 }
 
 export function useBgm(): BgmCtx {
