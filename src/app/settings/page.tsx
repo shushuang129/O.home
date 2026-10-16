@@ -2975,10 +2975,10 @@ function BgmPane() {
         <KToggle checked={state.settings.enabled} onChange={v => setSettings({ enabled: v })} />
       </div>
       <div className="set-row">
-        <div className="l"><b>재생 방식</b><small>사이트 전체 자동 재생은 첫 상호작용 시 시도하고, 방명록에 진입할 때도 재생을 시도합니다. 브라우저 정책상 차단될 경우 첫 클릭/키 입력 후 재생됩니다.</small></div>
+        <div className="l"><b>재생 방식</b><small>켜면 방명록에 들어갈 때만 자동 재생을 시도합니다. 다른 페이지에서는 자동 재생하지 않으며, 브라우저가 차단하면 방명록에서 첫 클릭/키 입력 후 다시 시도합니다.</small></div>
         <div className="mini-seg">
-          <button className={state.settings.autoplay ? 'on' : ''} onClick={() => setSettings({ autoplay: true })}>접속 시 자동 재생</button>
-          <button className={!state.settings.autoplay ? 'on' : ''} onClick={() => setSettings({ autoplay: false })}>버튼 눌러야 재생</button>
+          <button className={state.settings.autoplay ? 'on' : ''} onClick={() => setSettings({ autoplay: true })}>방명록 진입 시 자동 재생</button>
+          <button className={!state.settings.autoplay ? 'on' : ''} onClick={() => setSettings({ autoplay: false })}>자동 재생 안 함</button>
         </div>
       </div>
     </div>
