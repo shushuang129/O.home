@@ -26,6 +26,8 @@ export default function GuestbookPage() {
   const [secret, setSecret] = useState(false);
   const [gName, setGName] = useState('');
   const [q, setQ] = useState('');
+  type GuestViewMode = 'latest' | 'chronological';
+  const [viewMode, setViewMode] = useState<GuestViewMode>('latest');
   const [replyFor, setReplyFor] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
   const [replyName, setReplyName] = useState('');   // 손님 답글 닉네임
@@ -112,11 +114,29 @@ export default function GuestbookPage() {
   const removeReply = (c: Comment) =>
     del.ask('이 답글을 삭제하시겠습니까?', () => setCmtRows(cmtRows.filter(x => x.id !== c.id)));
 
-  // 최신 글이 위로 — 저장은 뒤에 붙이므로(위 참조) 보여 줄 때 날짜 내림차순으로 세운다
+  // 보기 방식은 이 브라우저에 기억한다. 기본은 기존 최신순 보기.
+  useEffect(() => {
+    try {
+      if (localStorage.getItem('ohome.guest.viewMode.v1') === 'chronological') {
+        setViewMode('chronological');
+      }
+    } catch { /* 저장을 사용할 수 없어도 방명록은 계속 동작 */ }
+  }, []);
+  const changeViewMode = (mode: GuestViewMode) => {
+    setViewMode(mode);
+    setPage(1);
+    try { localStorage.setItem('ohome.guest.viewMode.v1', mode); } catch { /* 무시 */ }
+  };
+
+  // 기존 보기는 최신 글부터, 연출 보기는 오래된 글부터 날짜순으로 표시한다.
   const visible = (q
     ? entries.filter(e => canRead(e) && (e.body.includes(q) || e.author.includes(q)))
     : entries
-  ).slice().sort((a, b) => b.date.localeCompare(a.date));
+  ).slice().sort((a, b) =>
+    viewMode === 'chronological'
+      ? a.date.localeCompare(b.date)
+      : b.date.localeCompare(a.date)
+  );
 
   // 방명록이 쌓이면 페이지로 (v2.0 사용자 요청) — 한 페이지 15개.
   // 답글이 달리면 한 칸이 길어지므로 도토리(12개)보다 조금만 늘렸다.
@@ -125,7 +145,7 @@ export default function GuestbookPage() {
   const pages = Math.max(1, Math.ceil(visible.length / PER_GB));
   const cur = Math.min(page, pages);      // 검색·삭제로 줄어 페이지가 사라지면 마지막으로 당긴다
   const start = (cur - 1) * PER_GB;
-  useEffect(() => { setPage(1); }, [q]);  // 검색어가 바뀌면 첫 장부터
+  useEffect(() => { setPage(1); }, [q, viewMode]);  // 검색어·보기 방식이 바뀌면 첫 장부터
 
   return (
     <section className="page">
@@ -150,10 +170,33 @@ export default function GuestbookPage() {
         </div>
       </div>
 
+      {/* 보기 방식 */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
+        <span style={{ fontSize: 11, letterSpacing: '.08em', color: 'var(--faint)' }}>방명록 보기</span>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          <button
+            className={viewMode === 'latest' ? 'btn btn-dark' : 'btn btn-ghost'}
+            style={{ minHeight: 32, padding: '0 12px', fontSize: 11 }}
+            aria-pressed={viewMode === 'latest'}
+            onClick={() => changeViewMode('latest')}
+          >기존 보기 · 최신순</button>
+          <button
+            className={viewMode === 'chronological' ? 'btn btn-dark' : 'btn btn-ghost'}
+            style={{ minHeight: 32, padding: '0 12px', fontSize: 11 }}
+            aria-pressed={viewMode === 'chronological'}
+            onClick={() => changeViewMode('chronological')}
+          >시간순 · 하나씩 등장</button>
+        </div>
+      </div>
+
       {/* 목록 */}
       <div className="panel flush">
-        {visible.slice(start, start + PER_GB).map(e => (
-          <div className="gb-item" key={e.id}>
+        {visible.slice(start, start + PER_GB).map((e, i) => (
+          <div
+            className={`gb-item ${viewMode === 'chronological' ? 'ohome-guest-reveal' : ''}`}
+            key={e.id}
+            style={viewMode === 'chronological' ? { animationDelay: `${Math.min(i * 150, 2100)}ms` } : undefined}
+          >
             <div className="hd">
               {canRead(e)
                 ? <b>{e.secret && '🔒 '}{e.author}</b>
@@ -217,6 +260,25 @@ export default function GuestbookPage() {
         </>}>
         <p style={{ fontSize: 13, color: 'var(--sub)' }}>이 방명록을 삭제할까요?</p>
       </Modal>
+
+      <style jsx global>{`
+        @keyframes ohomeGuestbookEntry {
+          from { opacity: 0; transform: translateY(9px); filter: blur(2px); }
+          to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+        .gb-item.ohome-guest-reveal {
+          opacity: 0;
+          animation: ohomeGuestbookEntry 460ms cubic-bezier(.2, .7, .2, 1) both;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .gb-item.ohome-guest-reveal {
+            opacity: 1 !important;
+            animation: none !important;
+            transform: none !important;
+            filter: none !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
