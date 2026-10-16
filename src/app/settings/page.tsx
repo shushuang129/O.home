@@ -3218,7 +3218,7 @@ function QuizBonusPane() {
 
 
 /** 방문자 모두에게 적용되는 방명록 표시 방식 */
-type GuestbookViewMode = 'latest' | 'chronological';
+type GuestbookViewMode = 'latest' | 'chronological' | 'oldest';
 function GuestbookPane() {
   const toast = useToast();
   const [mode, setMode] = useState<GuestbookViewMode>(() =>
@@ -3230,7 +3230,9 @@ function GuestbookPane() {
     setSetting(GUESTBOOK_VIEW_MODE_KEY, next);
     toast(next === 'latest'
       ? '방명록을 기존 최신순 보기로 설정했습니다'
-      : '방명록을 시간순 · 하나씩 등장으로 설정했습니다');
+      : next === 'oldest'
+        ? '방명록을 오래된 글부터 표시하도록 설정했습니다'
+        : '방명록을 시간순 · 하나씩 등장으로 설정했습니다');
   };
 
   return (
@@ -3240,13 +3242,15 @@ function GuestbookPane() {
       <div className="set-row" style={{ flexWrap: 'wrap' }}>
         <div className="l">
           <b>글 정렬 및 표시</b>
-          <small>시간순 보기는 오래된 글부터 표시하고, 각 글이 약 2초 간격으로 차례대로 나타납니다.</small>
+          <small>오래된 순은 정렬만 바꾸고, 순차 애니메이션은 오래된 글부터 약 2초 간격으로 나타납니다.</small>
         </div>
         <div className="mini-seg">
           <button className={mode === 'latest' ? 'on' : ''} aria-pressed={mode === 'latest'}
-            onClick={() => chooseMode('latest')}>기존 보기 · 최신순</button>
+            onClick={() => chooseMode('latest')}>최신순</button>
+          <button className={mode === 'oldest' ? 'on' : ''} aria-pressed={mode === 'oldest'}
+            onClick={() => chooseMode('oldest')}>오래된 순</button>
           <button className={mode === 'chronological' ? 'on' : ''} aria-pressed={mode === 'chronological'}
-            onClick={() => chooseMode('chronological')}>시간순 · 하나씩 등장</button>
+            onClick={() => chooseMode('chronological')}>오래된 순 + 애니메이션</button>
         </div>
       </div>
       <p className="hint">변경은 자동 저장되며 방명록을 다시 열면 방문자 모두에게 적용됩니다.</p>
